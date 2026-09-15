@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <!-- iPhone Safari 全螢幕與縮放優化 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>日本自由行助手</title>
+  <style>
+    :root {
+      --primary-color: #007aff;
+      --bg-color: #f2f2f7;
+      --card-bg: #ffffff;
+      --text-color: #1c1c1e;
+      --sub-text: #8e8e93;
+      --border-color: #e5e5ea;
+      --danger-color: #ff3b30;
+      --success-color: #34c759;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding-bottom: 90px;
+      font-size: 16px;
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      background: rgba(249, 249, 249, 0.9);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 15px 20px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+      z-index: 100;
+    }
+
+    .container {
+      padding: 15px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Tab Content Display */
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Card Style */
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    /* Form Controls */
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--sub-text);
+      margin-bottom: 4px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      background-color: #fff;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .form-row {
+      display: flex;
+      gap: 10px;
+    }
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    /* Buttons */
+    .btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-danger {
+      background-color: var(--danger-color);
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      width: auto;
+    }
+
+    /* Bottom Navigation Bar (iOS Style) */
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(249, 249, 249, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+      z-index: 1000;
+    }
+    .nav-item {
+      flex: 1;
+      text-align: center;
+      color: var(--sub-text);
+      font-size: 0.75rem;
+      text-decoration: none;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+    .nav-item.active {
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+    .nav-icon {
+      font-size: 1.4rem;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    /* Item Card Details */
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .item-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .item-sub {
+      font-size: 0.85rem;
+      color: var(--sub-text);
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      background: #e5e5ea;
+      color: #3a3a3c;
+      margin-right: 5px;
+    }
+
+    /* Proxy Buy Specifics */
+    .buy-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .buy-item.bought .item-title {
+      text-decoration: line-through;
+      color: var(--sub-text);
+    }
+    .checkbox-custom {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .checkbox-custom.checked {
+      background-color: var(--success-color);
+      border-color: var(--success-color);
+      color: white;
+    }
+    .checkbox-custom.checked::after {
+      content: '✓';
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    /* Rate setting header */
+    .rate-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #eef6ff;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+    }
+    .rate-bar input {
+      width: 80px;
+      padding: 4px 8px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+
+  <header id="header-title">行程規劃</header>
+
+  <div class="container">
+    
+    <!-- 1. 行程 Tab -->
+    <div id="tab-schedule" class="tab-content active">
+      <!-- 新增行程表單 -->
+      <div class="card">
+        <h3 style="margin-bottom: 10px; font-size: 1rem;">➕ 新增行程項</h3>
+        <form id="schedule-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>日期</label>
+              <input type="date" id="sch-date" required>
+            </div>
+            <div class="form-group">
+              <label>天數 (例: Day 1)</label>
+              <input type="text" id="sch-day" placeholder="Day 1" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>開始時間</label>
+              <input type="time" id="sch-start" required>
+            </div>
+            <div class="form-group">
+              <label>結束時間</label>
+              <input type="time" id="sch-end" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>地點 / 景點</label>
+            <input type="text" id="sch-place" placeholder="例如：淺草寺" required>
+          </div>
+          <div class="form-group">
+            <label>預計停留時間 / 備註</label>
+            <input type="text" id="sch-duration" placeholder="例如：2小時、需先預約">
+          </div>
+          <button type="submit" class="btn">新增行程</button>
+        </form>
+      </div>
+
+      <!-- 行程列表 -->
+      <div id="schedule-list"></div>
+    </div>
+
+    <!-- 2. 代購 Tab -->
+    <div id="tab-buy" class="tab-content">
+      
+      <!-- 匯率設定 -->
+      <div class="rate-bar">
+        <span>🇯🇵 日幣換算台幣匯率：</span>
+        <input type="number" id="exchange-rate" step="0.001" value="0.21" onchange="updateRate()">
+      </div>
+
+      <!-- 篩選器 -->
+      <div class="card">
+        <h3 style="margin-bottom: 10px; font-size: 0.9rem; color: var(--sub-text);">🔍 條件篩選</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>分類</label>
+            <select id="filter-category" onchange="renderBuyList()">
+              <option value="ALL">全部分類</option>
+              <option value="藥妝">藥妝</option>
+              <option value="零食">零食</option>
+              <option value="動漫/玩具">動漫/玩具</option>
+              <option value="電器">電器</option>
+              <option value="服飾">服飾</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>購買狀態</label>
+            <select id="filter-status" onchange="renderBuyList()">
+              <option value="ALL">全部狀態</option>
+              <option value="UNBOUGHT">未購買</option>
+              <option value="BOUGHT">已購買</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>委託人</label>
+            <select id="filter-owner" onchange="renderBuyList()">
+              <option value="ALL">全部委託人</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 新增代購表單 -->
+      <div class="card">
+        <h3 style="margin-bottom: 10px; font-size: 1rem;">➕ 新增代購商品</h3>
+        <form id="buy-form">
+          <div class="form-group">
+            <label>商品名稱</label>
+            <input type="text" id="buy-name" placeholder="例如：合利他命 EX" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>分類</label>
+              <select id="buy-category">
+                <option value="藥妝">藥妝</option>
+                <option value="零食">零食</option>
+                <option value="動漫/玩具">動漫/玩具</option>
+                <option value="電器">電器</option>
+                <option value="服飾">服飾</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>數量</label>
+              <input type="number" id="buy-qty" value="1" min="1" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>日幣單價 (円)</label>
+              <input type="number" id="buy-price" placeholder="5000" required>
+            </div>
+            <div class="form-group">
+              <label>委託人</label>
+              <input type="text" id="buy-owner" placeholder="例如：小明" required>
+            </div>
+          </div>
+          <button type="submit" class="btn">新增代購項</button>
+        </form>
+      </div>
+
+      <!-- 代購列表 -->
+      <div id="buy-list"></div>
+    </div>
+
+  </div>
+
+  <!-- 底部分頁導覽列 -->
+  <nav class="nav-bar">
+    <button class="nav-item active" onclick="switchTab('schedule')">
+      <span class="nav-icon">🗺️</span>
+      行程規劃
+    </button>
+    <button class="nav-item" onclick="switchTab('buy')">
+      <span class="nav-icon">🛍️</span>
+      代購清單
+    </button>
+  </nav>
+
+  <script>
+    // --- 資料結構與初始化 ---
+    let schedules = JSON.parse(localStorage.getItem('japan_schedules')) || [];
+    let buyItems = JSON.parse(localStorage.getItem('japan_buyItems')) || [];
+    let exchangeRate = parseFloat(localStorage.getItem('japan_rate')) || 0.21;
+
+    document.getElementById('exchange-rate').value = exchangeRate;
+
+    // --- Tab 切換 logic ---
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+      if (tabName === 'schedule') {
+        document.getElementById('tab-schedule').classList.add('active');
+        document.querySelectorAll('.nav-item')[0].classList.add('active');
+        document.getElementById('header-title').innerText = '行程規劃';
+      } else {
+        document.getElementById('tab-buy').classList.add('active');
+        document.querySelectorAll('.nav-item')[1].classList.add('active');
+        document.getElementById('header-title').innerText = '清單與代購';
+        updateOwnerFilterOptions();
+        renderBuyList();
+      }
+    }
+
+    // --- 匯率相關 ---
+    function updateRate() {
+      const val = parseFloat(document.getElementById('exchange-rate').value);
+      if (!isNaN(val) && val > 0) {
+        exchangeRate = val;
+        localStorage.setItem('japan_rate', exchangeRate);
+        renderBuyList();
+      }
+    }
+
+    // --- 1. 行程管理 logic ---
+    document.getElementById('schedule-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const newItem = {
+        id: Date.now(),
+        date: document.getElementById('sch-date').value,
+        day: document.getElementById('sch-day').value,
+        startTime: document.getElementById('sch-start').value,
+        endTime: document.getElementById('sch-end').value,
+        place: document.getElementById('sch-place').value,
+        duration: document.getElementById('sch-duration').value
+      };
+      schedules.push(newItem);
+      // 依日期與時間排序
+      schedules.sort((a, b) => (a.date + a.startTime).localeCompare(b.date + b.startTime));
+      saveSchedules();
+      renderSchedules();
+      this.reset();
+    });
+
+    function deleteSchedule(id) {
+      if (confirm('確定要刪除此行程嗎？')) {
+        schedules = schedules.filter(item => item.id !== id);
+        saveSchedules();
+        renderSchedules();
+      }
+    }
+
+    function saveSchedules() {
+      localStorage.setItem('japan_schedules', JSON.stringify(schedules));
+    }
+
+    function renderSchedules() {
+      const listEl = document.getElementById('schedule-list');
+      listEl.innerHTML = '';
+
+      if (schedules.length === 0) {
+        listEl.innerHTML = '<div style="text-align:center; color:var(--sub-text); padding:20px;">尚無行程，請點擊上方新增</div>';
+        return;
+      }
+
+      schedules.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="item-header">
+            <div>
+              <span class="tag">${item.day}</span>
+              <span class="item-sub">${item.date}</span>
+            </div>
+            <button class="btn btn-danger" onclick="deleteSchedule(${item.id})">刪除</button>
+          </div>
+          <div class="item-title" style="margin: 6px 0;">${item.place}</div>
+          <div class="item-sub">⏰ ${item.startTime} ~ ${item.endTime} ${item.duration ? `(${item.duration})` : ''}</div>
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    // --- 2. 代購管理 logic ---
+    document.getElementById('buy-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const newItem = {
+        id: Date.now(),
+        name: document.getElementById('buy-name').value,
+        category: document.getElementById('buy-category').value,
+        qty: parseInt(document.getElementById('buy-qty').value),
+        priceJpy: parseFloat(document.getElementById('buy-price').value),
+        owner: document.getElementById('buy-owner').value.trim(),
+        bought: false
+      };
+      buyItems.push(newItem);
+      saveBuyItems();
+      updateOwnerFilterOptions();
+      renderBuyList();
+      this.reset();
+    });
+
+    function toggleBought(id) {
+      const item = buyItems.find(i => i.id === id);
+      if (item) {
+        item.bought = !item.bought;
+        saveBuyItems();
+        renderBuyList();
+      }
+    }
+
+    function deleteBuyItem(id) {
+      if (confirm('確定刪除此代購項目？')) {
+        buyItems = buyItems.filter(i => i.id !== id);
+        saveBuyItems();
+        updateOwnerFilterOptions();
+        renderBuyList();
+      }
+    }
+
+    function saveBuyItems() {
+      localStorage.setItem('japan_buyItems', JSON.stringify(buyItems));
+    }
+
+    function updateOwnerFilterOptions() {
+      const select = document.getElementById('filter-owner');
+      const currentVal = select.value;
+      const owners = [...new Set(buyItems.map(i => i.owner))];
+
+      select.innerHTML = '<option value="ALL">全部委託人</option>';
+      owners.forEach(owner => {
+        const opt = document.createElement('option');
+        opt.value = owner;
+        opt.innerText = owner;
+        select.appendChild(opt);
+      });
+      select.value = currentVal;
+    }
+
+    function renderBuyList() {
+      const listEl = document.getElementById('buy-list');
+      const catFilter = document.getElementById('filter-category').value;
+      const statusFilter = document.getElementById('filter-status').value;
+      const ownerFilter = document.getElementById('filter-owner').value;
+
+      listEl.innerHTML = '';
+
+      // 篩選
+      const filtered = buyItems.filter(item => {
+        if (catFilter !== 'ALL' && item.category !== catFilter) return false;
+        if (statusFilter === 'BOUGHT' && !item.bought) return false;
+        if (statusFilter === 'UNBOUGHT' && item.bought) return false;
+        if (ownerFilter !== 'ALL' && item.owner !== ownerFilter) return false;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = '<div style="text-align:center; color:var(--sub-text); padding:20px;">無符合條件的代購項目</div>';
+        return;
+      }
+
+      filtered.forEach(item => {
+        const twpTotal = Math.round(item.priceJpy * item.qty * exchangeRate);
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="buy-item ${item.bought ? 'bought' : ''}">
+            <div class="checkbox-custom ${item.bought ? 'checked' : ''}" onclick="toggleBought(${item.id})"></div>
+            <div style="flex: 1;">
+              <div class="item-header">
+                <span class="item-title">${item.name}</span>
+                <button class="btn btn-danger" onclick="deleteBuyItem(${item.id})">刪除</button>
+              </div>
+              <div style="margin-bottom: 4px;">
+                <span class="tag">${item.category}</span>
+                <span class="tag" style="background:#e3f2fd; color:#0d47a1;">👤 ${item.owner}</span>
+              </div>
+              <div class="item-sub">
+                數量: <b>${item.qty}</b> | 單價: ¥${item.priceJpy.toLocaleString()}
+              </div>
+              <div style="margin-top: 4px; font-weight: 600; color: #d32f2f;">
+                約 NT$ ${twpTotal.toLocaleString()} (含總價)
+              </div>
+            </div>
+          </div>
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    // 初始化渲染
+    renderSchedules();
+  </script>
+</body>
+</html>
