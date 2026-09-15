@@ -317,6 +317,104 @@
       margin-bottom: 10px;
     }
 
+
+    .photo-preview {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .photo-preview img {
+      width: 86px;
+      height: 86px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+    }
+    .photo-thumb {
+      width: 58px;
+      height: 58px;
+      object-fit: cover;
+      border-radius: 9px;
+      border: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+    .buy-row {
+      display: grid;
+      grid-template-columns: 28px minmax(0,1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+    .buy-main-line {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+    .buy-main-line .buy-name {
+      font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .buy-meta {
+      font-size: 0.78rem;
+      color: var(--sub-text);
+      margin-top: 3px;
+      white-space: nowrap;
+    }
+    .buy-actions {
+      display: flex;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .owner-summary {
+      cursor: pointer;
+      border-left: 4px solid var(--primary-color);
+    }
+    .owner-summary-head {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .owner-total {
+      font-size:.78rem;
+      color:var(--sub-text);
+      margin-top:3px;
+    }
+    .owner-money {
+      font-weight:800;
+      color:#d32f2f;
+      white-space:nowrap;
+    }
+    .owner-items {
+      display:none;
+      margin-top:10px;
+      border-top:1px dashed var(--border-color);
+      padding-top:9px;
+    }
+    .owner-items.show { display:block; }
+    .buy-item-line {
+      display:grid;
+      grid-template-columns:24px minmax(0,1fr) auto;
+      gap:7px;
+      align-items:center;
+      padding:7px 0;
+      border-bottom:1px solid #f0f0f2;
+    }
+    .buy-item-line:last-child { border-bottom:none; }
+    @media (max-width: 520px) {
+      .buy-actions .btn-sm {
+        padding: 6px 7px;
+        font-size: .72rem;
+      }
+      .buy-row { grid-template-columns: 26px minmax(0,1fr) auto; }
+      .buy-main-line .buy-name { max-width: 155px; }
+      .photo-thumb { width:50px; height:50px; }
+    }
+
     /* Modal 彈窗樣式 */
     .modal-overlay {
       position: fixed;
@@ -717,6 +815,11 @@
           <label>備註 / 停留時間</label>
           <input type="text" id="edit-sch-duration">
         </div>
+        <div class="form-group">
+          <label>照片（可選）</label>
+          <input type="file" id="edit-sch-photo" accept="image/*">
+          <div id="edit-sch-photo-preview" class="photo-preview"></div>
+        </div>
         <button type="submit" class="btn">儲存變更</button>
       </form>
     </div>
@@ -762,6 +865,11 @@
             <input type="text" id="edit-buy-owner" required>
           </div>
         </div>
+        <div class="form-group">
+          <label>商品照片（可選）</label>
+          <input type="file" id="edit-buy-photo" accept="image/*">
+          <div id="edit-buy-photo-preview" class="photo-preview"></div>
+        </div>
         <button type="submit" class="btn">儲存變更</button>
       </form>
     </div>
@@ -782,6 +890,7 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
   <script>
     // 您的 Firebase 設定
@@ -797,6 +906,7 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const storage = firebase.storage();
 
     let trips = [];
     let currentTripId = null;
@@ -869,6 +979,7 @@
       document.getElementById('header-title').innerText = trip.name;
 
       switchTab('schedule');
+      setTimeout(setScheduleDefaults, 0);
     }
 
     function toggleQuickPanel(panelId) {
@@ -964,6 +1075,65 @@
       });
     }
 
+
+    // ===== 行程連續輸入 / 照片上傳 =====
+    function setScheduleDefaults() {
+      const trip = trips.find(t => t.id === currentTripId);
+      if (!trip) return;
+      const items = [...(trip.schedules || [])].sort((a,b) =>
+        (a.date + a.startTime).localeCompare(b.date + b.startTime)
+      );
+      const last = items[items.length - 1];
+      const dateEl = document.getElementById('sch-date');
+      const startEl = document.getElementById('sch-start');
+      const dayEl = document.getElementById('sch-day');
+
+      if (!dateEl.value) dateEl.value = last ? last.date : trip.startDate;
+      if (!startEl.value) startEl.value = last ? last.endTime : '00:00';
+
+      if (!dayEl.value) {
+        const d = new Date(dateEl.value + 'T00:00:00');
+        const start = new Date(trip.startDate + 'T00:00:00');
+        const diff = Math.round((d - start) / 86400000) + 1;
+        dayEl.value = `Day ${Math.max(1, diff)}`;
+      }
+    }
+
+    function showPhotoPreview(inputId, previewId, existingUrl='') {
+      const input = document.getElementById(inputId);
+      const preview = document.getElementById(previewId);
+      if (!input || !preview) return;
+      preview.innerHTML = existingUrl ? `<img src="${existingUrl}" alt="照片預覽">` : '';
+      input.onchange = () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => preview.innerHTML = `<img src="${e.target.result}" alt="照片預覽">`;
+        reader.readAsDataURL(file);
+      };
+    }
+
+    async function uploadPhoto(file, folder, id) {
+      if (!file) return null;
+      const safeName = (file.name || 'photo').replace(/[^a-zA-Z0-9._-]/g, '_');
+      const ref = storage.ref(`${folder}/${currentTripId}/${id}_${Date.now()}_${safeName}`);
+      await ref.put(file);
+      return await ref.getDownloadURL();
+    }
+
+    showPhotoPreview('sch-photo','sch-photo-preview');
+    showPhotoPreview('edit-sch-photo','edit-sch-photo-preview');
+    showPhotoPreview('buy-photo','buy-photo-preview');
+    showPhotoPreview('edit-buy-photo','edit-buy-photo-preview');
+
+    document.getElementById('sch-date').addEventListener('change', () => {
+      const trip = trips.find(t => t.id === currentTripId);
+      if (!trip) return;
+      const d = new Date(document.getElementById('sch-date').value + 'T00:00:00');
+      const s = new Date(trip.startDate + 'T00:00:00');
+      document.getElementById('sch-day').value = `Day ${Math.max(1, Math.round((d-s)/86400000)+1)}`;
+    });
+
     // 2. 行程細項管理
     document.getElementById('schedule-form').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -1003,34 +1173,40 @@
       document.getElementById('edit-sch-end').value = item.endTime;
       document.getElementById('edit-sch-place').value = item.place;
       document.getElementById('edit-sch-duration').value = item.duration || '';
+      showPhotoPreview('edit-sch-photo','edit-sch-photo-preview', item.photoUrl || '');
 
       document.getElementById('edit-sch-modal').classList.add('show');
     }
 
-    document.getElementById('edit-sch-form').addEventListener('submit', function(e) {
+    document.getElementById('edit-sch-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       const trip = trips.find(t => t.id === currentTripId);
       if (!trip) return;
 
       const id = parseInt(document.getElementById('edit-sch-id').value);
+      const oldItem = trip.schedules.find(s => s.id === id);
+      const photoFile = document.getElementById('edit-sch-photo').files[0];
+      const photoUrl = photoFile ? await uploadPhoto(photoFile, 'schedulePhotos', id) : (oldItem.photoUrl || null);
+
       const updatedSchedules = trip.schedules.map(item => {
         if (item.id === id) {
           return {
-            id: id,
+            ...item,
+            id,
             date: document.getElementById('edit-sch-date').value,
             day: document.getElementById('edit-sch-day').value.trim(),
             startTime: document.getElementById('edit-sch-start').value,
             endTime: document.getElementById('edit-sch-end').value,
             place: document.getElementById('edit-sch-place').value.trim(),
-            duration: document.getElementById('edit-sch-duration').value.trim()
+            duration: document.getElementById('edit-sch-duration').value.trim(),
+            photoUrl
           };
         }
         return item;
       });
 
       updatedSchedules.sort((a, b) => (a.date + a.startTime).localeCompare(b.date + b.startTime));
-
-      db.collection("trips").doc(currentTripId).update({ schedules: updatedSchedules });
+      await db.collection("trips").doc(currentTripId).update({ schedules: updatedSchedules });
       closeModal('edit-sch-modal');
     });
 
@@ -1150,16 +1326,21 @@
       document.getElementById('edit-buy-qty').value = item.qty;
       document.getElementById('edit-buy-price').value = item.priceJpy;
       document.getElementById('edit-buy-owner').value = item.owner;
+      showPhotoPreview('edit-buy-photo','edit-buy-photo-preview', item.photoUrl || '');
 
       document.getElementById('edit-buy-modal').classList.add('show');
     }
 
-    document.getElementById('edit-buy-form').addEventListener('submit', function(e) {
+    document.getElementById('edit-buy-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       const trip = trips.find(t => t.id === currentTripId);
       if (!trip) return;
 
       const id = parseInt(document.getElementById('edit-buy-id').value);
+      const oldItem = trip.buyItems.find(i => i.id === id);
+      const photoFile = document.getElementById('edit-buy-photo').files[0];
+      const photoUrl = photoFile ? await uploadPhoto(photoFile, 'buyPhotos', id) : (oldItem.photoUrl || null);
+
       const updatedBuyItems = trip.buyItems.map(item => {
         if (item.id === id) {
           return {
@@ -1168,13 +1349,14 @@
             category: document.getElementById('edit-buy-category').value,
             qty: parseInt(document.getElementById('edit-buy-qty').value),
             priceJpy: parseFloat(document.getElementById('edit-buy-price').value),
-            owner: document.getElementById('edit-buy-owner').value.trim()
+            owner: document.getElementById('edit-buy-owner').value.trim(),
+            photoUrl
           };
         }
         return item;
       });
 
-      db.collection("trips").doc(currentTripId).update({ buyItems: updatedBuyItems });
+      await db.collection("trips").doc(currentTripId).update({ buyItems: updatedBuyItems });
       closeModal('edit-buy-modal');
     });
 
@@ -1216,6 +1398,11 @@
       select.value = currentVal;
     }
 
+    function toggleOwnerItems(ownerKey) {
+      const el = document.getElementById(ownerKey);
+      if (el) el.classList.toggle('show');
+    }
+
     function renderBuyList() {
       const listEl = document.getElementById('buy-list');
       listEl.innerHTML = '';
@@ -1234,67 +1421,63 @@
         return true;
       });
 
-      filtered.sort((a,b) => (a.bought === b.bought ? 0 : a.bought ? 1 : -1));
-
       if (filtered.length === 0) {
         listEl.innerHTML = '<div style="text-align:center; color:var(--sub-text); padding:30px 0;">無符合條件的代購項目</div>';
         return;
       }
 
-      const owners = {};
+      const groups = {};
       filtered.forEach(item => {
-        if (!owners[item.owner]) owners[item.owner] = [];
-        owners[item.owner].push(item);
+        const owner = item.owner || '未指定';
+        if (!groups[owner]) groups[owner] = [];
+        groups[owner].push(item);
       });
 
-      Object.keys(owners).sort((a,b) => a.localeCompare(b,'zh-Hant')).forEach((owner, idx) => {
-        const ownerItems = owners[owner];
-        const bought = ownerItems.filter(i => i.bought).length;
-        const group = document.createElement('div');
-        group.className = 'owner-group';
-        group.innerHTML = `
-          <div class="owner-header" onclick="toggleOwnerGroup(${idx})">
+      Object.entries(groups).sort((a,b)=>a[0].localeCompare(b[0], 'zh-Hant')).forEach(([owner, ownerItems], idx) => {
+        const boughtCount = ownerItems.filter(i => i.bought).length;
+        const boughtAmount = ownerItems
+          .filter(i => i.bought)
+          .reduce((sum, i) => sum + (Number(i.priceJpy) || 0) * (Number(i.qty) || 0) * exchangeRate, 0);
+        const ownerKey = `owner-${idx}-${btoa(unescape(encodeURIComponent(owner))).replace(/[^a-zA-Z0-9]/g,'')}`;
+
+        const card = document.createElement('div');
+        card.className = 'card owner-summary';
+        card.onclick = () => toggleOwnerItems(ownerKey);
+        card.innerHTML = `
+          <div class="owner-summary-head">
             <div>
-              <div class="owner-title">👤 ${owner}</div>
-              <div class="owner-meta">${ownerItems.length} 項商品 · ${bought}/${ownerItems.length} 已購買</div>
+              <div style="font-size:1.05rem;font-weight:800;">👤 ${owner}</div>
+              <div class="owner-total">已購買 ${boughtCount} 項／共 ${ownerItems.length} 項</div>
             </div>
-            <span id="owner-arrow-${idx}" style="color:var(--primary-color);font-weight:800;">${idx === 0 ? '⌄' : '›'}</span>
+            <div style="text-align:right;">
+              <div class="owner-money">收款 NT$ ${Math.round(boughtAmount).toLocaleString()}</div>
+              <div style="font-size:.72rem;color:var(--sub-text);">已購買才計算</div>
+            </div>
           </div>
-          <div class="owner-items ${idx === 0 ? 'show' : ''}" id="owner-items-${idx}">
+          <div id="${ownerKey}" class="owner-items">
             ${ownerItems.map(item => {
-              const twpTotal = Math.round(item.priceJpy * item.qty * exchangeRate);
+              const total = Math.round((Number(item.priceJpy)||0) * (Number(item.qty)||0) * exchangeRate);
               return `
-                <div class="buy-row ${item.bought ? 'bought' : ''}">
+                <div class="buy-item-line" onclick="event.stopPropagation()">
                   <div class="checkbox-custom ${item.bought ? 'checked' : ''}" onclick="toggleBought(${item.id})"></div>
-                  <div class="buy-main">
-                    <div class="buy-line">
+                  ${item.photoUrl ? `<img class="photo-thumb" src="${item.photoUrl}" alt="商品照片">` : ''}
+                  <div style="min-width:0;">
+                    <div class="buy-main-line">
                       <span class="buy-name">${item.name}</span>
                       <span class="tag">${item.category}</span>
                     </div>
-                    <div class="buy-detail">數量 ${item.qty} × ¥${item.priceJpy.toLocaleString()} · ${item.bought ? '已購買' : '待購買'}</div>
+                    <div class="buy-meta">×${item.qty}　¥${Number(item.priceJpy).toLocaleString()}　→　NT$ ${total.toLocaleString()}</div>
                   </div>
-                  <div>
-                    <div class="buy-total">NT$ ${twpTotal.toLocaleString()}</div>
-                    <div class="buy-actions">
-                      <button class="btn-sm btn-edit" onclick="openEditBuyItem(${item.id})">編輯</button>
-                      <button class="btn-sm btn-danger" onclick="deleteBuyItem(${item.id})">刪除</button>
-                    </div>
+                  <div class="buy-actions" onclick="event.stopPropagation()">
+                    <button class="btn-sm btn-edit" onclick="openEditBuyItem(${item.id})">編輯</button>
+                    <button class="btn-sm btn-danger" onclick="deleteBuyItem(${item.id})">刪除</button>
                   </div>
-                </div>
-              `;
+                </div>`;
             }).join('')}
           </div>
         `;
-        listEl.appendChild(group);
+        listEl.appendChild(card);
       });
-    }
-
-    function toggleOwnerGroup(index) {
-      const body = document.getElementById(`owner-items-${index}`);
-      const arrow = document.getElementById(`owner-arrow-${index}`);
-      if (!body) return;
-      const show = body.classList.toggle('show');
-      if (arrow) arrow.textContent = show ? '⌄' : '›';
     }
 
     renderTripsList();
