@@ -356,6 +356,133 @@
       color: var(--sub-text);
       cursor: pointer;
     }
+
+    /* === 2026 UI 更新：置頂快速工具列 === */
+    .quick-toolbar {
+      position: sticky;
+      top: 61px;
+      z-index: 90;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      margin: -15px -15px 12px;
+      background: rgba(249,249,249,.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .quick-toolbar::-webkit-scrollbar { display:none; }
+    .quick-btn {
+      flex: 0 0 auto;
+      border: 1px solid var(--border-color);
+      background: #fff;
+      color: var(--text-color);
+      border-radius: 9px;
+      padding: 7px 10px;
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .quick-btn.primary { color: var(--primary-color); }
+    .quick-btn.sync { color: var(--success-color); }
+    .quick-btn.active { background: var(--primary-light); border-color: #b8d8ff; }
+    .quick-panel {
+      display:none;
+      background:#fff;
+      border:1px solid var(--border-color);
+      border-radius:12px;
+      padding:12px;
+      margin-bottom:12px;
+      box-shadow:0 4px 14px rgba(0,0,0,.06);
+    }
+    .quick-panel.show { display:block; }
+    .quick-panel-title {
+      font-size:.82rem; font-weight:700; color:var(--text-color);
+      margin-bottom:8px;
+    }
+    .rate-reference {
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      background:var(--primary-light); border-radius:9px; padding:9px 10px;
+      font-size:.82rem; margin-bottom:8px;
+    }
+    .rate-reference b { color:var(--primary-color); }
+    .rate-edit-row { display:flex; align-items:center; gap:8px; }
+    .rate-edit-row input { flex:1; width:auto; padding:8px 10px; }
+    .mini-note { font-size:.72rem; color:var(--sub-text); margin-top:5px; }
+
+    /* === 行程：專案管理 / 日期群組 / 時間軸 === */
+    .schedule-day {
+      background:#fff; border:1px solid var(--border-color); border-radius:14px;
+      margin-bottom:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.035);
+    }
+    .schedule-day-header {
+      display:flex; align-items:center; gap:10px; padding:12px 13px; cursor:pointer;
+      background:linear-gradient(180deg,#fff,#fafafa);
+    }
+    .schedule-day-arrow { color:var(--primary-color); font-weight:800; width:16px; }
+    .schedule-day-main { flex:1; min-width:0; }
+    .schedule-day-title { font-size:.98rem; font-weight:750; }
+    .schedule-day-sub { font-size:.74rem; color:var(--sub-text); margin-top:2px; }
+    .schedule-progress { width:64px; height:6px; background:#e9e9ee; border-radius:99px; overflow:hidden; }
+    .schedule-progress span { display:block; height:100%; background:var(--primary-color); border-radius:99px; }
+    .schedule-items { display:none; padding:0 12px 10px 20px; border-top:1px solid var(--border-color); }
+    .schedule-items.show { display:block; }
+    .timeline-item {
+      display:grid; grid-template-columns:72px 14px 1fr auto; gap:8px; align-items:stretch;
+      padding:10px 0; border-bottom:1px solid #f0f0f3;
+    }
+    .timeline-item:last-child { border-bottom:none; }
+    .timeline-time { font-size:.76rem; font-weight:750; color:var(--primary-color); padding-top:2px; }
+    .timeline-line { position:relative; width:14px; }
+    .timeline-line::before { content:''; position:absolute; left:6px; top:5px; bottom:-12px; width:2px; background:#dbeafe; }
+    .timeline-item:last-child .timeline-line::before { bottom:5px; }
+    .timeline-line::after { content:''; position:absolute; left:3px; top:4px; width:8px; height:8px; border-radius:50%; background:var(--primary-color); }
+    .timeline-content { min-width:0; }
+    .timeline-title { font-size:.93rem; font-weight:700; line-height:1.3; }
+    .timeline-note { font-size:.74rem; color:#636366; margin-top:3px; }
+    .timeline-actions { display:flex; gap:4px; align-items:flex-start; }
+    .timeline-actions .btn-sm { padding:4px 7px; }
+
+    /* === 代購：委託人群組 === */
+    .owner-group {
+      background:#fff; border:1px solid var(--border-color); border-radius:14px;
+      margin-bottom:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.035);
+    }
+    .owner-header {
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      padding:11px 13px; cursor:pointer; background:#fafafa;
+    }
+    .owner-title { font-weight:750; font-size:.95rem; }
+    .owner-meta { font-size:.72rem; color:var(--sub-text); }
+    .owner-items { display:none; }
+    .owner-items.show { display:block; }
+    .buy-row {
+      display:grid; grid-template-columns:28px 1fr auto; gap:8px; align-items:center;
+      padding:9px 11px; border-top:1px solid #f0f0f3;
+    }
+    .buy-main { min-width:0; }
+    .buy-line {
+      display:flex; align-items:center; gap:7px; min-width:0; white-space:nowrap; overflow:hidden;
+    }
+    .buy-name { font-weight:650; overflow:hidden; text-overflow:ellipsis; }
+    .buy-detail { font-size:.72rem; color:var(--sub-text); margin-top:2px; white-space:nowrap; }
+    .buy-total { font-size:.82rem; font-weight:750; color:#d32f2f; white-space:nowrap; }
+    .buy-actions { display:flex; gap:4px; }
+    .tag { display:inline-block; padding:2px 6px; border-radius:5px; background:#f0f0f5; color:#636366; font-size:.65rem; }
+    .sync-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--success-color); margin-right:4px; }
+
+    @media (max-width:480px) {
+      .timeline-item { grid-template-columns:64px 14px 1fr; }
+      .timeline-actions { grid-column:3; margin-top:3px; }
+      .buy-row { grid-template-columns:28px 1fr; }
+      .buy-total, .buy-actions { grid-column:2; }
+      .buy-actions { justify-content:flex-end; }
+    }
+
   </style>
 </head>
 <body>
@@ -406,137 +533,149 @@
 
     <!-- 第二頁：行程與代購細項 -->
     <div id="view-detail" class="view">
-      
-      <!-- 1. 行程細項 Tab -->
-      <div id="tab-schedule" class="tab-content">
-        <div class="card">
-          <div class="collapsible-header" onclick="toggleCollapsible('sch-form-body', 'sch-form-icon')">
-            <span>➕ 新增行程細項</span>
-            <span id="sch-form-icon">＋</span>
+      <!-- 置頂快速工具列：平時只佔一排，按下才展開 -->
+      <div id="quick-toolbar" class="quick-toolbar">
+        <button class="quick-btn sync" type="button"><span class="sync-dot"></span>同步中</button>
+        <button class="quick-btn primary" type="button" onclick="toggleQuickPanel('add-panel')">＋ 新增</button>
+        <button id="quick-rate-btn" class="quick-btn" type="button" onclick="toggleQuickPanel('rate-panel')">💴 匯率</button>
+        <button id="quick-filter-btn" class="quick-btn" type="button" onclick="toggleQuickPanel('filter-panel')">☷ 篩選</button>
+      </div>
+
+      <div id="add-panel" class="quick-panel">
+        <div class="quick-panel-title">新增</div>
+        <div id="add-schedule-shortcut">
+          <button class="btn" type="button" onclick="openAddSchedule()">＋ 新增行程細項</button>
+        </div>
+        <div id="add-buy-shortcut" style="display:none;">
+          <button class="btn" type="button" onclick="openAddBuy()">＋ 新增代購商品</button>
+        </div>
+      </div>
+
+      <div id="rate-panel" class="quick-panel">
+        <div class="quick-panel-title">💴 日幣換算台幣</div>
+        <div class="rate-reference">
+          <span>今日參考匯率 <b id="rate-reference-date">2026-09-16</b></span>
+          <b id="rate-reference-value">0.2057</b>
+        </div>
+        <div class="rate-edit-row">
+          <span style="font-size:.82rem;white-space:nowrap;">使用匯率</span>
+          <input type="number" id="exchange-rate" step="0.0001" value="0.2057" onchange="updateRate()" aria-label="使用匯率">
+        </div>
+        <div class="mini-note">參考值保留日期；使用匯率可自行修改，代購金額會依此計算。</div>
+      </div>
+
+      <div id="filter-panel" class="quick-panel">
+        <div class="quick-panel-title">☷ 條件篩選</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>分類</label>
+            <select id="filter-category" onchange="renderBuyList()">
+              <option value="ALL">全部分類</option>
+              <option value="藥妝">藥妝</option>
+              <option value="零食">零食</option>
+              <option value="動漫/玩具">動漫/玩具</option>
+              <option value="電器">電器</option>
+              <option value="服飾">服飾</option>
+              <option value="其他">其他</option>
+            </select>
           </div>
-          <div id="sch-form-body" class="collapsible-body">
-            <form id="schedule-form">
-              <div class="form-row">
-                <div class="form-group">
-                  <label>日期</label>
-                  <input type="date" id="sch-date" required>
-                </div>
-                <div class="form-group">
-                  <label>天數 (如: Day 1)</label>
-                  <input type="text" id="sch-day" placeholder="Day 1" required>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>開始時間</label>
-                  <input type="time" id="sch-start" required>
-                </div>
-                <div class="form-group">
-                  <label>結束時間</label>
-                  <input type="time" id="sch-end" required>
-                </div>
-              </div>
-              <div class="form-group">
-                <label>地點 / 景點 / 行程內容</label>
-                <input type="text" id="sch-place" placeholder="例如：成田機場 ✈️ 福岡機場" required>
-              </div>
-              <div class="form-group">
-                <label>備註 / 停留時間</label>
-                <input type="text" id="sch-duration" placeholder="例如：記得出示 Visit Japan Web QR Code">
-              </div>
-              <button type="submit" class="btn">新增行程</button>
-            </form>
+          <div class="form-group">
+            <label>購買狀態</label>
+            <select id="filter-status" onchange="renderBuyList()">
+              <option value="ALL">全部狀態</option>
+              <option value="UNBOUGHT">未購買</option>
+              <option value="BOUGHT">已購買</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>委託人</label>
+            <select id="filter-owner" onchange="renderBuyList()">
+              <option value="ALL">全部委託人</option>
+            </select>
           </div>
         </div>
+      </div>
 
+      <!-- 1. 行程細項 Tab -->
+      <div id="tab-schedule" class="tab-content">
+        <div id="sch-form-body" class="quick-panel">
+          <div class="quick-panel-title">＋ 新增行程細項</div>
+          <form id="schedule-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>日期</label>
+                <input type="date" id="sch-date" required>
+              </div>
+              <div class="form-group">
+                <label>天數 (如: Day 1)</label>
+                <input type="text" id="sch-day" placeholder="Day 1" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>開始時間</label>
+                <input type="time" id="sch-start" required>
+              </div>
+              <div class="form-group">
+                <label>結束時間</label>
+                <input type="time" id="sch-end" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>地點 / 景點 / 行程內容</label>
+              <input type="text" id="sch-place" placeholder="例如：成田機場 ✈️ 福岡機場" required>
+            </div>
+            <div class="form-group">
+              <label>備註 / 停留時間</label>
+              <input type="text" id="sch-duration" placeholder="例如：記得出示 Visit Japan Web QR Code">
+            </div>
+            <button type="submit" class="btn">新增行程</button>
+          </form>
+        </div>
         <div id="schedule-list"></div>
       </div>
 
       <!-- 2. 代購 Tab -->
       <div id="tab-buy" class="tab-content">
-        <div class="rate-bar">
-          <span>🇯🇵 日幣換算台幣匯率：</span>
-          <input type="number" id="exchange-rate" step="0.001" value="0.21" onchange="updateRate()">
-        </div>
-
-        <div class="card">
-          <h3 style="margin-bottom: 10px; font-size: 0.85rem; color: var(--sub-text);">🔍 條件篩選</h3>
-          <div class="form-row">
+        <div id="buy-form-body" class="quick-panel">
+          <div class="quick-panel-title">＋ 新增代購商品</div>
+          <form id="buy-form">
             <div class="form-group">
-              <label>分類</label>
-              <select id="filter-category" onchange="renderBuyList()">
-                <option value="ALL">全部分類</option>
-                <option value="藥妝">藥妝</option>
-                <option value="零食">零食</option>
-                <option value="動漫/玩具">動漫/玩具</option>
-                <option value="電器">電器</option>
-                <option value="服飾">服飾</option>
-                <option value="其他">其他</option>
-              </select>
+              <label>商品名稱</label>
+              <input type="text" id="buy-name" placeholder="例如：合利他命 EX" required>
             </div>
-            <div class="form-group">
-              <label>購買狀態</label>
-              <select id="filter-status" onchange="renderBuyList()">
-                <option value="ALL">全部狀態</option>
-                <option value="UNBOUGHT">未購買</option>
-                <option value="BOUGHT">已購買</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>委託人</label>
-              <select id="filter-owner" onchange="renderBuyList()">
-                <option value="ALL">全部委託人</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="collapsible-header" onclick="toggleCollapsible('buy-form-body', 'buy-form-icon')">
-            <span>➕ 新增代購商品</span>
-            <span id="buy-form-icon">＋</span>
-          </div>
-          <div id="buy-form-body" class="collapsible-body">
-            <form id="buy-form">
+            <div class="form-row">
               <div class="form-group">
-                <label>商品名稱</label>
-                <input type="text" id="buy-name" placeholder="例如：合利他命 EX" required>
+                <label>分類</label>
+                <select id="buy-category">
+                  <option value="藥妝">藥妝</option>
+                  <option value="零食">零食</option>
+                  <option value="動漫/玩具">動漫/玩具</option>
+                  <option value="電器">電器</option>
+                  <option value="服飾">服飾</option>
+                  <option value="其他">其他</option>
+                </select>
               </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>分類</label>
-                  <select id="buy-category">
-                    <option value="藥妝">藥妝</option>
-                    <option value="零食">零食</option>
-                    <option value="動漫/玩具">動漫/玩具</option>
-                    <option value="電器">電器</option>
-                    <option value="服飾">服飾</option>
-                    <option value="其他">其他</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>數量</label>
-                  <input type="number" id="buy-qty" value="1" min="1" required>
-                </div>
+              <div class="form-group">
+                <label>數量</label>
+                <input type="number" id="buy-qty" value="1" min="1" required>
               </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>日幣單價 (円)</label>
-                  <input type="number" id="buy-price" placeholder="5000" required>
-                </div>
-                <div class="form-group">
-                  <label>委託人</label>
-                  <input type="text" id="buy-owner" placeholder="例如：小明" required>
-                </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>日幣單價 (円)</label>
+                <input type="number" id="buy-price" placeholder="5000" required>
               </div>
-              <button type="submit" class="btn">新增代購項</button>
-            </form>
-          </div>
+              <div class="form-group">
+                <label>委託人</label>
+                <input type="text" id="buy-owner" placeholder="例如：小明" required>
+              </div>
+            </div>
+            <button type="submit" class="btn">新增代購項</button>
+          </form>
         </div>
-
         <div id="buy-list"></div>
       </div>
-
     </div>
 
   </div>
@@ -661,7 +800,9 @@
 
     let trips = [];
     let currentTripId = null;
-    let exchangeRate = 0.21;
+    const TODAY_REFERENCE_RATE = 0.2057;
+    const TODAY_REFERENCE_DATE = '2026-09-16';
+    let exchangeRate = TODAY_REFERENCE_RATE;
 
     // Realtime Sync
     db.collection("trips").onSnapshot(snapshot => {
@@ -679,11 +820,17 @@
 
     db.collection("settings").doc("rate").onSnapshot(doc => {
       if (doc.exists) {
-        exchangeRate = doc.data().val || 0.21;
+        exchangeRate = parseFloat(doc.data().val) || TODAY_REFERENCE_RATE;
         document.getElementById('exchange-rate').value = exchangeRate;
-        if (currentTripId) renderBuyList();
+      } else {
+        exchangeRate = TODAY_REFERENCE_RATE;
+        document.getElementById('exchange-rate').value = TODAY_REFERENCE_RATE;
       }
+      if (currentTripId) renderBuyList();
     });
+
+    document.getElementById('rate-reference-date').textContent = TODAY_REFERENCE_DATE;
+    document.getElementById('rate-reference-value').textContent = TODAY_REFERENCE_RATE.toFixed(4);
 
     // 折疊表單控制
     function toggleCollapsible(bodyId, iconId) {
@@ -724,17 +871,48 @@
       switchTab('schedule');
     }
 
+    function toggleQuickPanel(panelId) {
+      const panel = document.getElementById(panelId);
+      const isOpen = panel.classList.contains('show');
+      document.querySelectorAll('.quick-panel').forEach(p => p.classList.remove('show'));
+      document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
+      if (!isOpen) {
+        panel.classList.add('show');
+        const btn = document.querySelector(`[onclick="toggleQuickPanel('${panelId}')"]`);
+        if (btn) btn.classList.add('active');
+      }
+    }
+
+    function openAddSchedule() {
+      document.querySelectorAll('.quick-panel').forEach(p => p.classList.remove('show'));
+      document.getElementById('sch-form-body').classList.add('show');
+      document.getElementById('add-panel').classList.add('show');
+      document.getElementById('sch-date').focus();
+    }
+
+    function openAddBuy() {
+      document.querySelectorAll('.quick-panel').forEach(p => p.classList.remove('show'));
+      document.getElementById('buy-form-body').classList.add('show');
+      document.getElementById('add-panel').classList.add('show');
+      document.getElementById('buy-name').focus();
+    }
+
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('#detail-nav-bar .nav-item').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.quick-panel').forEach(el => el.classList.remove('show'));
+      document.querySelectorAll('.quick-btn').forEach(el => el.classList.remove('active'));
 
-      if (tabName === 'schedule') {
-        document.getElementById('tab-schedule').classList.add('active');
-        document.querySelectorAll('#detail-nav-bar .nav-item')[0].classList.add('active');
-        renderSchedules();
-      } else {
-        document.getElementById('tab-buy').classList.add('active');
-        document.querySelectorAll('#detail-nav-bar .nav-item')[1].classList.add('active');
+      const isSchedule = tabName === 'schedule';
+      document.getElementById(isSchedule ? 'tab-schedule' : 'tab-buy').classList.add('active');
+      document.querySelectorAll('#detail-nav-bar .nav-item')[isSchedule ? 0 : 1].classList.add('active');
+      document.getElementById('quick-rate-btn').style.display = isSchedule ? 'none' : 'block';
+      document.getElementById('quick-filter-btn').style.display = isSchedule ? 'none' : 'block';
+      document.getElementById('add-schedule-shortcut').style.display = isSchedule ? 'block' : 'none';
+      document.getElementById('add-buy-shortcut').style.display = isSchedule ? 'none' : 'block';
+
+      if (isSchedule) renderSchedules();
+      else {
         updateOwnerFilterOptions();
         renderBuyList();
       }
@@ -808,7 +986,8 @@
 
       db.collection("trips").doc(currentTripId).update({ schedules: updatedSchedules });
       this.reset();
-      toggleCollapsible('sch-form-body', 'sch-form-icon');
+      document.getElementById('sch-form-body').classList.remove('show');
+      document.getElementById('add-panel').classList.remove('show');
     });
 
     function openEditSchedule(id) {
@@ -870,42 +1049,70 @@
       listEl.innerHTML = '';
       const trip = trips.find(t => t.id === currentTripId);
       if (!trip || !trip.schedules || trip.schedules.length === 0) {
-        listEl.innerHTML = '<div style="text-align:center; color:var(--sub-text); padding:30px 0;">尚無行程細項，點擊上方 + 號新增</div>';
+        listEl.innerHTML = '<div style="text-align:center; color:var(--sub-text); padding:30px 0;">尚無行程細項，點擊置頂「＋ 新增」</div>';
         return;
       }
 
-      // 確保按時間排序
-      const sortedSchedules = [...trip.schedules].sort((a, b) => (a.date + a.startTime).localeCompare(b.date + b.startTime));
-
-      sortedSchedules.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'card sch-card';
-        card.innerHTML = `
-          <div class="sch-top-bar">
-            <div>
-              <span class="day-badge">${item.day}</span>
-              <span class="date-text">${item.date}</span>
-            </div>
-            <div class="btn-action-group">
-              <button class="btn-sm btn-edit" onclick="openEditSchedule(${item.id})">編輯</button>
-              <button class="btn-sm btn-danger" onclick="deleteSchedule(${item.id})">刪除</button>
-            </div>
-          </div>
-          <div class="sch-title">${item.place}</div>
-          <div style="margin-top: 4px;">
-            <span class="sch-time">⏰ ${item.startTime} ～ ${item.endTime}</span>
-          </div>
-          ${item.duration ? `<div class="sch-note">📌 ${item.duration}</div>` : ''}
-        `;
-        listEl.appendChild(card);
+      const sorted = [...trip.schedules].sort((a,b) =>
+        (a.date + a.startTime).localeCompare(b.date + b.startTime)
+      );
+      const groups = {};
+      sorted.forEach(item => {
+        if (!groups[item.date]) groups[item.date] = [];
+        groups[item.date].push(item);
       });
+
+      const dates = Object.keys(groups).sort();
+      dates.forEach((date, index) => {
+        const items = groups[date];
+        const day = items[0].day || `Day ${index + 1}`;
+        const completed = items.filter(i => i.completed).length;
+        const progress = Math.round((completed / items.length) * 100);
+        const wrap = document.createElement('div');
+        wrap.className = 'schedule-day';
+        wrap.innerHTML = `
+          <div class="schedule-day-header" onclick="toggleDayGroup('${date}')">
+            <span class="schedule-day-arrow" id="arrow-${date}">›</span>
+            <div class="schedule-day-main">
+              <div class="schedule-day-title">${day} · ${date}</div>
+              <div class="schedule-day-sub">${items.length} 個時間段 · ${completed}/${items.length} 已完成</div>
+            </div>
+            <div class="schedule-progress"><span style="width:${progress}%"></span></div>
+          </div>
+          <div class="schedule-items ${index === 0 ? 'show' : ''}" id="day-items-${date}">
+            ${items.map(item => `
+              <div class="timeline-item">
+                <div class="timeline-time">${item.startTime}–${item.endTime}</div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">${item.place}</div>
+                  ${item.duration ? `<div class="timeline-note">📌 ${item.duration}</div>` : ''}
+                </div>
+                <div class="timeline-actions">
+                  <button class="btn-sm btn-edit" onclick="openEditSchedule(${item.id})">編輯</button>
+                  <button class="btn-sm btn-danger" onclick="deleteSchedule(${item.id})">刪除</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        listEl.appendChild(wrap);
+      });
+    }
+
+    function toggleDayGroup(date) {
+      const body = document.getElementById(`day-items-${date}`);
+      const arrow = document.getElementById(`arrow-${date}`);
+      if (!body) return;
+      const show = body.classList.toggle('show');
+      if (arrow) arrow.textContent = show ? '⌄' : '›';
     }
 
     // 3. 代購管理
     function updateRate() {
       const val = parseFloat(document.getElementById('exchange-rate').value);
       if (!isNaN(val) && val > 0) {
-        db.collection("settings").doc("rate").set({ val: val });
+        db.collection("settings").doc("rate").set({ val: val, updatedAt: new Date().toISOString() });
       }
     }
 
@@ -927,7 +1134,8 @@
       const updatedBuyItems = [...(trip.buyItems || []), newItem];
       db.collection("trips").doc(currentTripId).update({ buyItems: updatedBuyItems });
       this.reset();
-      toggleCollapsible('buy-form-body', 'buy-form-icon');
+      document.getElementById('buy-form-body').classList.remove('show');
+      document.getElementById('add-panel').classList.remove('show');
     });
 
     function openEditBuyItem(id) {
@@ -1026,44 +1234,67 @@
         return true;
       });
 
-      // 預設將未買的排在前面，已買的排後面
-      filtered.sort((a, b) => (a.bought === b.bought ? 0 : a.bought ? 1 : -1));
+      filtered.sort((a,b) => (a.bought === b.bought ? 0 : a.bought ? 1 : -1));
 
       if (filtered.length === 0) {
         listEl.innerHTML = '<div style="text-align:center; color:var(--sub-text); padding:30px 0;">無符合條件的代購項目</div>';
         return;
       }
 
+      const owners = {};
       filtered.forEach(item => {
-        const twpTotal = Math.round(item.priceJpy * item.qty * exchangeRate);
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <div class="buy-item ${item.bought ? 'bought' : ''}">
-            <div class="checkbox-custom ${item.bought ? 'checked' : ''}" onclick="toggleBought(${item.id})"></div>
-            <div style="flex: 1;">
-              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
-                <span class="sch-title" style="font-size:1.05rem;">${item.name}</span>
-                <div class="btn-action-group">
-                  <button class="btn-sm btn-edit" onclick="openEditBuyItem(${item.id})">編輯</button>
-                  <button class="btn-sm btn-danger" onclick="deleteBuyItem(${item.id})">刪除</button>
-                </div>
-              </div>
-              <div style="margin-bottom: 6px;">
-                <span class="tag">${item.category}</span>
-                <span class="tag" style="background:#e3f2fd; color:#0d47a1;">👤 ${item.owner}</span>
-              </div>
-              <div style="font-size:0.85rem; color:var(--sub-text);">
-                數量: <b>${item.qty}</b> | 單價: ¥${item.priceJpy.toLocaleString()}
-              </div>
-              <div style="margin-top: 4px; font-weight: 700; color: #d32f2f; font-size:0.95rem;">
-                約 NT$ ${twpTotal.toLocaleString()}
-              </div>
+        if (!owners[item.owner]) owners[item.owner] = [];
+        owners[item.owner].push(item);
+      });
+
+      Object.keys(owners).sort((a,b) => a.localeCompare(b,'zh-Hant')).forEach((owner, idx) => {
+        const ownerItems = owners[owner];
+        const bought = ownerItems.filter(i => i.bought).length;
+        const group = document.createElement('div');
+        group.className = 'owner-group';
+        group.innerHTML = `
+          <div class="owner-header" onclick="toggleOwnerGroup(${idx})">
+            <div>
+              <div class="owner-title">👤 ${owner}</div>
+              <div class="owner-meta">${ownerItems.length} 項商品 · ${bought}/${ownerItems.length} 已購買</div>
             </div>
+            <span id="owner-arrow-${idx}" style="color:var(--primary-color);font-weight:800;">${idx === 0 ? '⌄' : '›'}</span>
+          </div>
+          <div class="owner-items ${idx === 0 ? 'show' : ''}" id="owner-items-${idx}">
+            ${ownerItems.map(item => {
+              const twpTotal = Math.round(item.priceJpy * item.qty * exchangeRate);
+              return `
+                <div class="buy-row ${item.bought ? 'bought' : ''}">
+                  <div class="checkbox-custom ${item.bought ? 'checked' : ''}" onclick="toggleBought(${item.id})"></div>
+                  <div class="buy-main">
+                    <div class="buy-line">
+                      <span class="buy-name">${item.name}</span>
+                      <span class="tag">${item.category}</span>
+                    </div>
+                    <div class="buy-detail">數量 ${item.qty} × ¥${item.priceJpy.toLocaleString()} · ${item.bought ? '已購買' : '待購買'}</div>
+                  </div>
+                  <div>
+                    <div class="buy-total">NT$ ${twpTotal.toLocaleString()}</div>
+                    <div class="buy-actions">
+                      <button class="btn-sm btn-edit" onclick="openEditBuyItem(${item.id})">編輯</button>
+                      <button class="btn-sm btn-danger" onclick="deleteBuyItem(${item.id})">刪除</button>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
           </div>
         `;
-        listEl.appendChild(card);
+        listEl.appendChild(group);
       });
+    }
+
+    function toggleOwnerGroup(index) {
+      const body = document.getElementById(`owner-items-${index}`);
+      const arrow = document.getElementById(`owner-arrow-${index}`);
+      if (!body) return;
+      const show = body.classList.toggle('show');
+      if (arrow) arrow.textContent = show ? '⌄' : '›';
     }
 
     renderTripsList();
