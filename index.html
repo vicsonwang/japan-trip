@@ -2,7 +2,6 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <!-- iPhone Safari 全螢幕與縮放優化 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -38,15 +37,29 @@
     header {
       position: sticky;
       top: 0;
-      background: rgba(249, 249, 249, 0.9);
+      background: rgba(249, 249, 249, 0.94);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border-color);
       padding: 15px 20px;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       font-weight: 600;
       font-size: 1.1rem;
       z-index: 100;
+    }
+
+    .header-btn {
+      background: none;
+      border: none;
+      color: var(--primary-color);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .container {
@@ -55,11 +68,11 @@
       margin: 0 auto;
     }
 
-    /* Tab Content Display */
-    .tab-content {
+    /* Views Switcher */
+    .view {
       display: none;
     }
-    .tab-content.active {
+    .view.active {
       display: block;
     }
 
@@ -100,6 +113,26 @@
       flex: 1;
     }
 
+    /* Collapsible Form Card */
+    .collapsible-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    .collapsible-body {
+      display: none;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px dashed var(--border-color);
+    }
+    .collapsible-body.show {
+      display: block;
+    }
+
     /* Buttons */
     .btn {
       background-color: var(--primary-color);
@@ -113,11 +146,18 @@
       cursor: pointer;
       text-align: center;
     }
+    .btn-secondary {
+      background-color: #e5e5ea;
+      color: var(--text-color);
+    }
     .btn-danger {
       background-color: var(--danger-color);
+      color: white;
       padding: 6px 12px;
       font-size: 0.85rem;
       width: auto;
+      border-radius: 6px;
+      border: none;
     }
 
     /* Bottom Navigation Bar (iOS Style) */
@@ -212,7 +252,6 @@
       font-weight: bold;
     }
 
-    /* Rate setting header */
     .rate-bar {
       display: flex;
       align-items: center;
@@ -228,110 +267,176 @@
       padding: 4px 8px;
       text-align: right;
     }
+
+    /* Trip list Card */
+    .trip-card {
+      cursor: pointer;
+      transition: background-color 0.2s;
+      border-left: 5px solid var(--primary-color);
+    }
+    .trip-card:active {
+      background-color: #f2f2f7;
+    }
   </style>
 </head>
 <body>
 
-  <header id="header-title">行程規劃</header>
+  <!-- Top Header -->
+  <header>
+    <button id="back-to-trips-btn" class="header-btn" style="visibility: hidden;" onclick="showTripsView()">
+      ‹ 返回旅程
+    </button>
+    <span id="header-title">日本自由行</span>
+    <span style="width: 70px;"></span>
+  </header>
 
   <div class="container">
-    
-    <!-- 1. 行程 Tab -->
-    <div id="tab-schedule" class="tab-content active">
-      <!-- 新增行程表單 -->
+
+    <!-- 1. 旅程選擇頁 (首頁) -->
+    <div id="view-trips" class="view active">
+      <!-- 新增旅程 (可折疊) -->
       <div class="card">
-        <h3 style="margin-bottom: 10px; font-size: 1rem;">➕ 新增行程項</h3>
-        <form id="schedule-form">
-          <div class="form-row">
+        <div class="collapsible-header" onclick="toggleCollapsible('trip-form-body', 'trip-form-icon')">
+          <span>➕ 新增自由行程</span>
+          <span id="trip-form-icon">＋</span>
+        </div>
+        <div id="trip-form-body" class="collapsible-body">
+          <form id="trip-form">
             <div class="form-group">
-              <label>日期</label>
-              <input type="date" id="sch-date" required>
+              <label>旅程名稱</label>
+              <input type="text" id="trip-name" placeholder="例如：大阪京都行" required>
             </div>
-            <div class="form-group">
-              <label>天數 (例: Day 1)</label>
-              <input type="text" id="sch-day" placeholder="Day 1" required>
+            <div class="form-row">
+              <div class="form-group">
+                <label>開始日期</label>
+                <input type="date" id="trip-start-date" required>
+              </div>
+              <div class="form-group">
+                <label>結束日期</label>
+                <input type="date" id="trip-end-date" required>
+              </div>
             </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>開始時間</label>
-              <input type="time" id="sch-start" required>
-            </div>
-            <div class="form-group">
-              <label>結束時間</label>
-              <input type="time" id="sch-end" required>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>地點 / 景點</label>
-            <input type="text" id="sch-place" placeholder="例如：淺草寺" required>
-          </div>
-          <div class="form-group">
-            <label>預計停留時間 / 備註</label>
-            <input type="text" id="sch-duration" placeholder="例如：2小時、需先預約">
-          </div>
-          <button type="submit" class="btn">新增行程</button>
-        </form>
-      </div>
-
-      <!-- 行程列表 -->
-      <div id="schedule-list"></div>
-    </div>
-
-    <!-- 2. 代購 Tab -->
-    <div id="tab-buy" class="tab-content">
-      
-      <!-- 匯率設定 -->
-      <div class="rate-bar">
-        <span>🇯🇵 日幣換算台幣匯率：</span>
-        <input type="number" id="exchange-rate" step="0.001" value="0.21" onchange="updateRate()">
-      </div>
-
-      <!-- 篩選器 -->
-      <div class="card">
-        <h3 style="margin-bottom: 10px; font-size: 0.9rem; color: var(--sub-text);">🔍 條件篩選</h3>
-        <div class="form-row">
-          <div class="form-group">
-            <label>分類</label>
-            <select id="filter-category" onchange="renderBuyList()">
-              <option value="ALL">全部分類</option>
-              <option value="藥妝">藥妝</option>
-              <option value="零食">零食</option>
-              <option value="動漫/玩具">動漫/玩具</option>
-              <option value="電器">電器</option>
-              <option value="服飾">服飾</option>
-              <option value="其他">其他</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>購買狀態</label>
-            <select id="filter-status" onchange="renderBuyList()">
-              <option value="ALL">全部狀態</option>
-              <option value="UNBOUGHT">未購買</option>
-              <option value="BOUGHT">已購買</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>委託人</label>
-            <select id="filter-owner" onchange="renderBuyList()">
-              <option value="ALL">全部委託人</option>
-            </select>
-          </div>
+            <button type="submit" class="btn">建立旅程</button>
+          </form>
         </div>
       </div>
 
-      <!-- 新增代購表單 -->
-      <div class="card">
-        <h3 style="margin-bottom: 10px; font-size: 1rem;">➕ 新增代購商品</h3>
-        <form id="buy-form">
-          <div class="form-group">
-            <label>商品名稱</label>
-            <input type="text" id="buy-name" placeholder="例如：合利他命 EX" required>
+      <!-- 旅程列表 -->
+      <h3 style="margin: 15px 5px 10px; font-size: 0.95rem; color: var(--sub-text);">我的旅程清單</h3>
+      <div id="trips-list"></div>
+    </div>
+
+    <!-- 2. 旅程細項與代購 (細項頁) -->
+    <div id="view-detail" class="view">
+      
+      <!-- 2A. 行程細項 Tab -->
+      <div id="tab-schedule" class="tab-content">
+        <!-- 新增細項表單 (可折疊) -->
+        <div class="card">
+          <div class="collapsible-header" onclick="toggleCollapsible('sch-form-body', 'sch-form-icon')">
+            <span>➕ 新增行程細項</span>
+            <span id="sch-form-icon">＋</span>
           </div>
+          <div id="sch-form-body" class="collapsible-body">
+            <form id="schedule-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>日期</label>
+                  <input type="date" id="sch-date" required>
+                </div>
+                <div class="form-group">
+                  <label>天數 (例: Day 1)</label>
+                  <input type="text" id="sch-day" placeholder="Day 1" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>開始時間</label>
+                  <input type="time" id="sch-start" required>
+                </div>
+                <div class="form-group">
+                  <label>結束時間</label>
+                  <input type="time" id="sch-end" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>地點 / 景點名稱</label>
+                <input type="text" id="sch-place" placeholder="例如：清水寺" required>
+              </div>
+              <div class="form-group">
+                <label>預計停留時間 / 備註</label>
+                <input type="text" id="sch-duration" placeholder="例如：停留 2 小時、預約 14:00">
+              </div>
+              <button type="submit" class="btn">儲存行程細項</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- 細項列表 -->
+        <div id="schedule-list"></div>
+      </div>
+
+      <!-- 2B. 代購清單 Tab -->
+      <div id="tab-buy" class="tab-content">
+        
+        <!-- 匯率設定 -->
+        <div class="rate-bar">
+          <span>🇯🇵 日幣換算台幣匯率：</span>
+          <input type="number" id="exchange-rate" step="0.001" value="0.21" onchange="updateRate()">
+        </div>
+
+        <!-- 新增代購表單 (可折疊) -->
+        <div class="card">
+          <div class="collapsible-header" onclick="toggleCollapsible('buy-form-body', 'buy-form-icon')">
+            <span>➕ 新增代購商品</span>
+            <span id="buy-form-icon">＋</span>
+          </div>
+          <div id="buy-form-body" class="collapsible-body">
+            <form id="buy-form">
+              <div class="form-group">
+                <label>商品名稱</label>
+                <input type="text" id="buy-name" placeholder="例如：合利他命 EX" required>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>分類</label>
+                  <select id="buy-category">
+                    <option value="藥妝">藥妝</option>
+                    <option value="零食">零食</option>
+                    <option value="動漫/玩具">動漫/玩具</option>
+                    <option value="電器">電器</option>
+                    <option value="服飾">服飾</option>
+                    <option value="其他">其他</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>數量</label>
+                  <input type="number" id="buy-qty" value="1" min="1" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>日幣單價 (円)</label>
+                  <input type="number" id="buy-price" placeholder="5000" required>
+                </div>
+                <div class="form-group">
+                  <label>委託人</label>
+                  <input type="text" id="buy-owner" placeholder="例如：小明" required>
+                </div>
+              </div>
+              <button type="submit" class="btn">新增代購項</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- 篩選器 -->
+        <div class="card">
+          <h3 style="margin-bottom: 10px; font-size: 0.85rem; color: var(--sub-text);">🔍 條件篩選</h3>
           <div class="form-row">
             <div class="form-group">
               <label>分類</label>
-              <select id="buy-category">
+              <select id="filter-category" onchange="renderBuyList()">
+                <option value="ALL">全部分類</option>
                 <option value="藥妝">藥妝</option>
                 <option value="零食">零食</option>
                 <option value="動漫/玩具">動漫/玩具</option>
@@ -341,35 +446,35 @@
               </select>
             </div>
             <div class="form-group">
-              <label>數量</label>
-              <input type="number" id="buy-qty" value="1" min="1" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>日幣單價 (円)</label>
-              <input type="number" id="buy-price" placeholder="5000" required>
+              <label>購買狀態</label>
+              <select id="filter-status" onchange="renderBuyList()">
+                <option value="ALL">全部狀態</option>
+                <option value="UNBOUGHT">未購買</option>
+                <option value="BOUGHT">已購買</option>
+              </select>
             </div>
             <div class="form-group">
               <label>委託人</label>
-              <input type="text" id="buy-owner" placeholder="例如：小明" required>
+              <select id="filter-owner" onchange="renderBuyList()">
+                <option value="ALL">全部委託人</option>
+              </select>
             </div>
           </div>
-          <button type="submit" class="btn">新增代購項</button>
-        </form>
+        </div>
+
+        <!-- 代購列表 -->
+        <div id="buy-list"></div>
       </div>
 
-      <!-- 代購列表 -->
-      <div id="buy-list"></div>
     </div>
 
   </div>
 
-  <!-- 底部分頁導覽列 -->
-  <nav class="nav-bar">
+  <!-- 細項頁底部分頁導覽列 -->
+  <nav id="detail-nav-bar" class="nav-bar" style="display: none;">
     <button class="nav-item active" onclick="switchTab('schedule')">
       <span class="nav-icon">🗺️</span>
-      行程規劃
+      行程細項
     </button>
     <button class="nav-item" onclick="switchTab('buy')">
       <span class="nav-icon">🛍️</span>
@@ -378,32 +483,188 @@
   </nav>
 
   <script>
-    // --- 資料結構與初始化 ---
-    let schedules = JSON.parse(localStorage.getItem('japan_schedules')) || [];
-    let buyItems = JSON.parse(localStorage.getItem('japan_buyItems')) || [];
+    // --- 資料存儲 State ---
+    let trips = JSON.parse(localStorage.getItem('japan_trips')) || [];
+    let currentTripId = null;
     let exchangeRate = parseFloat(localStorage.getItem('japan_rate')) || 0.21;
 
     document.getElementById('exchange-rate').value = exchangeRate;
 
-    // --- Tab 切換 logic ---
+    // --- 折疊控制 ---
+    function toggleCollapsible(bodyId, iconId) {
+      const body = document.getElementById(bodyId);
+      const icon = document.getElementById(iconId);
+      const isOpen = body.classList.contains('show');
+
+      if (isOpen) {
+        body.classList.remove('show');
+        icon.innerText = '＋';
+      } else {
+        body.classList.add('show');
+        icon.innerText = '✕';
+      }
+    }
+
+    // --- 頁面與 View 切換 ---
+    function showTripsView() {
+      currentTripId = null;
+      document.getElementById('view-trips').classList.add('active');
+      document.getElementById('view-detail').classList.remove('active');
+      document.getElementById('detail-nav-bar').style.display = 'none';
+      document.getElementById('back-to-trips-btn').style.visibility = 'hidden';
+      document.getElementById('header-title').innerText = '日本自由行';
+      renderTripsList();
+    }
+
+    function openTripDetail(tripId) {
+      currentTripId = tripId;
+      const trip = trips.find(t => t.id === tripId);
+      if (!trip) return;
+
+      document.getElementById('view-trips').classList.remove('active');
+      document.getElementById('view-detail').classList.add('active');
+      document.getElementById('detail-nav-bar').style.display = 'flex';
+      document.getElementById('back-to-trips-btn').style.visibility = 'visible';
+      document.getElementById('header-title').innerText = trip.name;
+
+      // 預設切換到行程 tab
+      switchTab('schedule');
+    }
+
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('#detail-nav-bar .nav-item').forEach(el => el.classList.remove('active'));
 
       if (tabName === 'schedule') {
         document.getElementById('tab-schedule').classList.add('active');
-        document.querySelectorAll('.nav-item')[0].classList.add('active');
-        document.getElementById('header-title').innerText = '行程規劃';
+        document.querySelectorAll('#detail-nav-bar .nav-item')[0].classList.add('active');
+        renderSchedules();
       } else {
         document.getElementById('tab-buy').classList.add('active');
-        document.querySelectorAll('.nav-item')[1].classList.add('active');
-        document.getElementById('header-title').innerText = '清單與代購';
+        document.querySelectorAll('#detail-nav-bar .nav-item')[1].classList.add('active');
         updateOwnerFilterOptions();
         renderBuyList();
       }
     }
 
-    // --- 匯率相關 ---
+    // --- 1. 旅程總覽 (Trips) ---
+    document.getElementById('trip-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const newTrip = {
+        id: Date.now(),
+        name: document.getElementById('trip-name').value.trim(),
+        startDate: document.getElementById('trip-start-date').value,
+        endDate: document.getElementById('trip-end-date').value,
+        schedules: [],
+        buyItems: []
+      };
+      trips.push(newTrip);
+      saveTrips();
+      renderTripsList();
+      this.reset();
+      toggleCollapsible('trip-form-body', 'trip-form-icon');
+    });
+
+    function deleteTrip(id, e) {
+      e.stopPropagation();
+      if (confirm('確定要刪除整個旅程及其內容嗎？')) {
+        trips = trips.filter(t => t.id !== id);
+        saveTrips();
+        renderTripsList();
+      }
+    }
+
+    function renderTripsList() {
+      const listEl = document.getElementById('trips-list');
+      listEl.innerHTML = '';
+
+      if (trips.length === 0) {
+        listEl.innerHTML = '<div style="text-align:center; color:var(--sub-text); padding:30px 0;">尚無旅程，請點擊上方 + 新增旅程</div>';
+        return;
+      }
+
+      trips.forEach(trip => {
+        const card = document.createElement('div');
+        card.className = 'card trip-card';
+        card.onclick = () => openTripDetail(trip.id);
+        card.innerHTML = `
+          <div class="item-header">
+            <span class="item-title">${trip.name}</span>
+            <button class="btn-danger" onclick="deleteTrip(${trip.id}, event)">刪除</button>
+          </div>
+          <div class="item-sub">🗓️ ${trip.startDate} ～ ${trip.endDate}</div>
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    function saveTrips() {
+      localStorage.setItem('japan_trips', JSON.stringify(trips));
+    }
+
+    // --- 2. 行程細項 (Schedule) ---
+    document.getElementById('schedule-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const trip = trips.find(t => t.id === currentTripId);
+      if (!trip) return;
+
+      const newItem = {
+        id: Date.now(),
+        date: document.getElementById('sch-date').value,
+        day: document.getElementById('sch-day').value.trim(),
+        startTime: document.getElementById('sch-start').value,
+        endTime: document.getElementById('sch-end').value,
+        place: document.getElementById('sch-place').value.trim(),
+        duration: document.getElementById('sch-duration').value.trim()
+      };
+
+      trip.schedules.push(newItem);
+      trip.schedules.sort((a, b) => (a.date + a.startTime).localeCompare(b.date + b.startTime));
+      saveTrips();
+      renderSchedules();
+      this.reset();
+      toggleCollapsible('sch-form-body', 'sch-form-icon');
+    });
+
+    function deleteSchedule(id) {
+      if (confirm('確定刪除此細項？')) {
+        const trip = trips.find(t => t.id === currentTripId);
+        if (trip) {
+          trip.schedules = trip.schedules.filter(s => s.id !== id);
+          saveTrips();
+          renderSchedules();
+        }
+      }
+    }
+
+    function renderSchedules() {
+      const listEl = document.getElementById('schedule-list');
+      listEl.innerHTML = '';
+      const trip = trips.find(t => t.id === currentTripId);
+      if (!trip || !trip.schedules || trip.schedules.length === 0) {
+        listEl.innerHTML = '<div style="text-align:center; color:var(--sub-text); padding:20px;">尚無細項行程，點擊上方 + 號新增</div>';
+        return;
+      }
+
+      trip.schedules.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="item-header">
+            <div>
+              <span class="tag">${item.day}</span>
+              <span class="item-sub">${item.date}</span>
+            </div>
+            <button class="btn-danger" onclick="deleteSchedule(${item.id})">刪除</button>
+          </div>
+          <div class="item-title" style="margin: 6px 0;">${item.place}</div>
+          <div class="item-sub">⏰ ${item.startTime} ~ ${item.endTime} ${item.duration ? `(${item.duration})` : ''}</div>
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    // --- 3. 代購清單 (Buy Items) ---
     function updateRate() {
       const val = parseFloat(document.getElementById('exchange-rate').value);
       if (!isNaN(val) && val > 0) {
@@ -413,110 +674,60 @@
       }
     }
 
-    // --- 1. 行程管理 logic ---
-    document.getElementById('schedule-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const newItem = {
-        id: Date.now(),
-        date: document.getElementById('sch-date').value,
-        day: document.getElementById('sch-day').value,
-        startTime: document.getElementById('sch-start').value,
-        endTime: document.getElementById('sch-end').value,
-        place: document.getElementById('sch-place').value,
-        duration: document.getElementById('sch-duration').value
-      };
-      schedules.push(newItem);
-      // 依日期與時間排序
-      schedules.sort((a, b) => (a.date + a.startTime).localeCompare(b.date + b.startTime));
-      saveSchedules();
-      renderSchedules();
-      this.reset();
-    });
-
-    function deleteSchedule(id) {
-      if (confirm('確定要刪除此行程嗎？')) {
-        schedules = schedules.filter(item => item.id !== id);
-        saveSchedules();
-        renderSchedules();
-      }
-    }
-
-    function saveSchedules() {
-      localStorage.setItem('japan_schedules', JSON.stringify(schedules));
-    }
-
-    function renderSchedules() {
-      const listEl = document.getElementById('schedule-list');
-      listEl.innerHTML = '';
-
-      if (schedules.length === 0) {
-        listEl.innerHTML = '<div style="text-align:center; color:var(--sub-text); padding:20px;">尚無行程，請點擊上方新增</div>';
-        return;
-      }
-
-      schedules.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <div class="item-header">
-            <div>
-              <span class="tag">${item.day}</span>
-              <span class="item-sub">${item.date}</span>
-            </div>
-            <button class="btn btn-danger" onclick="deleteSchedule(${item.id})">刪除</button>
-          </div>
-          <div class="item-title" style="margin: 6px 0;">${item.place}</div>
-          <div class="item-sub">⏰ ${item.startTime} ~ ${item.endTime} ${item.duration ? `(${item.duration})` : ''}</div>
-        `;
-        listEl.appendChild(card);
-      });
-    }
-
-    // --- 2. 代購管理 logic ---
     document.getElementById('buy-form').addEventListener('submit', function(e) {
       e.preventDefault();
+      const trip = trips.find(t => t.id === currentTripId);
+      if (!trip) return;
+
       const newItem = {
         id: Date.now(),
-        name: document.getElementById('buy-name').value,
+        name: document.getElementById('buy-name').value.trim(),
         category: document.getElementById('buy-category').value,
         qty: parseInt(document.getElementById('buy-qty').value),
         priceJpy: parseFloat(document.getElementById('buy-price').value),
         owner: document.getElementById('buy-owner').value.trim(),
         bought: false
       };
-      buyItems.push(newItem);
-      saveBuyItems();
+
+      if (!trip.buyItems) trip.buyItems = [];
+      trip.buyItems.push(newItem);
+      saveTrips();
       updateOwnerFilterOptions();
       renderBuyList();
       this.reset();
+      toggleCollapsible('buy-form-body', 'buy-form-icon');
     });
 
     function toggleBought(id) {
-      const item = buyItems.find(i => i.id === id);
-      if (item) {
-        item.bought = !item.bought;
-        saveBuyItems();
-        renderBuyList();
+      const trip = trips.find(t => t.id === currentTripId);
+      if (trip && trip.buyItems) {
+        const item = trip.buyItems.find(i => i.id === id);
+        if (item) {
+          item.bought = !item.bought;
+          saveTrips();
+          renderBuyList();
+        }
       }
     }
 
     function deleteBuyItem(id) {
-      if (confirm('確定刪除此代購項目？')) {
-        buyItems = buyItems.filter(i => i.id !== id);
-        saveBuyItems();
-        updateOwnerFilterOptions();
-        renderBuyList();
+      if (confirm('確定刪除此代購商品？')) {
+        const trip = trips.find(t => t.id === currentTripId);
+        if (trip && trip.buyItems) {
+          trip.buyItems = trip.buyItems.filter(i => i.id !== id);
+          saveTrips();
+          updateOwnerFilterOptions();
+          renderBuyList();
+        }
       }
-    }
-
-    function saveBuyItems() {
-      localStorage.setItem('japan_buyItems', JSON.stringify(buyItems));
     }
 
     function updateOwnerFilterOptions() {
       const select = document.getElementById('filter-owner');
       const currentVal = select.value;
-      const owners = [...new Set(buyItems.map(i => i.owner))];
+      const trip = trips.find(t => t.id === currentTripId);
+      const items = (trip && trip.buyItems) ? trip.buyItems : [];
+      const owners = [...new Set(items.map(i => i.owner))];
 
       select.innerHTML = '<option value="ALL">全部委託人</option>';
       owners.forEach(owner => {
@@ -530,14 +741,15 @@
 
     function renderBuyList() {
       const listEl = document.getElementById('buy-list');
+      listEl.innerHTML = '';
+      const trip = trips.find(t => t.id === currentTripId);
+      const items = (trip && trip.buyItems) ? trip.buyItems : [];
+
       const catFilter = document.getElementById('filter-category').value;
       const statusFilter = document.getElementById('filter-status').value;
       const ownerFilter = document.getElementById('filter-owner').value;
 
-      listEl.innerHTML = '';
-
-      // 篩選
-      const filtered = buyItems.filter(item => {
+      const filtered = items.filter(item => {
         if (catFilter !== 'ALL' && item.category !== catFilter) return false;
         if (statusFilter === 'BOUGHT' && !item.bought) return false;
         if (statusFilter === 'UNBOUGHT' && item.bought) return false;
@@ -560,7 +772,7 @@
             <div style="flex: 1;">
               <div class="item-header">
                 <span class="item-title">${item.name}</span>
-                <button class="btn btn-danger" onclick="deleteBuyItem(${item.id})">刪除</button>
+                <button class="btn-danger" onclick="deleteBuyItem(${item.id})">刪除</button>
               </div>
               <div style="margin-bottom: 4px;">
                 <span class="tag">${item.category}</span>
@@ -579,8 +791,205 @@
       });
     }
 
-    // 初始化渲染
-    renderSchedules();
+    // 初始化顯示旅程清單頁
+    renderTripsList();
+  </script>
+</body>
+</html>
+```eof
+
+更新後的網頁已為你產生完成！你可以將檔案覆蓋更新至 GitHub 上，重新整理頁面後即可體驗全新的兩層式結構（旅程總覽 ➜ 行程與代購細項）與摺疊新增介面。這是一個非常適合使用 Vue 3 (或 React/HTML+JS) 實作的互動介面架構。透過「狀態控制（State Management）」與「條件渲染（Conditional Rendering）」，可以輕鬆實現展開/折疊與兩階段輸入的流程。
+
+以下為您設計的版面架構與核心 HTML/CSS/Vue3 範例程式碼：
+
+### 畫面 UI/UX 架構規劃
+
+1. **第一頁：行程總覽頁 (Trip List View)**
+   * **頂部區域**：預設顯示一個 `+ 新增行程` 按鈕。點擊後向下展開輸入表單（包含：行程名稱、開始日期、結束日期），填完提交後收合並新增至列表。
+   * **行程卡片列表**：顯示已建立的行程（例如：`2026/09/25 - 2026/09/28 大阪京都行`）。點擊卡片即可「進入」該行程的詳細頁面。
+
+2. **第二頁：行程與代購細項頁 (Trip Detail View)**
+   * **頁籤/頂部欄**：顯示當前行程名稱，並提供返回按鈕。
+   * **功能開關區**：提供兩個折疊按鈕/按鍵（`+ 新增細項行程`、`+ 新增代購項目`）。
+   * **動態表單區**：點擊 `+` 號後才滑出對應的填寫表單，填寫完成點擊「儲存」後自動折疊收起。
+
+---
+
+### 程式碼實作範例 (Vue 3 語法)
+
+```html
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>旅遊行程與代購管理</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+  <div id="app" class="max-w-2xl mx-auto space-y-6">
+
+    <!-- 第一頁：行程總覽列表 -->
+    <div v-if="currentStep === 'list'" class="space-y-4">
+      <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-800">我的旅遊行程</h1>
+        <button 
+          @click="showAddTripForm = !showAddTripForm"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition flex items-center gap-1">
+          <span>{{ showAddTripForm ? '✕ 收起' : '＋ 新增行程' }}</span>
+        </button>
+      </div>
+
+      <!-- 折疊區：新增行程表單 -->
+      <div v-if="showAddTripForm" class="bg-white p-4 rounded-xl shadow-md space-y-3 transition-all">
+        <h3 class="font-semibold text-gray-700">新增旅遊計畫</h3>
+        <input v-model="newTrip.name" type="text" placeholder="行程名稱 (例如: 大阪京都行)" class="w-full border p-2 rounded" />
+        <div class="flex gap-2">
+          <input v-model="newTrip.startDate" type="date" class="w-1/2 border p-2 rounded" />
+          <input v-model="newTrip.endDate" type="date" class="w-1/2 border p-2 rounded" />
+        </div>
+        <button @click="createTrip" class="w-full bg-green-600 text-white py-2 rounded font-medium hover:bg-green-700">儲存行程</button>
+      </div>
+
+      <!-- 行程清單 -->
+      <div class="space-y-3">
+        <div 
+          v-for="(trip, index) in trips" 
+          :key="index" 
+          @click="selectTrip(trip)"
+          class="bg-white p-4 rounded-xl shadow cursor-pointer hover:border-blue-500 border-2 border-transparent transition flex justify-between items-center">
+          <div>
+            <h2 class="text-lg font-bold text-gray-800">{{ trip.name }}</h2>
+            <p class="text-sm text-gray-500">📅 {{ trip.startDate }} ~ {{ trip.endDate }}</p>
+          </div>
+          <span class="text-gray-400">進入細項 ➔</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第二頁：行程與代購細項管理 -->
+    <div v-if="currentStep === 'detail'" class="space-y-6">
+      <button @click="currentStep = 'list'" class="text-sm text-blue-600 hover:underline">← 返回行程列表</button>
+      
+      <div class="bg-white p-4 rounded-xl shadow">
+        <h1 class="text-2xl font-bold text-gray-800">{{ activeTrip.name }}</h1>
+        <p class="text-sm text-gray-500">📅 {{ activeTrip.startDate }} ~ {{ activeTrip.endDate }}</p>
+      </div>
+
+      <!-- 按鈕控制區：新增行程 / 新增代購 -->
+      <div class="flex gap-3">
+        <button 
+          @click="toggleForm('detail')" 
+          class="flex-1 bg-indigo-50 border-2 border-indigo-200 text-indigo-700 p-3 rounded-xl font-medium hover:bg-indigo-100 flex items-center justify-center gap-2">
+          <span>{{ activeForm === 'detail' ? '✕ 折疊' : '＋ 新增景點/每日行程' }}</span>
+        </button>
+        <button 
+          @click="toggleForm('shopping')" 
+          class="flex-1 bg-emerald-50 border-2 border-emerald-200 text-emerald-700 p-3 rounded-xl font-medium hover:bg-emerald-100 flex items-center justify-center gap-2">
+          <span>{{ activeForm === 'shopping' ? '✕ 折疊' : '＋ 新增代購清單' }}</span>
+        </button>
+      </div>
+
+      <!-- 折疊區 A：新增行程細項表單 -->
+      <div v-if="activeForm === 'detail'" class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 space-y-3">
+        <h3 class="font-semibold text-indigo-900">＋ 填寫行程細項</h3>
+        <input v-model="newItem.title" type="text" placeholder="景點/活動名稱 (例: 清水寺)" class="w-full border p-2 rounded" />
+        <textarea v-model="newItem.note" placeholder="備註 (例: 門票 400 日圓、需早起)" class="w-full border p-2 rounded"></textarea>
+        <button @click="addItem('details')" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">加入行程</button>
+      </div>
+
+      <!-- 折疊區 B：新增代購表單 -->
+      <div v-if="activeForm === 'shopping'" class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100 space-y-3">
+        <h3 class="font-semibold text-emerald-900">＋ 填寫代購項目</h3>
+        <input v-model="newShopping.item" type="text" placeholder="商品名稱 (例: 合利他命 EX)" class="w-full border p-2 rounded" />
+        <div class="flex gap-2">
+          <input v-model="newShopping.buyer" type="text" placeholder="委託人" class="w-1/2 border p-2 rounded" />
+          <input v-model="newShopping.price" type="number" placeholder="預估預算" class="w-1/2 border p-2 rounded" />
+        </div>
+        <button @click="addItem('shopping')" class="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700">加入代購</button>
+      </div>
+
+      <!-- 細項顯示區 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- 景點細項列表 -->
+        <div class="bg-white p-4 rounded-xl shadow space-y-2">
+          <h3 class="font-bold border-b pb-2 text-gray-700">📍 景點與每日行程</h3>
+          <ul class="space-y-2">
+            <li v-for="(item, i) in activeTrip.details" :key="i" class="bg-gray-50 p-2 rounded text-sm">
+              <div class="font-semibold text-gray-800">{{ item.title }}</div>
+              <div class="text-gray-500">{{ item.note }}</div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 代購清單列表 -->
+        <div class="bg-white p-4 rounded-xl shadow space-y-2">
+          <h3 class="font-bold border-b pb-2 text-gray-700">🛍️ 代購清單</h3>
+          <ul class="space-y-2">
+            <li v-for="(shop, i) in activeTrip.shoppingList" :key="i" class="bg-gray-50 p-2 rounded text-sm flex justify-between">
+              <div>
+                <span class="font-semibold text-gray-800">{{ shop.item }}</span>
+                <span class="text-xs text-gray-400 block">買主: {{ shop.buyer }}</span>
+              </div>
+              <span class="font-bold text-emerald-600">￥{{ shop.price }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref } = Vue;
+    createApp({
+      setup() {
+        const currentStep = ref('list'); // 'list' | 'detail'
+        const showAddTripForm = ref(false);
+        const activeForm = ref(null); // null | 'detail' | 'shopping'
+
+        const trips = ref([
+          { name: '大阪京都行', startDate: '2026-09-25', endDate: '2026-09-28', details: [], shoppingList: [] }
+        ]);
+        const activeTrip = ref(null);
+
+        const newTrip = ref({ name: '', startDate: '', endDate: '' });
+        const newItem = ref({ title: '', note: '' });
+        const newShopping = ref({ item: '', buyer: '', price: '' });
+
+        const createTrip = () => {
+          if (!newTrip.value.name) return;
+          trips.value.push({ ...newTrip.value, details: [], shoppingList: [] });
+          newTrip.value = { name: '', startDate: '', endDate: '' };
+          showAddTripForm.value = false; // 儲存後自動折疊
+        };
+
+        const selectTrip = (trip) => {
+          activeTrip.value = trip;
+          currentStep.value = 'detail';
+        };
+
+        const toggleForm = (formType) => {
+          activeForm.value = activeForm.value === formType ? null : formType;
+        };
+
+        const addItem = (type) => {
+          if (type === 'details' && newItem.value.title) {
+            activeTrip.value.details.push({ ...newItem.value });
+            newItem.value = { title: '', note: '' };
+          } else if (type === 'shopping' && newShopping.value.item) {
+            activeTrip.value.shoppingList.push({ ...newShopping.value });
+            newShopping.value = { item: '', buyer: '', price: '' };
+          }
+          activeForm.value = null; // 儲存後自動折疊表單
+        };
+
+        return {
+          currentStep, showAddTripForm, activeForm, trips, activeTrip,
+          newTrip, newItem, newShopping, createTrip, selectTrip, toggleForm, addItem
+        };
+      }
+    }).mount('#app');
   </script>
 </body>
 </html>
