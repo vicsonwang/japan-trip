@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>日本自由行助手</title>
+  <title>日本自由行助手 (雲端同步版)</title>
   <style>
     :root {
       --primary-color: #007aff;
@@ -265,6 +265,13 @@
       cursor: pointer;
       border-left: 5px solid var(--primary-color);
     }
+
+    .sync-status {
+      font-size: 0.75rem;
+      color: var(--success-color);
+      text-align: center;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -279,6 +286,7 @@
   </header>
 
   <div class="container">
+    <div id="sync-notice" class="sync-status">🟢 雲端連線同步中</div>
 
     <!-- 第一頁：旅程選擇頁 (首頁) -->
     <div id="view-trips" class="view active">
@@ -468,26 +476,59 @@
     </button>
   </nav>
 
-  <script>
-    let trips = JSON.parse(localStorage.getItem('japan_trips')) || [];
-    let currentTripId = null;
-    let exchangeRate = parseFloat(localStorage.getItem('japan_rate')) || 0.21;
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-    document.getElementById('exchange-rate').value = exchangeRate;
+  <script>
+    // 您的 Firebase 設定
+    const firebaseConfig = {
+      apiKey: "AIzaSyDCNbwIV1iMoxwlPL7a4xEbMwpMv75sOak",
+      authDomain: "japan-trip-701cd.firebaseapp.com",
+      projectId: "japan-trip-701cd",
+      storageBucket: "japan-trip-701cd.firebasestorage.app",
+      messagingSenderId: "811979985418",
+      appId: "1:811979985418:web:e3e93cf122f780af4585f3",
+      measurementId: "G-62BVTK2QEZ"
+    };
+
+    // 初始化 Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let trips = [];
+    let currentTripId = null;
+    let exchangeRate = 0.21;
+
+    // 實時監聽資料庫變更 (Realtime Sync)
+    db.collection("trips").onSnapshot(snapshot => {
+      trips = [];
+      snapshot.forEach(doc => {
+        trips.push({ id: doc.id, ...doc.data() });
+      });
+      renderTripsList();
+      if (currentTripId) {
+        renderSchedules();
+        updateOwnerFilterOptions();
+        renderBuyList();
+      }
+    });
+
+    db.collection("settings").doc("rate").onSnapshot(doc => {
+      if (doc.exists) {
+        exchangeRate = doc.data().val || 0.21;
+        document.getElementById('exchange-rate').value = exchangeRate;
+        if (currentTripId) renderBuyList();
+      }
+    });
 
     // 折疊表單控制
     function toggleCollapsible(bodyId, iconId) {
       const body = document.getElementById(bodyId);
       const icon = document.getElementById(iconId);
       const isOpen = body.classList.contains('show');
-
-      if (isOpen) {
-        body.classList.remove('show');
-        icon.innerText = '＋';
-      } else {
-        body.classList.add('show');
-        icon.innerText = '✕';
-      }
+      body.classList.toggle('show', !isOpen);
+      icon.innerText = isOpen ? '＋' : '✕';
     }
 
     // 頁面切換
@@ -535,16 +576,13 @@
     document.getElementById('trip-form').addEventListener('submit', function(e) {
       e.preventDefault();
       const newTrip = {
-        id: Date.now(),
         name: document.getElementById('trip-name').value.trim(),
         startDate: document.getElementById('trip-start-date').value,
         endDate: document.getElementById('trip-end-date').value,
         schedules: [],
         buyItems: []
       };
-      trips.push(newTrip);
-      saveTrips();
-      renderTripsList();
+      db.collection("trips").add(newTrip);
       this.reset();
       toggleCollapsible('trip-form-body', 'trip-form-icon');
     });
@@ -552,9 +590,7 @@
     function deleteTrip(id, e) {
       e.stopPropagation();
       if (confirm('確定要刪除整個旅程嗎？')) {
-        trips = trips.filter(t => t.id !== id);
-        saveTrips();
-        renderTripsList();
+        db.collection("trips").doc(id).delete();
       }
     }
 
@@ -574,16 +610,12 @@
         card.innerHTML = `
           <div class="item-header">
             <span class="item-title">${trip.name}</span>
-            <button class="btn-danger" onclick="deleteTrip(${trip.id}, event)">刪除</button>
+            <button class="btn-danger" onclick="deleteTrip('${trip.id}', event)">刪除</button>
           </div>
           <div class="item-sub">🗓️ ${trip.startDate} ～ ${trip.endDate}</div>
         `;
         listEl.appendChild(card);
       });
-    }
-
-    function saveTrips() {
-      localStorage.setItem('japan_trips', JSON.stringify(trips));
     }
 
     // 2. 行程細項
@@ -602,11 +634,10 @@
         duration: document.getElementById('sch-duration').value.trim()
       };
 
-      if (!trip.schedules) trip.schedules = [];
-      trip.schedules.push(newItem);
-      trip.schedules.sort((a, b) => (a.date + a.startTime).localeCompare(b.date + b.startTime));
-      saveTrips();
-      renderSchedules();
+      const updatedSchedules = [...(trip.schedules || []), newItem];
+      updatedSchedules.sort((a, b) => (a.date + a.startTime).localeCompare(b.date + b.startTime));
+
+      db.collection("trips").doc(currentTripId).update({ schedules: updatedSchedules });
       this.reset();
       toggleCollapsible('sch-form-body', 'sch-form-icon');
     });
@@ -615,9 +646,8 @@
       if (confirm('確定刪除此行程細項？')) {
         const trip = trips.find(t => t.id === currentTripId);
         if (trip) {
-          trip.schedules = trip.schedules.filter(s => s.id !== id);
-          saveTrips();
-          renderSchedules();
+          const updatedSchedules = trip.schedules.filter(s => s.id !== id);
+          db.collection("trips").doc(currentTripId).update({ schedules: updatedSchedules });
         }
       }
     }
@@ -653,9 +683,7 @@
     function updateRate() {
       const val = parseFloat(document.getElementById('exchange-rate').value);
       if (!isNaN(val) && val > 0) {
-        exchangeRate = val;
-        localStorage.setItem('japan_rate', exchangeRate);
-        renderBuyList();
+        db.collection("settings").doc("rate").set({ val: val });
       }
     }
 
@@ -674,11 +702,8 @@
         bought: false
       };
 
-      if (!trip.buyItems) trip.buyItems = [];
-      trip.buyItems.push(newItem);
-      saveTrips();
-      updateOwnerFilterOptions();
-      renderBuyList();
+      const updatedBuyItems = [...(trip.buyItems || []), newItem];
+      db.collection("trips").doc(currentTripId).update({ buyItems: updatedBuyItems });
       this.reset();
       toggleCollapsible('buy-form-body', 'buy-form-icon');
     });
@@ -686,12 +711,11 @@
     function toggleBought(id) {
       const trip = trips.find(t => t.id === currentTripId);
       if (trip && trip.buyItems) {
-        const item = trip.buyItems.find(i => i.id === id);
-        if (item) {
-          item.bought = !item.bought;
-          saveTrips();
-          renderBuyList();
-        }
+        const updatedBuyItems = trip.buyItems.map(item => {
+          if (item.id === id) return { ...item, bought: !item.bought };
+          return item;
+        });
+        db.collection("trips").doc(currentTripId).update({ buyItems: updatedBuyItems });
       }
     }
 
@@ -699,10 +723,8 @@
       if (confirm('確定刪除此代購商品？')) {
         const trip = trips.find(t => t.id === currentTripId);
         if (trip && trip.buyItems) {
-          trip.buyItems = trip.buyItems.filter(i => i.id !== id);
-          saveTrips();
-          updateOwnerFilterOptions();
-          renderBuyList();
+          const updatedBuyItems = trip.buyItems.filter(i => i.id !== id);
+          db.collection("trips").doc(currentTripId).update({ buyItems: updatedBuyItems });
         }
       }
     }
