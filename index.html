@@ -9,6 +9,7 @@
   <style>
     :root {
       --primary-color: #007aff;
+      --primary-light: #eef6ff;
       --bg-color: #f2f2f7;
       --card-bg: #ffffff;
       --text-color: #1c1c1e;
@@ -16,6 +17,7 @@
       --border-color: #e5e5ea;
       --danger-color: #ff3b30;
       --success-color: #34c759;
+      --warning-color: #ff9500;
     }
 
     * {
@@ -76,10 +78,11 @@
     /* Card Style */
     .card {
       background: var(--card-bg);
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid rgba(0,0,0,0.03);
     }
 
     /* Form Controls */
@@ -90,7 +93,8 @@
       display: block;
       font-size: 0.85rem;
       color: var(--sub-text);
-      margin-bottom: 4px;
+      margin-bottom: 6px;
+      font-weight: 500;
     }
     input, select, textarea {
       width: 100%;
@@ -143,17 +147,28 @@
       cursor: pointer;
       text-align: center;
     }
-    .btn-danger {
-      background-color: var(--danger-color);
-      color: white;
-      padding: 6px 12px;
-      font-size: 0.85rem;
-      width: auto;
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 0.8rem;
       border-radius: 6px;
       border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .btn-edit {
+      background-color: #e5e5ea;
+      color: #1c1c1e;
+    }
+    .btn-danger {
+      background-color: rgba(255, 59, 48, 0.1);
+      color: var(--danger-color);
+    }
+    .btn-action-group {
+      display: flex;
+      gap: 6px;
     }
 
-    /* Bottom Navigation Bar (iOS Style) */
+    /* Bottom Navigation Bar */
     .nav-bar {
       position: fixed;
       bottom: 0;
@@ -188,38 +203,65 @@
       margin-bottom: 2px;
     }
 
-    /* Item Card Details */
-    .item-header {
+    /* 行程美化卡片 */
+    .sch-card {
+      position: relative;
+      border-left: 4px solid var(--primary-color);
+      padding-left: 14px;
+    }
+    .sch-top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 8px;
     }
-    .item-title {
-      font-size: 1.1rem;
-      font-weight: 600;
+    .day-badge {
+      background: var(--primary-color);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
     }
-    .item-sub {
+    .date-text {
       font-size: 0.85rem;
       color: var(--sub-text);
+      margin-left: 6px;
+      font-weight: 500;
     }
-    .tag {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      background: #e5e5ea;
-      color: #3a3a3c;
-      margin-right: 5px;
+    .sch-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-color);
+      margin-bottom: 6px;
+    }
+    .sch-time {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.85rem;
+      color: var(--primary-color);
+      background: var(--primary-light);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .sch-note {
+      font-size: 0.85rem;
+      color: #636366;
+      margin-top: 6px;
+      background: #f8f8fa;
+      padding: 6px 10px;
+      border-radius: 6px;
     }
 
     /* Proxy Buy Specifics */
     .buy-item {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 12px;
     }
-    .buy-item.bought .item-title {
+    .buy-item.bought .sch-title {
       text-decoration: line-through;
       color: var(--sub-text);
     }
@@ -233,6 +275,7 @@
       justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
+      margin-top: 2px;
     }
     .checkbox-custom.checked {
       background-color: var(--success-color);
@@ -249,11 +292,12 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #eef6ff;
+      background: var(--primary-light);
       padding: 10px 15px;
-      border-radius: 8px;
+      border-radius: 10px;
       margin-bottom: 15px;
       font-size: 0.9rem;
+      font-weight: 500;
     }
     .rate-bar input {
       width: 80px;
@@ -271,6 +315,46 @@
       color: var(--success-color);
       text-align: center;
       margin-bottom: 10px;
+    }
+
+    /* Modal 彈窗樣式 */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+    .modal-overlay.show {
+      display: flex;
+    }
+    .modal-card {
+      background: #fff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--sub-text);
+      cursor: pointer;
     }
   </style>
 </head>
@@ -290,7 +374,6 @@
 
     <!-- 第一頁：旅程選擇頁 (首頁) -->
     <div id="view-trips" class="view active">
-      <!-- 折疊的新增旅程表單 -->
       <div class="card">
         <div class="collapsible-header" onclick="toggleCollapsible('trip-form-body', 'trip-form-icon')">
           <span>➕ 新增自由行程</span>
@@ -300,7 +383,7 @@
           <form id="trip-form">
             <div class="form-group">
               <label>旅程名稱</label>
-              <input type="text" id="trip-name" placeholder="例如：大阪京都行" required>
+              <input type="text" id="trip-name" placeholder="例如：東京 6 天 5 夜自由行" required>
             </div>
             <div class="form-row">
               <div class="form-group">
@@ -317,7 +400,6 @@
         </div>
       </div>
 
-      <!-- 旅程清單 -->
       <h3 style="margin: 15px 5px 10px; font-size: 0.9rem; color: var(--sub-text);">我的旅程清單</h3>
       <div id="trips-list"></div>
     </div>
@@ -327,7 +409,6 @@
       
       <!-- 1. 行程細項 Tab -->
       <div id="tab-schedule" class="tab-content">
-        <!-- 折疊的新增行程表單 -->
         <div class="card">
           <div class="collapsible-header" onclick="toggleCollapsible('sch-form-body', 'sch-form-icon')">
             <span>➕ 新增行程細項</span>
@@ -341,7 +422,7 @@
                   <input type="date" id="sch-date" required>
                 </div>
                 <div class="form-group">
-                  <label>天數 (例: Day 1)</label>
+                  <label>天數 (如: Day 1)</label>
                   <input type="text" id="sch-day" placeholder="Day 1" required>
                 </div>
               </div>
@@ -356,12 +437,12 @@
                 </div>
               </div>
               <div class="form-group">
-                <label>地點 / 景點</label>
-                <input type="text" id="sch-place" placeholder="例如：淺草寺" required>
+                <label>地點 / 景點 / 行程內容</label>
+                <input type="text" id="sch-place" placeholder="例如：成田機場 ✈️ 福岡機場" required>
               </div>
               <div class="form-group">
-                <label>預計停留時間 / 備註</label>
-                <input type="text" id="sch-duration" placeholder="例如：2小時、需先預約">
+                <label>備註 / 停留時間</label>
+                <input type="text" id="sch-duration" placeholder="例如：記得出示 Visit Japan Web QR Code">
               </div>
               <button type="submit" class="btn">新增行程</button>
             </form>
@@ -373,14 +454,11 @@
 
       <!-- 2. 代購 Tab -->
       <div id="tab-buy" class="tab-content">
-        
-        <!-- 匯率設定 -->
         <div class="rate-bar">
           <span>🇯🇵 日幣換算台幣匯率：</span>
           <input type="number" id="exchange-rate" step="0.001" value="0.21" onchange="updateRate()">
         </div>
 
-        <!-- 條件篩選 -->
         <div class="card">
           <h3 style="margin-bottom: 10px; font-size: 0.85rem; color: var(--sub-text);">🔍 條件篩選</h3>
           <div class="form-row">
@@ -413,7 +491,6 @@
           </div>
         </div>
 
-        <!-- 折疊的新增代購表單 -->
         <div class="card">
           <div class="collapsible-header" onclick="toggleCollapsible('buy-form-body', 'buy-form-icon')">
             <span>➕ 新增代購商品</span>
@@ -464,7 +541,94 @@
 
   </div>
 
-  <!-- 底部分頁導覽列 (只在進入行程後顯示) -->
+  <!-- 編輯行程 Modal -->
+  <div id="edit-sch-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span>✏️ 編輯行程細項</span>
+        <button class="modal-close" onclick="closeModal('edit-sch-modal')">✕</button>
+      </div>
+      <form id="edit-sch-form">
+        <input type="hidden" id="edit-sch-id">
+        <div class="form-row">
+          <div class="form-group">
+            <label>日期</label>
+            <input type="date" id="edit-sch-date" required>
+          </div>
+          <div class="form-group">
+            <label>天數</label>
+            <input type="text" id="edit-sch-day" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>開始時間</label>
+            <input type="time" id="edit-sch-start" required>
+          </div>
+          <div class="form-group">
+            <label>結束時間</label>
+            <input type="time" id="edit-sch-end" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>地點 / 景點 / 行程內容</label>
+          <input type="text" id="edit-sch-place" required>
+        </div>
+        <div class="form-group">
+          <label>備註 / 停留時間</label>
+          <input type="text" id="edit-sch-duration">
+        </div>
+        <button type="submit" class="btn">儲存變更</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 編輯代購 Modal -->
+  <div id="edit-buy-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span>✏️ 編輯代購商品</span>
+        <button class="modal-close" onclick="closeModal('edit-buy-modal')">✕</button>
+      </div>
+      <form id="edit-buy-form">
+        <input type="hidden" id="edit-buy-id">
+        <div class="form-group">
+          <label>商品名稱</label>
+          <input type="text" id="edit-buy-name" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>分類</label>
+            <select id="edit-buy-category">
+              <option value="藥妝">藥妝</option>
+              <option value="零食">零食</option>
+              <option value="動漫/玩具">動漫/玩具</option>
+              <option value="電器">電器</option>
+              <option value="服飾">服飾</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>數量</label>
+            <input type="number" id="edit-buy-qty" min="1" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>日幣單價 (円)</label>
+            <input type="number" id="edit-buy-price" required>
+          </div>
+          <div class="form-group">
+            <label>委託人</label>
+            <input type="text" id="edit-buy-owner" required>
+          </div>
+        </div>
+        <button type="submit" class="btn">儲存變更</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 底部分頁導覽列 -->
   <nav id="detail-nav-bar" class="nav-bar" style="display: none;">
     <button class="nav-item active" onclick="switchTab('schedule')">
       <span class="nav-icon">🗺️</span>
@@ -492,7 +656,6 @@
       measurementId: "G-62BVTK2QEZ"
     };
 
-    // 初始化 Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
@@ -500,7 +663,7 @@
     let currentTripId = null;
     let exchangeRate = 0.21;
 
-    // 實時監聽資料庫變更 (Realtime Sync)
+    // Realtime Sync
     db.collection("trips").onSnapshot(snapshot => {
       trips = [];
       snapshot.forEach(doc => {
@@ -529,6 +692,11 @@
       const isOpen = body.classList.contains('show');
       body.classList.toggle('show', !isOpen);
       icon.innerText = isOpen ? '＋' : '✕';
+    }
+
+    // Modal 控制
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
     }
 
     // 頁面切換
@@ -572,7 +740,7 @@
       }
     }
 
-    // 1. 旅程清單
+    // 1. 旅程管理
     document.getElementById('trip-form').addEventListener('submit', function(e) {
       e.preventDefault();
       const newTrip = {
@@ -608,17 +776,17 @@
         card.className = 'card trip-card';
         card.onclick = () => openTripDetail(trip.id);
         card.innerHTML = `
-          <div class="item-header">
-            <span class="item-title">${trip.name}</span>
-            <button class="btn-danger" onclick="deleteTrip('${trip.id}', event)">刪除</button>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:1.15rem; font-weight:700;">${trip.name}</span>
+            <button class="btn-sm btn-danger" onclick="deleteTrip('${trip.id}', event)">刪除</button>
           </div>
-          <div class="item-sub">🗓️ ${trip.startDate} ～ ${trip.endDate}</div>
+          <div style="font-size:0.85rem; color:var(--sub-text);">🗓️ ${trip.startDate} ～ ${trip.endDate}</div>
         `;
         listEl.appendChild(card);
       });
     }
 
-    // 2. 行程細項
+    // 2. 行程細項管理
     document.getElementById('schedule-form').addEventListener('submit', function(e) {
       e.preventDefault();
       const trip = trips.find(t => t.id === currentTripId);
@@ -635,11 +803,56 @@
       };
 
       const updatedSchedules = [...(trip.schedules || []), newItem];
+      // 按日期與時間排序
       updatedSchedules.sort((a, b) => (a.date + a.startTime).localeCompare(b.date + b.startTime));
 
       db.collection("trips").doc(currentTripId).update({ schedules: updatedSchedules });
       this.reset();
       toggleCollapsible('sch-form-body', 'sch-form-icon');
+    });
+
+    function openEditSchedule(id) {
+      const trip = trips.find(t => t.id === currentTripId);
+      if (!trip) return;
+      const item = trip.schedules.find(s => s.id === id);
+      if (!item) return;
+
+      document.getElementById('edit-sch-id').value = item.id;
+      document.getElementById('edit-sch-date').value = item.date;
+      document.getElementById('edit-sch-day').value = item.day;
+      document.getElementById('edit-sch-start').value = item.startTime;
+      document.getElementById('edit-sch-end').value = item.endTime;
+      document.getElementById('edit-sch-place').value = item.place;
+      document.getElementById('edit-sch-duration').value = item.duration || '';
+
+      document.getElementById('edit-sch-modal').classList.add('show');
+    }
+
+    document.getElementById('edit-sch-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const trip = trips.find(t => t.id === currentTripId);
+      if (!trip) return;
+
+      const id = parseInt(document.getElementById('edit-sch-id').value);
+      const updatedSchedules = trip.schedules.map(item => {
+        if (item.id === id) {
+          return {
+            id: id,
+            date: document.getElementById('edit-sch-date').value,
+            day: document.getElementById('edit-sch-day').value.trim(),
+            startTime: document.getElementById('edit-sch-start').value,
+            endTime: document.getElementById('edit-sch-end').value,
+            place: document.getElementById('edit-sch-place').value.trim(),
+            duration: document.getElementById('edit-sch-duration').value.trim()
+          };
+        }
+        return item;
+      });
+
+      updatedSchedules.sort((a, b) => (a.date + a.startTime).localeCompare(b.date + b.startTime));
+
+      db.collection("trips").doc(currentTripId).update({ schedules: updatedSchedules });
+      closeModal('edit-sch-modal');
     });
 
     function deleteSchedule(id) {
@@ -657,29 +870,38 @@
       listEl.innerHTML = '';
       const trip = trips.find(t => t.id === currentTripId);
       if (!trip || !trip.schedules || trip.schedules.length === 0) {
-        listEl.innerHTML = '<div style="text-align:center; color:var(--sub-text); padding:20px;">尚無行程細項，點擊上方 + 號新增</div>';
+        listEl.innerHTML = '<div style="text-align:center; color:var(--sub-text); padding:30px 0;">尚無行程細項，點擊上方 + 號新增</div>';
         return;
       }
 
-      trip.schedules.forEach(item => {
+      // 確保按時間排序
+      const sortedSchedules = [...trip.schedules].sort((a, b) => (a.date + a.startTime).localeCompare(b.date + b.startTime));
+
+      sortedSchedules.forEach(item => {
         const card = document.createElement('div');
-        card.className = 'card';
+        card.className = 'card sch-card';
         card.innerHTML = `
-          <div class="item-header">
+          <div class="sch-top-bar">
             <div>
-              <span class="tag">${item.day}</span>
-              <span class="item-sub">${item.date}</span>
+              <span class="day-badge">${item.day}</span>
+              <span class="date-text">${item.date}</span>
             </div>
-            <button class="btn-danger" onclick="deleteSchedule(${item.id})">刪除</button>
+            <div class="btn-action-group">
+              <button class="btn-sm btn-edit" onclick="openEditSchedule(${item.id})">編輯</button>
+              <button class="btn-sm btn-danger" onclick="deleteSchedule(${item.id})">刪除</button>
+            </div>
           </div>
-          <div class="item-title" style="margin: 6px 0;">${item.place}</div>
-          <div class="item-sub">⏰ ${item.startTime} ~ ${item.endTime} ${item.duration ? `(${item.duration})` : ''}</div>
+          <div class="sch-title">${item.place}</div>
+          <div style="margin-top: 4px;">
+            <span class="sch-time">⏰ ${item.startTime} ～ ${item.endTime}</span>
+          </div>
+          ${item.duration ? `<div class="sch-note">📌 ${item.duration}</div>` : ''}
         `;
         listEl.appendChild(card);
       });
     }
 
-    // 3. 代購
+    // 3. 代購管理
     function updateRate() {
       const val = parseFloat(document.getElementById('exchange-rate').value);
       if (!isNaN(val) && val > 0) {
@@ -706,6 +928,46 @@
       db.collection("trips").doc(currentTripId).update({ buyItems: updatedBuyItems });
       this.reset();
       toggleCollapsible('buy-form-body', 'buy-form-icon');
+    });
+
+    function openEditBuyItem(id) {
+      const trip = trips.find(t => t.id === currentTripId);
+      if (!trip) return;
+      const item = trip.buyItems.find(i => i.id === id);
+      if (!item) return;
+
+      document.getElementById('edit-buy-id').value = item.id;
+      document.getElementById('edit-buy-name').value = item.name;
+      document.getElementById('edit-buy-category').value = item.category;
+      document.getElementById('edit-buy-qty').value = item.qty;
+      document.getElementById('edit-buy-price').value = item.priceJpy;
+      document.getElementById('edit-buy-owner').value = item.owner;
+
+      document.getElementById('edit-buy-modal').classList.add('show');
+    }
+
+    document.getElementById('edit-buy-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const trip = trips.find(t => t.id === currentTripId);
+      if (!trip) return;
+
+      const id = parseInt(document.getElementById('edit-buy-id').value);
+      const updatedBuyItems = trip.buyItems.map(item => {
+        if (item.id === id) {
+          return {
+            ...item,
+            name: document.getElementById('edit-buy-name').value.trim(),
+            category: document.getElementById('edit-buy-category').value,
+            qty: parseInt(document.getElementById('edit-buy-qty').value),
+            priceJpy: parseFloat(document.getElementById('edit-buy-price').value),
+            owner: document.getElementById('edit-buy-owner').value.trim()
+          };
+        }
+        return item;
+      });
+
+      db.collection("trips").doc(currentTripId).update({ buyItems: updatedBuyItems });
+      closeModal('edit-buy-modal');
     });
 
     function toggleBought(id) {
@@ -756,7 +1018,7 @@
       const statusFilter = document.getElementById('filter-status').value;
       const ownerFilter = document.getElementById('filter-owner').value;
 
-      const filtered = items.filter(item => {
+      let filtered = items.filter(item => {
         if (catFilter !== 'ALL' && item.category !== catFilter) return false;
         if (statusFilter === 'BOUGHT' && !item.bought) return false;
         if (statusFilter === 'UNBOUGHT' && item.bought) return false;
@@ -764,8 +1026,11 @@
         return true;
       });
 
+      // 預設將未買的排在前面，已買的排後面
+      filtered.sort((a, b) => (a.bought === b.bought ? 0 : a.bought ? 1 : -1));
+
       if (filtered.length === 0) {
-        listEl.innerHTML = '<div style="text-align:center; color:var(--sub-text); padding:20px;">無符合條件的代購項目</div>';
+        listEl.innerHTML = '<div style="text-align:center; color:var(--sub-text); padding:30px 0;">無符合條件的代購項目</div>';
         return;
       }
 
@@ -777,19 +1042,22 @@
           <div class="buy-item ${item.bought ? 'bought' : ''}">
             <div class="checkbox-custom ${item.bought ? 'checked' : ''}" onclick="toggleBought(${item.id})"></div>
             <div style="flex: 1;">
-              <div class="item-header">
-                <span class="item-title">${item.name}</span>
-                <button class="btn-danger" onclick="deleteBuyItem(${item.id})">刪除</button>
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+                <span class="sch-title" style="font-size:1.05rem;">${item.name}</span>
+                <div class="btn-action-group">
+                  <button class="btn-sm btn-edit" onclick="openEditBuyItem(${item.id})">編輯</button>
+                  <button class="btn-sm btn-danger" onclick="deleteBuyItem(${item.id})">刪除</button>
+                </div>
               </div>
-              <div style="margin-bottom: 4px;">
+              <div style="margin-bottom: 6px;">
                 <span class="tag">${item.category}</span>
                 <span class="tag" style="background:#e3f2fd; color:#0d47a1;">👤 ${item.owner}</span>
               </div>
-              <div class="item-sub">
+              <div style="font-size:0.85rem; color:var(--sub-text);">
                 數量: <b>${item.qty}</b> | 單價: ¥${item.priceJpy.toLocaleString()}
               </div>
-              <div style="margin-top: 4px; font-weight: 600; color: #d32f2f;">
-                約 NT$ ${twpTotal.toLocaleString()} (含總價)
+              <div style="margin-top: 4px; font-weight: 700; color: #d32f2f; font-size:0.95rem;">
+                約 NT$ ${twpTotal.toLocaleString()}
               </div>
             </div>
           </div>
