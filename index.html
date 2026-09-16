@@ -740,6 +740,11 @@
               <label>備註 / 停留時間</label>
               <input type="text" id="sch-duration" placeholder="例如：記得出示 Visit Japan Web QR Code">
             </div>
+            <div class="form-group">
+  <label>照片（可選）</label>
+  <input type="file" id="sch-photo" accept="image/*">
+  <div id="sch-photo-preview" class="photo-preview"></div>
+</div>
             <button type="submit" class="btn">新增行程</button>
           </form>
         </div>
@@ -782,6 +787,12 @@
                 <input type="text" id="buy-owner" placeholder="例如：小明" required>
               </div>
             </div>
+
+            <div class="form-group">
+  <label>商品照片（可選）</label>
+  <input type="file" id="buy-photo" accept="image/*">
+  <div id="buy-photo-preview" class="photo-preview"></div>
+</div>
             <button type="submit" class="btn">新增代購項</button>
           </form>
         </div>
