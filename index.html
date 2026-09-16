@@ -1163,20 +1163,53 @@ function startTripSync(user) {
       renderTripsList();
     }
 
-    function openTripDetail(tripId) {
-      currentTripId = tripId;
-      const trip = trips.find(t => t.id === tripId);
-      if (!trip) return;
+   function openTripDetail(tripId, tripData = null) {
 
-      document.getElementById('view-trips').classList.remove('active');
-      document.getElementById('view-detail').classList.add('active');
-      document.getElementById('detail-nav-bar').style.display = 'flex';
-      document.getElementById('back-to-trips-btn').style.visibility = 'visible';
-      document.getElementById('header-title').innerText = trip.name;
+  // 優先使用目前記憶體中的旅程
+  let trip = trips.find(t => t.id === tripId);
 
-      switchTab('schedule');
-      setTimeout(setScheduleDefaults, 0);
+  // 如果 listener 還沒同步完成，就使用傳進來的資料
+  if (!trip && tripData) {
+    trip = {
+      id: tripId,
+      ...tripData
+    };
+
+    // 先放進本地 trips，避免畫面找不到
+    const existingIndex = trips.findIndex(t => t.id === tripId);
+
+    if (existingIndex >= 0) {
+      trips[existingIndex] = trip;
+    } else {
+      trips.push(trip);
     }
+  }
+
+  if (!trip) {
+    console.warn('找不到旅程：', tripId);
+    alert('旅程資料還在同步中，請再試一次。');
+    return;
+  }
+
+  currentTripId = tripId;
+
+  // 記住目前開啟的旅程
+  localStorage.setItem('currentTripId', tripId);
+
+  document.getElementById('view-trips').classList.remove('active');
+  document.getElementById('view-detail').classList.add('active');
+  document.getElementById('detail-nav-bar').style.display = 'flex';
+  document.getElementById('back-to-trips-btn').style.visibility = 'visible';
+  document.getElementById('header-title').innerText = trip.name || '日本自由行';
+
+  switchTab('schedule');
+
+  setTimeout(() => {
+    setScheduleDefaults();
+  }, 0);
+
+  console.log('進入旅程：', tripId, trip.name);
+}
 
     function toggleQuickPanel(panelId) {
       const panel = document.getElementById(panelId);
@@ -1264,13 +1297,17 @@ document.getElementById('trip-form')
   const inviteCode =
     generateInviteCode();
 
-  const newTrip = {
+const newTrip = {
 
     name,
 
     startDate,
 
     endDate,
+
+    // 旅程邀請碼
+    inviteCode: inviteCode,
+    code: inviteCode,
 
     schedules: [],
 
@@ -1934,6 +1971,10 @@ function generateInviteCode() {
 // 🔗 加入家庭旅程
 // ========================================
 
+// ========================================
+// 🔗 加入家庭旅程
+// ========================================
+
 document.getElementById('join-trip-form')
 .addEventListener('submit', async function(e) {
 
@@ -1946,8 +1987,8 @@ document.getElementById('join-trip-form')
     return;
   }
 
-  const code =
-    document.getElementById('join-trip-code')
+  const code = document
+    .getElementById('join-trip-code')
     .value
     .trim()
     .toUpperCase();
@@ -1955,19 +1996,27 @@ document.getElementById('join-trip-form')
   const resultEl =
     document.getElementById('join-trip-result');
 
-  resultEl.textContent =
-    '🔍 查找旅程中…';
+  if (!code) {
+    resultEl.style.color = 'var(--danger-color)';
+    resultEl.textContent = '❌ 請輸入旅程邀請碼';
+    return;
+  }
+
+  resultEl.style.color = 'var(--sub-text)';
+  resultEl.textContent = '🔍 查找旅程中…';
 
   try {
 
-    // 找邀請碼
-    const snapshot =
-      await db
-        .collection('tripInvites')
-        .doc(code)
-        .get();
+    // ------------------------------------
+    // 1. 找邀請碼
+    // ------------------------------------
 
-    if (!snapshot.exists) {
+    const inviteSnap = await db
+      .collection('tripInvites')
+      .doc(code)
+      .get();
+
+    if (!inviteSnap.exists) {
 
       resultEl.style.color =
         'var(--danger-color)';
@@ -1978,13 +2027,17 @@ document.getElementById('join-trip-form')
       return;
     }
 
-    const invite =
-      snapshot.data();
+    const invite = inviteSnap.data();
+    const tripId = invite.tripId;
 
-    const tripId =
-      invite.tripId;
+    if (!tripId) {
+      throw new Error('邀請碼資料不完整');
+    }
 
-    // 取得旅程
+    // ------------------------------------
+    // 2. 取得旅程
+    // ------------------------------------
+
     const tripRef =
       db.collection('trips').doc(tripId);
 
@@ -2002,41 +2055,81 @@ document.getElementById('join-trip-form')
       return;
     }
 
-    const trip =
-      tripSnap.data();
+    const trip = tripSnap.data();
+
+    // ------------------------------------
+    // 3. 確保 memberUids 存在
+    // ------------------------------------
 
     const members =
       Array.isArray(trip.memberUids)
         ? trip.memberUids
         : [];
 
-    // 已經加入
-    if (members.includes(user.uid)) {
+    // ------------------------------------
+    // 4. 加入成員
+    // ------------------------------------
 
-      resultEl.style.color =
-        'var(--success-color)';
+    if (!members.includes(user.uid)) {
 
-      resultEl.textContent =
-        '✅ 你已經是這個旅程的成員';
+      await tripRef.update({
 
-      setTimeout(() => {
+        memberUids:
+          firebase.firestore.FieldValue.arrayUnion(
+            user.uid
+          )
 
-        openTripDetail(tripId);
+      });
 
-      }, 500);
+      // 更新本地資料
+      trip.memberUids = [
+        ...members,
+        user.uid
+      ];
 
-      return;
+    } else {
+
+      trip.memberUids = members;
+
     }
 
-    // 加入成員
-    await tripRef.update({
+    // ------------------------------------
+    // 5. 立刻放進本地 trips
+    //    不等待 onSnapshot
+    // ------------------------------------
 
-      memberUids:
-        firebase.firestore.FieldValue.arrayUnion(
-          user.uid
-        )
+    const localTrip = {
+      id: tripId,
+      ...trip
+    };
 
-    });
+    const existingIndex =
+      trips.findIndex(t => t.id === tripId);
+
+    if (existingIndex >= 0) {
+
+      trips[existingIndex] = localTrip;
+
+    } else {
+
+      trips.push(localTrip);
+
+    }
+
+    // ------------------------------------
+    // 6. 設定目前旅程
+    // ------------------------------------
+
+    currentTripId = tripId;
+
+    localStorage.setItem(
+      'currentTripId',
+      tripId
+    );
+
+    // ------------------------------------
+    // 7. 顯示成功
+    // ------------------------------------
 
     resultEl.style.color =
       'var(--success-color)';
@@ -2048,16 +2141,27 @@ document.getElementById('join-trip-form')
       'join-trip-code'
     ).value = '';
 
+    // ------------------------------------
+    // 8. 直接進入旅程
+    //    不再等待 Firestore listener
+    // ------------------------------------
+
     setTimeout(() => {
 
-      toggleCollapsible(
-        'join-trip-body',
+      document.getElementById(
+        'join-trip-body'
+      ).classList.remove('show');
+
+      document.getElementById(
         'join-trip-icon'
+      ).textContent = '＋';
+
+      openTripDetail(
+        tripId,
+        localTrip
       );
 
-      openTripDetail(tripId);
-
-    }, 600);
+    }, 300);
 
   } catch (error) {
 
@@ -2071,10 +2175,12 @@ document.getElementById('join-trip-form')
 
     resultEl.textContent =
       '❌ 加入失敗：' +
-      error.message;
+      (error.message || error);
   }
 
 });
+
+   
   </script>
 </body>
 </html>
