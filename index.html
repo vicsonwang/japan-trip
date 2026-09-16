@@ -331,6 +331,14 @@
       border-radius: 10px;
       border: 1px solid var(--border-color);
     }
+    .photo-upload-status {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      color: var(--sub-text);
+      min-height: 1.2em;
+    }
+    .photo-upload-status.error { color: #d32f2f; }
+    .photo-upload-status.success { color: var(--success-color); }
     .photo-thumb {
       width: 58px;
       height: 58px;
@@ -737,10 +745,16 @@
               <input type="text" id="sch-place" placeholder="例如：成田機場 ✈️ 福岡機場" required>
             </div>
             <div class="form-group">
+              <label>照片（可選）</label>
+              <input type="file" id="sch-photo" accept="image/*">
+              <div id="sch-photo-preview" class="photo-preview"></div>
+              <div id="sch-photo-status" class="photo-upload-status"></div>
+            </div>
+            <div class="form-group">
               <label>備註 / 停留時間</label>
               <input type="text" id="sch-duration" placeholder="例如：記得出示 Visit Japan Web QR Code">
             </div>
-            <button type="submit" class="btn">新增行程</button>
+            
           </form>
         </div>
         <div id="schedule-list"></div>
@@ -771,18 +785,14 @@
                 <label>數量</label>
                 <input type="number" id="buy-qty" value="1" min="1" required>
               </div>
+            </div>
+            <div class="form-group">
+              <label>商品照片（可選）</label>
+              <input type="file" id="buy-photo" accept="image/*">
+              <div id="buy-photo-preview" class="photo-preview"></div>
+              <div id="buy-photo-status" class="photo-upload-status"></div>
             </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>日幣單價 (円)</label>
-                <input type="number" id="buy-price" placeholder="5000" required>
-              </div>
-              <div class="form-group">
-                <label>委託人</label>
-                <input type="text" id="buy-owner" placeholder="例如：小明" required>
-              </div>
-            </div>
-            <button type="submit" class="btn">新增代購項</button>
+            
           </form>
         </div>
         <div id="buy-list"></div>
@@ -1206,11 +1216,24 @@
     function showPhotoPreview(inputId, previewId, existingUrl='') {
       const input = document.getElementById(inputId);
       const preview = document.getElementById(previewId);
+      const status = document.getElementById(inputId + '-status');
       if (!input || !preview) return;
       preview.innerHTML = existingUrl ? `<img src="${existingUrl}" alt="照片預覽">` : '';
+      if (status) {
+        status.textContent = existingUrl ? '已存在照片' : '';
+        status.className = 'photo-upload-status';
+      }
       input.onchange = () => {
         const file = input.files && input.files[0];
-        if (!file) return;
+        if (!file) {
+          preview.innerHTML = '';
+          if (status) { status.textContent = ''; status.className = 'photo-upload-status'; }
+          return;
+        }
+        if (status) {
+          status.textContent = `已選擇：${file.name}（${Math.round(file.size / 1024)} KB），按下儲存後會上傳 Google Drive`;
+          status.className = 'photo-upload-status';
+        }
         const reader = new FileReader();
         reader.onload = e => preview.innerHTML = `<img src="${e.target.result}" alt="照片預覽">`;
         reader.readAsDataURL(file);
@@ -1471,15 +1494,20 @@
         duration: document.getElementById('sch-duration').value.trim()
       };
 
-      const photoFile = document.getElementById('sch-photo').files[0];
+      const photoInput = document.getElementById('sch-photo');
+      const photoFile = photoInput?.files?.[0];
+      const photoStatus = document.getElementById('sch-photo-status');
       if (photoFile) {
         try {
+          if (photoStatus) { photoStatus.textContent = '⏳ 正在上傳 Google Drive…'; photoStatus.className = 'photo-upload-status'; }
           const uploaded = await uploadPhoto(photoFile, 'schedulePhotos', newItem.id);
           newItem.photoUrl = uploaded.photoUrl;
           newItem.photoFileId = uploaded.fileId;
-          newItem.photoFileId = uploaded.fileId;
+          if (photoStatus) { photoStatus.textContent = `✅ Google Drive 上傳成功（File ID: ${uploaded.fileId}）`; photoStatus.className = 'photo-upload-status success'; }
         } catch (err) {
-          alert('照片上傳失敗：' + err.message);
+          console.error('行程照片上傳失敗：', err);
+          if (photoStatus) { photoStatus.textContent = '❌ ' + (err.message || err); photoStatus.className = 'photo-upload-status error'; }
+          alert('照片上傳失敗：\n' + (err.message || err));
           return;
         }
       }
@@ -1647,15 +1675,20 @@
         bought: false
       };
 
-      const photoFile = document.getElementById('buy-photo').files[0];
+      const photoInput = document.getElementById('buy-photo');
+      const photoFile = photoInput?.files?.[0];
+      const photoStatus = document.getElementById('buy-photo-status');
       if (photoFile) {
         try {
+          if (photoStatus) { photoStatus.textContent = '⏳ 正在上傳 Google Drive…'; photoStatus.className = 'photo-upload-status'; }
           const uploaded = await uploadPhoto(photoFile, 'buyPhotos', newItem.id);
           newItem.photoUrl = uploaded.photoUrl;
           newItem.photoFileId = uploaded.fileId;
-          newItem.photoFileId = uploaded.fileId;
+          if (photoStatus) { photoStatus.textContent = `✅ Google Drive 上傳成功（File ID: ${uploaded.fileId}）`; photoStatus.className = 'photo-upload-status success'; }
         } catch (err) {
-          alert('照片上傳失敗：' + err.message);
+          console.error('代購照片上傳失敗：', err);
+          if (photoStatus) { photoStatus.textContent = '❌ ' + (err.message || err); photoStatus.className = 'photo-upload-status error'; }
+          alert('照片上傳失敗：\n' + (err.message || err));
           return;
         }
       }
