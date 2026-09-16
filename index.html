@@ -723,33 +723,7 @@
   <div id="trips-list"></div>
 
 </div>
-          <span>➕ 新增自由行程</span>
-          <span id="trip-form-icon">＋</span>
-        </div>
-        <div id="trip-form-body" class="collapsible-body">
-          <form id="trip-form">
-            <div class="form-group">
-              <label>旅程名稱</label>
-              <input type="text" id="trip-name" placeholder="例如：東京 6 天 5 夜自由行" required>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>開始日期</label>
-                <input type="date" id="trip-start-date" required>
-              </div>
-              <div class="form-group">
-                <label>結束日期</label>
-                <input type="date" id="trip-end-date" required>
-              </div>
-            </div>
-            <button type="submit" class="btn">建立旅程</button>
-          </form>
-        </div>
-      </div>
-
-      <h3 style="margin: 15px 5px 10px; font-size: 0.9rem; color: var(--sub-text);">我的旅程清單</h3>
-      <div id="trips-list"></div>
-    </div>
+        
 
     <!-- 第二頁：行程與代購細項 -->
     <div id="view-detail" class="view">
@@ -1118,6 +1092,8 @@ const CLIENT_ID = '199956450968-4ufruphi7ebvglp45g5muqhivb6unsgl.apps.googleuser
 
 let tripsUnsubscribe = null;
 
+let tripsUnsubscribe = null;
+
 function startTripSync(user) {
 
   // 避免重複建立 listener
@@ -1131,6 +1107,123 @@ function startTripSync(user) {
     renderTripsList();
     return;
   }
+
+  console.log('開始同步旅程：', user.uid);
+
+  const savedTripId =
+    localStorage.getItem('currentTripId');
+
+  tripsUnsubscribe = db
+    .collection('trips')
+    .where('memberUids', 'array-contains', user.uid)
+    .onSnapshot(
+
+      // ==============================
+      // 成功
+      // ==============================
+      snapshot => {
+
+        trips = [];
+
+        snapshot.forEach(doc => {
+
+          trips.push({
+            id: doc.id,
+            ...doc.data()
+          });
+
+        });
+
+        // 日期排序
+        trips.sort((a, b) =>
+          (a.startDate || '').localeCompare(
+            b.startDate || ''
+          )
+        );
+
+        console.log(
+          `目前共有 ${trips.length} 個共享旅程`
+        );
+
+        renderTripsList();
+
+        // ==============================
+        // 自動恢復上次開啟的旅程
+        // ==============================
+
+        if (!currentTripId && savedTripId) {
+
+          const savedTrip =
+            trips.find(t => t.id === savedTripId);
+
+          if (savedTrip) {
+
+            console.log(
+              '恢復上次旅程：',
+              savedTrip.name
+            );
+
+            openTripDetail(
+              savedTrip.id,
+              savedTrip
+            );
+
+          } else {
+
+            localStorage.removeItem(
+              'currentTripId'
+            );
+
+          }
+        }
+
+        // ==============================
+        // 已經在旅程中
+        // ==============================
+
+        if (currentTripId) {
+
+          const currentTrip =
+            trips.find(t => t.id === currentTripId);
+
+          if (!currentTrip) {
+
+            localStorage.removeItem(
+              'currentTripId'
+            );
+
+            showTripsView();
+
+            return;
+          }
+
+          renderSchedules();
+          updateOwnerFilterOptions();
+          renderBuyList();
+        }
+
+      },
+
+      // ⭐ 這裡一定要有逗號
+      // ==============================
+      // 失敗
+      // ==============================
+      error => {
+
+        console.error(
+          '旅程同步失敗：',
+          error
+        );
+
+        document.getElementById(
+          'sync-notice'
+        ).innerHTML =
+          '🔴 雲端同步失敗：' +
+          (error.message || '');
+      }
+
+    );
+}
 
  console.log('開始同步旅程：', user.uid);
 
@@ -1215,7 +1308,7 @@ if (currentTripId) {
   renderSchedules();
   updateOwnerFilterOptions();
   renderBuyList();
-}
+},
 
       error => {
 
@@ -2057,7 +2150,151 @@ await db
     // ========================================
 // 🔑 產生邀請碼
 // ========================================
+function renderTripsList() {
 
+  const listEl =
+    document.getElementById('trips-list');
+
+  if (!listEl) return;
+
+  listEl.innerHTML = '';
+
+  if (!trips || trips.length === 0) {
+
+    listEl.innerHTML = `
+      <div class="card"
+           style="text-align:center;color:var(--sub-text);padding:30px 15px;">
+        <div style="font-size:2rem;margin-bottom:8px;">
+          🗾
+        </div>
+        <div style="font-weight:700;color:var(--text-color);">
+          目前還沒有旅程
+        </div>
+        <div style="font-size:.82rem;margin-top:5px;">
+          可以建立新的自由行程，或輸入邀請碼加入家庭旅程。
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+  trips.forEach(trip => {
+
+    const card =
+      document.createElement('div');
+
+    card.className =
+      'card trip-card';
+
+    card.onclick = () =>
+      openTripDetail(
+        trip.id,
+        trip
+      );
+
+    const start =
+      trip.startDate || '';
+
+    const end =
+      trip.endDate || '';
+
+    const memberCount =
+      Array.isArray(trip.memberUids)
+        ? trip.memberUids.length
+        : 1;
+
+    const isOwner =
+      auth.currentUser &&
+      trip.ownerUid === auth.currentUser.uid;
+
+    card.innerHTML = `
+
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:10px;
+      ">
+
+        <div style="min-width:0;">
+
+          <div style="
+            font-size:1.1rem;
+            font-weight:800;
+            margin-bottom:6px;
+          ">
+            🇯🇵 ${escapeHtml(trip.name || '未命名旅程')}
+          </div>
+
+          <div style="
+            font-size:.82rem;
+            color:var(--sub-text);
+          ">
+            📅 ${start} ～ ${end}
+          </div>
+
+          <div style="
+            font-size:.76rem;
+            color:var(--sub-text);
+            margin-top:5px;
+          ">
+            👥 ${memberCount} 位成員
+            ${isOwner ? ' · 👑 建立者' : ''}
+          </div>
+
+        </div>
+
+        <div style="
+          color:var(--primary-color);
+          font-size:1.4rem;
+          padding-top:5px;
+        ">
+          ›
+        </div>
+
+      </div>
+
+      ${
+        trip.inviteCode
+          ? `
+            <div style="
+              margin-top:12px;
+              padding-top:10px;
+              border-top:1px dashed var(--border-color);
+              font-size:.75rem;
+              color:var(--sub-text);
+            ">
+              邀請碼：
+              <b style="
+                color:var(--primary-color);
+                letter-spacing:1px;
+              ">
+                ${escapeHtml(trip.inviteCode)}
+              </b>
+            </div>
+          `
+          : ''
+      }
+
+    `;
+
+    listEl.appendChild(card);
+
+  });
+}
+
+
+function escapeHtml(value) {
+
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+}
 function generateInviteCode() {
 
   const chars =
