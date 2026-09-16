@@ -1225,81 +1225,148 @@
     async function ensureGoogleDriveToken() {
       if (googleDriveAccessToken) return googleDriveAccessToken;
       if (!auth.currentUser) throw new Error('請先登入 Google 帳號');
+
+      console.log('🔐 重新取得 Google Drive OAuth Token');
       const provider = new firebase.auth.GoogleAuthProvider();
       provider.addScope('https://www.googleapis.com/auth/drive.file');
       const result = await auth.currentUser.reauthenticateWithPopup(provider);
-      googleDriveAccessToken = result.credential && result.credential.accessToken;
-      if (!googleDriveAccessToken) throw new Error('沒有取得 Google Drive 授權');
+      googleDriveAccessToken = result.credential?.accessToken || null;
+
+      if (!googleDriveAccessToken) {
+        throw new Error('沒有取得 Google Drive 授權 Token。請確認 Google 登入視窗有允許 Drive 權限。');
+      }
       return googleDriveAccessToken;
     }
 
     async function driveApi(url, options = {}) {
       const token = await ensureGoogleDriveToken();
-      const headers = Object.assign({}, options.headers || {}, { Authorization: `Bearer ${token}` });
-      console.log('📡 Google Drive API:', options.method || 'GET', url);
+      const headers = Object.assign({}, options.headers || {}, {
+        Authorization: `Bearer ${token}`
+      });
 
-      const response = await fetch(url, Object.assign({}, options, { headers }));
-      let responseText = '';
-      try { responseText = await response.text(); } catch (_) {}
-      console.log('📡 Drive 回應：', response.status, responseText);
+      console.log('📡 Drive API →', options.method || 'GET', url);
+
+      let response;
+      try {
+        response = await fetch(url, Object.assign({}, options, { headers }));
+      } catch (networkError) {
+        throw new Error(
+          `Google Drive 網路請求失敗\n${networkError.message || networkError}`
+        );
+      }
+
+      const responseText = await response.text().catch(() => '');
+      console.log('📡 Drive API ←', response.status, responseText);
 
       if (response.status === 401) {
         googleDriveAccessToken = null;
-        throw new Error('Google Drive OAuth 授權已過期或無效（401）。請重新登入 Google。');
+        throw new Error('Google Drive 授權失效（401）。請重新登入 Google 後再試。');
       }
 
       if (!response.ok) {
-        let detail = responseText;
+        let reason = '未知';
+        let message = responseText || '沒有錯誤內容';
+
         try {
           const json = JSON.parse(responseText);
-          const reason = json?.error?.errors?.[0]?.reason || json?.error?.status || '';
-          const message = json?.error?.message || responseText;
-          detail = `reason=${reason || '未知'}\nmessage=${message}`;
+          reason = json?.error?.errors?.[0]?.reason || json?.error?.status || reason;
+          message = json?.error?.message || message;
         } catch (_) {}
-        throw new Error(`Google Drive HTTP ${response.status}\n${detail}`);
+
+        const hintMap = {
+          accessNotConfigured: 'Google Drive API 可能尚未在 Google Cloud 啟用。',
+          domainPolicy: 'Google Workspace 管理員可能禁止此 Drive 操作。',
+          storageQuotaExceeded: 'Google Drive 儲存空間可能已滿。',
+          rateLimitExceeded: 'Google Drive API 呼叫次數超過限制。',
+          userRateLimitExceeded: '此 Google 帳號的 API 呼叫次數超過限制。',
+          insufficientFilePermissions: '目前 OAuth 權限不足，請重新登入並允許 Google Drive 權限。'
+        };
+        const hint = hintMap[reason] ? `\n建議：${hintMap[reason]}` : '';
+
+        throw new Error(
+          `Google Drive HTTP ${response.status}\n` +
+          `reason=${reason}\n` +
+          `message=${message}${hint}`
+        );
       }
 
       return new Response(responseText, {
         status: response.status,
-        headers: { 'Content-Type': response.headers.get('Content-Type') || 'application/json' }
+        headers: {
+          'Content-Type': response.headers.get('Content-Type') || 'application/json'
+        }
       });
     }
 
-async function getOrCreateDriveFolder(folderName) {
-      console.log('📁 ① 檢查 Google Drive 資料夾：', folderName);
-      const q = encodeURIComponent(`name = '${folderName.replace(/'/g, "\\'")}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false`);
-      const list = await driveApi(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=drive&fields=files(id,name)&pageSize=10`);
-      const data = await list.json();
-      if (data.files?.length) {
-        console.log('📁 ② 找到既有資料夾：', data.files[0]);
-        return data.files[0].id;
+    async function getOrCreateDriveFolder(folderName) {
+      console.log(`📁 [1/3] 查詢 Drive 資料夾：${folderName}`);
+
+      const q = encodeURIComponent(
+        `name = '${folderName.replace(/'/g, "\\'")}' and ` +
+        `mimeType = 'application/vnd.google-apps.folder' and trashed = false`
+      );
+
+      try {
+        const list = await driveApi(
+          `https://www.googleapis.com/drive/v3/files?q=${q}` +
+          `&spaces=drive&fields=files(id,name,mimeType)&pageSize=10`
+        );
+        const data = await list.json();
+
+        if (data.files?.length) {
+          console.log('📁 [2/3] 找到資料夾：', data.files[0]);
+          return data.files[0].id;
+        }
+      } catch (err) {
+        throw new Error(`Drive 資料夾查詢失敗\n${err.message || err}`);
       }
 
-      console.log('📁 ③ 建立資料夾：', folderName);
-      const create = await driveApi('https://www.googleapis.com/drive/v3/files?fields=id,name', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: folderName, mimeType: 'application/vnd.google-apps.folder' })
-      });
-      const created = await create.json();
-      console.log('📁 ④ 資料夾建立成功：', created);
-      return created.id;
+      console.log(`📁 [2/3] 找不到，建立資料夾：${folderName}`);
+
+      try {
+        const create = await driveApi(
+          'https://www.googleapis.com/drive/v3/files?fields=id,name,mimeType',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: folderName,
+              mimeType: 'application/vnd.google-apps.folder'
+            })
+          }
+        );
+        const created = await create.json();
+        console.log('📁 [3/3] 資料夾建立成功：', created);
+        return created.id;
+      } catch (err) {
+        throw new Error(`Drive 資料夾建立失敗\n${err.message || err}`);
+      }
     }
 
     async function uploadPhoto(file, folder, id) {
       if (!file) return null;
       if (!auth.currentUser) throw new Error('請先登入 Google 帳號');
 
-      console.log('📸 開始上傳照片：', file.name, file.size, file.type);
-      console.log('📸 ⑤ 壓縮照片');
-      const compressed = await compressImage(file, 1600, 0.82);
-      console.log('📸 ⑥ 壓縮完成：', compressed.size);
+      const folderName = folder === 'schedulePhotos' ? '行程照片' : '代購照片';
+      console.log('========================================');
+      console.log('📸 開始 Google Drive 照片上傳');
+      console.log('📸 檔案：', file.name, file.type, file.size);
+      console.log('📸 目的資料夾：', folderName);
+
+      let compressed;
+      try {
+        console.log('📸 [1/4] 壓縮照片');
+        compressed = await compressImage(file, 1600, 0.82);
+        console.log('📸 [1/4] 壓縮完成：', compressed.size);
+      } catch (err) {
+        throw new Error(`照片壓縮失敗\n${err.message || err}`);
+      }
+
+      const subFolder = await getOrCreateDriveFolder(folderName);
 
       const safeName = (file.name || 'photo.jpg')
         .replace(/[^a-zA-Z0-9._-]/g, '_')
         .replace(/\.[^.]+$/, '') + '.jpg';
-      const folderName = folder === 'schedulePhotos' ? '行程照片' : '代購照片';
-      const subFolder = await getOrCreateDriveFolder(folderName);
 
       const metadata = {
         name: `${id}_${Date.now()}_${safeName}`,
@@ -1307,32 +1374,51 @@ async function getOrCreateDriveFolder(folderName) {
         parents: [subFolder]
       };
 
-      console.log('📸 ⑦ 準備送出 multipart 上傳：', metadata);
-      const boundary = 'japan_trip_' + Date.now();
-      const body = new Blob([
-        `--${boundary}\r\n`,
-        'Content-Type: application/json; charset=UTF-8\r\n\r\n',
-        JSON.stringify(metadata),
-        `\r\n--${boundary}\r\n`,
-        'Content-Type: image/jpeg\r\n\r\n',
-        compressed,
-        `\r\n--${boundary}--`
-      ]);
+      try {
+        console.log('📸 [3/4] 建立 multipart 上傳內容：', metadata);
 
-      const response = await driveApi('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink', {
-        method: 'POST',
-        headers: { 'Content-Type': `multipart/related; boundary=${boundary}` },
-        body
-      });
-      const uploaded = await response.json();
-      console.log('📸 ⑧ Google Drive 上傳成功：', uploaded);
+        const boundary = 'japan_trip_' + Date.now();
+        const body = new Blob([
+          `--${boundary}\r\n`,
+          'Content-Type: application/json; charset=UTF-8\r\n\r\n',
+          JSON.stringify(metadata),
+          `\r\n--${boundary}\r\n`,
+          'Content-Type: image/jpeg\r\n\r\n',
+          compressed,
+          `\r\n--${boundary}--`
+        ]);
 
-      // 不再設定 anyone/reader，避免 Google Workspace / 網域政策造成 403。
-      return {
-        fileId: uploaded.id,
-        photoUrl: `https://drive.google.com/thumbnail?id=${uploaded.id}&sz=w1200`
-      };
+        const response = await driveApi(
+          'https://www.googleapis.com/upload/drive/v3/files' +
+          '?uploadType=multipart&fields=id,name,webViewLink,webContentLink',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': `multipart/related; boundary=${boundary}`
+            },
+            body
+          }
+        );
+
+        const uploaded = await response.json();
+        console.log('📸 [4/4] Google Drive 上傳成功：', uploaded);
+
+        if (!uploaded.id) {
+          throw new Error('Google Drive 回傳成功，但沒有 fileId。');
+        }
+
+        // 不設定 anyone/reader，避免 Workspace 網域政策造成 403。
+        // 仍保留 fileId，照片屬於目前登入者自己的 Drive。
+        return {
+          fileId: uploaded.id,
+          photoUrl: `https://drive.google.com/thumbnail?id=${uploaded.id}&sz=w1200`,
+          webViewLink: uploaded.webViewLink || null
+        };
+      } catch (err) {
+        throw new Error(`Google Drive 照片上傳失敗\n${err.message || err}`);
+      }
     }
+
 
     function compressImage(file, maxSide, quality) {
       return new Promise((resolve, reject) => {
@@ -1390,6 +1476,7 @@ async function getOrCreateDriveFolder(folderName) {
         try {
           const uploaded = await uploadPhoto(photoFile, 'schedulePhotos', newItem.id);
           newItem.photoUrl = uploaded.photoUrl;
+          newItem.photoFileId = uploaded.fileId;
           newItem.photoFileId = uploaded.fileId;
         } catch (err) {
           alert('照片上傳失敗：' + err.message);
@@ -1565,6 +1652,7 @@ async function getOrCreateDriveFolder(folderName) {
         try {
           const uploaded = await uploadPhoto(photoFile, 'buyPhotos', newItem.id);
           newItem.photoUrl = uploaded.photoUrl;
+          newItem.photoFileId = uploaded.fileId;
           newItem.photoFileId = uploaded.fileId;
         } catch (err) {
           alert('照片上傳失敗：' + err.message);
