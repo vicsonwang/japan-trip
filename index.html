@@ -585,13 +585,26 @@
 </head>
 <body>
 
+  <!-- Google 登入遮罩 -->
+  <div id="login-overlay" class="modal-overlay show" style="z-index:3000; background:rgba(242,242,247,.98);">
+    <div class="modal-card" style="text-align:center; max-width:420px;">
+      <div style="font-size:3rem; margin-bottom:10px;">🇯🇵</div>
+      <div style="font-size:1.5rem; font-weight:800; margin-bottom:8px;">日本自由行助手</div>
+      <div style="color:var(--sub-text); line-height:1.6; margin-bottom:22px;">登入 Google 後即可同步旅程，並使用 Google Drive 儲存照片。</div>
+      <button id="google-login-btn" class="btn" style="background:#fff; color:#1c1c1e; border:1px solid var(--border-color); box-shadow:0 2px 8px rgba(0,0,0,.08);">
+        <span style="font-weight:800; color:#4285f4; margin-right:8px;">G</span> 使用 Google 帳號登入
+      </button>
+      <div id="login-error" style="color:var(--danger-color); font-size:.8rem; margin-top:12px;"></div>
+    </div>
+  </div>
+
   <!-- Top Header -->
   <header>
     <button id="back-to-trips-btn" class="header-btn" style="visibility: hidden;" onclick="showTripsView()">
       ‹ 返回旅程
     </button>
     <span id="header-title">日本自由行</span>
-    <span style="width: 70px;"></span>
+    <div id="user-area" style="min-width:120px; text-align:right; font-size:.75rem; color:var(--sub-text);">未登入</div>
   </header>
 
   <div class="container">
@@ -890,7 +903,7 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
   <script>
     // 您的 Firebase 設定
@@ -906,10 +919,42 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const storage = firebase.storage();
+    const auth = firebase.auth();
 
     let trips = [];
     let currentTripId = null;
+
+    auth.onAuthStateChanged(user => {
+      const overlay = document.getElementById('login-overlay');
+      const userArea = document.getElementById('user-area');
+      if (user) {
+        overlay.classList.remove('show');
+        userArea.innerHTML = `<span style="color:var(--success-color);">●</span> ${user.displayName || user.email || 'Google 使用者'}`;
+      } else {
+        overlay.classList.add('show');
+        userArea.textContent = '未登入';
+      }
+    });
+
+    document.getElementById('google-login-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('google-login-btn');
+      const error = document.getElementById('login-error');
+      error.textContent = '';
+      btn.disabled = true;
+      btn.textContent = 'Google 登入中…';
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('https://www.googleapis.com/auth/drive.file');
+        const result = await auth.signInWithPopup(provider);
+        googleDriveAccessToken = result.credential && result.credential.accessToken;
+      } catch (err) {
+        console.error(err);
+        error.textContent = '登入失敗：' + (err.message || err);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span style="font-weight:800; color:#4285f4; margin-right:8px;">G</span> 使用 Google 帳號登入';
+      }
+    });
     const TODAY_REFERENCE_RATE = 0.2057;
     const TODAY_REFERENCE_DATE = '2026-09-16';
     let exchangeRate = TODAY_REFERENCE_RATE;
@@ -1113,12 +1158,117 @@
       };
     }
 
+    // ===== Google Drive 照片上傳 =====
+    // 使用 Firebase Google 登入取得 Drive OAuth token；照片會存到「目前登入者」的 Google Drive。
+    // 需要在 Firebase Console → Authentication → Sign-in method 開啟 Google。
+    let googleDriveAccessToken = null;
+
+    async function ensureGoogleDriveToken() {
+      if (googleDriveAccessToken) return googleDriveAccessToken;
+      if (!auth.currentUser) throw new Error('請先登入 Google 帳號');
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.addScope('https://www.googleapis.com/auth/drive.file');
+      const result = await auth.currentUser.reauthenticateWithPopup(provider);
+      googleDriveAccessToken = result.credential && result.credential.accessToken;
+      if (!googleDriveAccessToken) throw new Error('沒有取得 Google Drive 授權');
+      return googleDriveAccessToken;
+    }
+
+    async function driveApi(url, options = {}) {
+      const token = await ensureGoogleDriveToken();
+      const headers = Object.assign({}, options.headers || {}, { Authorization: `Bearer ${token}` });
+      const response = await fetch(url, Object.assign({}, options, { headers }));
+      if (response.status === 401) {
+        googleDriveAccessToken = null;
+        throw new Error('Google Drive 授權已過期，請重新上傳一次');
+      }
+      if (!response.ok) {
+        let detail = '';
+        try { detail = await response.text(); } catch(e) {}
+        throw new Error(`Google Drive 錯誤 ${response.status}${detail ? ': ' + detail.slice(0,180) : ''}`);
+      }
+      return response;
+    }
+
+    async function getOrCreateDriveFolder(folderName) {
+      const q = encodeURIComponent(`name = '${folderName.replace(/'/g, "\\'")}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false`);
+      const list = await driveApi(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=drive&fields=files(id,name)&pageSize=10`);
+      const data = await list.json();
+      if (data.files && data.files.length) return data.files[0].id;
+
+      const create = await driveApi('https://www.googleapis.com/drive/v3/files?fields=id,name', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: folderName, mimeType: 'application/vnd.google-apps.folder' })
+      });
+      return (await create.json()).id;
+    }
+
     async function uploadPhoto(file, folder, id) {
       if (!file) return null;
-      const safeName = (file.name || 'photo').replace(/[^a-zA-Z0-9._-]/g, '_');
-      const ref = storage.ref(`${folder}/${currentTripId}/${id}_${Date.now()}_${safeName}`);
-      await ref.put(file);
-      return await ref.getDownloadURL();
+      if (!auth.currentUser) throw new Error('請先登入 Google 帳號');
+
+      // 瀏覽器端先壓縮，降低 Drive 用量；長邊最多 1600px、JPEG 約 82%。
+      const compressed = await compressImage(file, 1600, 0.82);
+      const safeName = (file.name || 'photo.jpg').replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.[^.]+$/, '') + '.jpg';
+      const subFolder = await getOrCreateDriveFolder(folder === 'schedulePhotos' ? '行程照片' : '代購照片');
+
+      const metadata = {
+        name: `${id}_${Date.now()}_${safeName}`,
+        mimeType: 'image/jpeg',
+        parents: [subFolder]
+      };
+      const boundary = 'japan_trip_' + Date.now();
+      const body = new Blob([
+        `--${boundary}\r\n`,
+        'Content-Type: application/json; charset=UTF-8\r\n\r\n',
+        JSON.stringify(metadata),
+        `\r\n--${boundary}\r\n`,
+        'Content-Type: image/jpeg\r\n\r\n',
+        compressed,
+        `\r\n--${boundary}--`
+      ]);
+
+      const response = await driveApi('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink', {
+        method: 'POST',
+        headers: { 'Content-Type': `multipart/related; boundary=${boundary}` },
+        body
+      });
+      const uploaded = await response.json();
+
+      // 設為「知道連結的人可查看」，讓其他家庭成員的瀏覽器也能看到照片。
+      await driveApi(`https://www.googleapis.com/drive/v3/files/${uploaded.id}/permissions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'anyone', role: 'reader' })
+      });
+
+      return {
+        fileId: uploaded.id,
+        photoUrl: `https://drive.google.com/thumbnail?id=${uploaded.id}&sz=w1200`
+      };
+    }
+
+    function compressImage(file, maxSide, quality) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = new Image();
+          img.onload = () => {
+            const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(img.width * scale));
+            canvas.height = Math.max(1, Math.round(img.height * scale));
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('照片壓縮失敗')), 'image/jpeg', quality);
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
     }
 
     showPhotoPreview('sch-photo','sch-photo-preview');
@@ -1135,7 +1285,7 @@
     });
 
     // 2. 行程細項管理
-    document.getElementById('schedule-form').addEventListener('submit', function(e) {
+    document.getElementById('schedule-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       const trip = trips.find(t => t.id === currentTripId);
       if (!trip) return;
@@ -1149,6 +1299,18 @@
         place: document.getElementById('sch-place').value.trim(),
         duration: document.getElementById('sch-duration').value.trim()
       };
+
+      const photoFile = document.getElementById('sch-photo').files[0];
+      if (photoFile) {
+        try {
+          const uploaded = await uploadPhoto(photoFile, 'schedulePhotos', newItem.id);
+          newItem.photoUrl = uploaded.photoUrl;
+          newItem.photoFileId = uploaded.fileId;
+        } catch (err) {
+          alert('照片上傳失敗：' + err.message);
+          return;
+        }
+      }
 
       const updatedSchedules = [...(trip.schedules || []), newItem];
       // 按日期與時間排序
@@ -1186,7 +1348,12 @@
       const id = parseInt(document.getElementById('edit-sch-id').value);
       const oldItem = trip.schedules.find(s => s.id === id);
       const photoFile = document.getElementById('edit-sch-photo').files[0];
-      const photoUrl = photoFile ? await uploadPhoto(photoFile, 'schedulePhotos', id) : (oldItem.photoUrl || null);
+      let photoUrl = oldItem.photoUrl || null;
+      let photoFileId = oldItem.photoFileId || null;
+      if (photoFile) {
+        try { const uploaded = await uploadPhoto(photoFile, 'schedulePhotos', id); photoUrl = uploaded.photoUrl; photoFileId = uploaded.fileId; }
+        catch (err) { alert('照片上傳失敗：' + err.message); return; }
+      }
 
       const updatedSchedules = trip.schedules.map(item => {
         if (item.id === id) {
@@ -1199,7 +1366,8 @@
             endTime: document.getElementById('edit-sch-end').value,
             place: document.getElementById('edit-sch-place').value.trim(),
             duration: document.getElementById('edit-sch-duration').value.trim(),
-            photoUrl
+            photoUrl,
+            photoFileId
           };
         }
         return item;
@@ -1292,7 +1460,7 @@
       }
     }
 
-    document.getElementById('buy-form').addEventListener('submit', function(e) {
+    document.getElementById('buy-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       const trip = trips.find(t => t.id === currentTripId);
       if (!trip) return;
@@ -1306,6 +1474,18 @@
         owner: document.getElementById('buy-owner').value.trim(),
         bought: false
       };
+
+      const photoFile = document.getElementById('buy-photo').files[0];
+      if (photoFile) {
+        try {
+          const uploaded = await uploadPhoto(photoFile, 'buyPhotos', newItem.id);
+          newItem.photoUrl = uploaded.photoUrl;
+          newItem.photoFileId = uploaded.fileId;
+        } catch (err) {
+          alert('照片上傳失敗：' + err.message);
+          return;
+        }
+      }
 
       const updatedBuyItems = [...(trip.buyItems || []), newItem];
       db.collection("trips").doc(currentTripId).update({ buyItems: updatedBuyItems });
@@ -1339,7 +1519,12 @@
       const id = parseInt(document.getElementById('edit-buy-id').value);
       const oldItem = trip.buyItems.find(i => i.id === id);
       const photoFile = document.getElementById('edit-buy-photo').files[0];
-      const photoUrl = photoFile ? await uploadPhoto(photoFile, 'buyPhotos', id) : (oldItem.photoUrl || null);
+      let photoUrl = oldItem.photoUrl || null;
+      let photoFileId = oldItem.photoFileId || null;
+      if (photoFile) {
+        try { const uploaded = await uploadPhoto(photoFile, 'buyPhotos', id); photoUrl = uploaded.photoUrl; photoFileId = uploaded.fileId; }
+        catch (err) { alert('照片上傳失敗：' + err.message); return; }
+      }
 
       const updatedBuyItems = trip.buyItems.map(item => {
         if (item.id === id) {
@@ -1350,7 +1535,8 @@
             qty: parseInt(document.getElementById('edit-buy-qty').value),
             priceJpy: parseFloat(document.getElementById('edit-buy-price').value),
             owner: document.getElementById('edit-buy-owner').value.trim(),
-            photoUrl
+            photoUrl,
+            photoFileId
           };
         }
         return item;
