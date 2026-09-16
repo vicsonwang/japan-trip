@@ -1503,39 +1503,30 @@ document.getElementById('trip-form')
 
 const newTrip = {
 
-    name,
+  name,
+  startDate,
+  endDate,
 
-    startDate,
+  inviteCode,
+  code: inviteCode,
 
-    endDate,
+  schedules: [],
+  buyItems: [],
 
-    // 旅程邀請碼
-    inviteCode: inviteCode,
-    code: inviteCode,
+  ownerUid: user.uid,
 
-    schedules: [],
+  ownerName:
+    user.displayName ||
+    user.email ||
+    'Google 使用者',
 
-    buyItems: [],
+  memberUids: [
+    user.uid
+  ],
 
-    // ⭐ 建立者
-    ownerUid: user.uid,
-
-    ownerName:
-      user.displayName ||
-      user.email ||
-      'Google 使用者',
-
-    // ⭐ 第一位成員就是建立者
-    memberUids: [
-      user.uid
-    ],
-
-    // ⭐ 給 Bao 加入
-    inviteCode,
-
-    createdAt:
-      firebase.firestore.FieldValue.serverTimestamp()
-  };
+  createdAt:
+    firebase.firestore.FieldValue.serverTimestamp()
+};
 
   try {
 
