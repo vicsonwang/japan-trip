@@ -163,6 +163,10 @@
       background-color: rgba(255, 59, 48, 0.1);
       color: var(--danger-color);
     }
+    .btn-action-group {
+      display: flex;
+      gap: 6px;
+    }
 
     /* Bottom Navigation Bar */
     .nav-bar {
@@ -199,7 +203,68 @@
       margin-bottom: 2px;
     }
 
+    /* 行程美化卡片 */
+    .sch-card {
+      position: relative;
+      border-left: 4px solid var(--primary-color);
+      padding-left: 14px;
+    }
+    .sch-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .day-badge {
+      background: var(--primary-color);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .date-text {
+      font-size: 0.85rem;
+      color: var(--sub-text);
+      margin-left: 6px;
+      font-weight: 500;
+    }
+    .sch-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-color);
+      margin-bottom: 6px;
+    }
+    .sch-time {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.85rem;
+      color: var(--primary-color);
+      background: var(--primary-light);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .sch-note {
+      font-size: 0.85rem;
+      color: #636366;
+      margin-top: 6px;
+      background: #f8f8fa;
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+
     /* Proxy Buy Specifics */
+    .buy-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .buy-item.bought .sch-title {
+      text-decoration: line-through;
+      color: var(--sub-text);
+    }
     .checkbox-custom {
       width: 24px;
       height: 24px;
@@ -223,6 +288,23 @@
       font-weight: bold;
     }
 
+    .rate-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--primary-light);
+      padding: 10px 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .rate-bar input {
+      width: 80px;
+      padding: 4px 8px;
+      text-align: right;
+    }
+
     .trip-card {
       cursor: pointer;
       border-left: 5px solid var(--primary-color);
@@ -234,6 +316,7 @@
       text-align: center;
       margin-bottom: 10px;
     }
+
 
     .photo-preview {
       margin-top: 8px;
@@ -256,7 +339,12 @@
       border: 1px solid var(--border-color);
       flex-shrink: 0;
     }
-
+    .buy-row {
+      display: grid;
+      grid-template-columns: 28px minmax(0,1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
     .buy-main-line {
       display: flex;
       align-items: center;
@@ -310,13 +398,22 @@
     .owner-items.show { display:block; }
     .buy-item-line {
       display:grid;
-      grid-template-columns:24px auto minmax(0,1fr) auto;
+      grid-template-columns:24px minmax(0,1fr) auto;
       gap:7px;
       align-items:center;
       padding:7px 0;
       border-bottom:1px solid #f0f0f2;
     }
     .buy-item-line:last-child { border-bottom:none; }
+    @media (max-width: 520px) {
+      .buy-actions .btn-sm {
+        padding: 6px 7px;
+        font-size: .72rem;
+      }
+      .buy-row { grid-template-columns: 26px minmax(0,1fr) auto; }
+      .buy-main-line .buy-name { max-width: 155px; }
+      .photo-thumb { width:50px; height:50px; }
+    }
 
     /* Modal 彈窗樣式 */
     .modal-overlay {
@@ -358,7 +455,7 @@
       cursor: pointer;
     }
 
-    /* 置頂快速工具列 */
+    /* === 2026 UI 更新：置頂快速工具列 === */
     .quick-toolbar {
       position: sticky;
       top: 61px;
@@ -407,7 +504,7 @@
     }
     .rate-reference {
       display:flex; justify-content:space-between; align-items:center; gap:10px;
-      background:var(--primary-light); border-radius:99px; padding:9px 12px;
+      background:var(--primary-light); border-radius:9px; padding:9px 10px;
       font-size:.82rem; margin-bottom:8px;
     }
     .rate-reference b { color:var(--primary-color); }
@@ -415,7 +512,7 @@
     .rate-edit-row input { flex:1; width:auto; padding:8px 10px; }
     .mini-note { font-size:.72rem; color:var(--sub-text); margin-top:5px; }
 
-    /* 行程：時間軸卡片 */
+    /* === 行程：專案管理 / 日期群組 / 時間軸 === */
     .schedule-day {
       background:#fff; border:1px solid var(--border-color); border-radius:14px;
       margin-bottom:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.035);
@@ -448,13 +545,42 @@
     .timeline-actions { display:flex; gap:4px; align-items:flex-start; }
     .timeline-actions .btn-sm { padding:4px 7px; }
 
+    /* === 代購：委託人群組 === */
+    .owner-group {
+      background:#fff; border:1px solid var(--border-color); border-radius:14px;
+      margin-bottom:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.035);
+    }
+    .owner-header {
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      padding:11px 13px; cursor:pointer; background:#fafafa;
+    }
+    .owner-title { font-weight:750; font-size:.95rem; }
+    .owner-meta { font-size:.72rem; color:var(--sub-text); }
+    .owner-items { display:none; }
+    .owner-items.show { display:block; }
+    .buy-row {
+      display:grid; grid-template-columns:28px 1fr auto; gap:8px; align-items:center;
+      padding:9px 11px; border-top:1px solid #f0f0f3;
+    }
+    .buy-main { min-width:0; }
+    .buy-line {
+      display:flex; align-items:center; gap:7px; min-width:0; white-space:nowrap; overflow:hidden;
+    }
+    .buy-name { font-weight:650; overflow:hidden; text-overflow:ellipsis; }
+    .buy-detail { font-size:.72rem; color:var(--sub-text); margin-top:2px; white-space:nowrap; }
+    .buy-total { font-size:.82rem; font-weight:750; color:#d32f2f; white-space:nowrap; }
+    .buy-actions { display:flex; gap:4px; }
     .tag { display:inline-block; padding:2px 6px; border-radius:5px; background:#f0f0f5; color:#636366; font-size:.65rem; }
     .sync-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--success-color); margin-right:4px; }
 
     @media (max-width:480px) {
       .timeline-item { grid-template-columns:64px 14px 1fr; }
       .timeline-actions { grid-column:3; margin-top:3px; }
+      .buy-row { grid-template-columns:28px 1fr; }
+      .buy-total, .buy-actions { grid-column:2; }
+      .buy-actions { justify-content:flex-end; }
     }
+
   </style>
 </head>
 <body>
@@ -488,6 +614,44 @@
     <div id="view-trips" class="view active">
       <div class="card">
         <div class="collapsible-header" onclick="toggleCollapsible('trip-form-body', 'trip-form-icon')">
+          <div class="card">
+  <div class="collapsible-header" onclick="toggleCollapsible('join-trip-body', 'join-trip-icon')">
+    <span>🔗 加入家庭旅程</span>
+    <span id="join-trip-icon">＋</span>
+  </div>
+
+  <div id="join-trip-body" class="collapsible-body">
+
+    <div style="font-size:.82rem;color:var(--sub-text);margin-bottom:12px;">
+      請輸入旅程建立者提供的邀請碼
+    </div>
+
+    <form id="join-trip-form">
+
+      <div class="form-group">
+        <label>旅程邀請碼</label>
+        <input
+          type="text"
+          id="join-trip-code"
+          placeholder="例如：JPN-8K4P"
+          maxlength="12"
+          style="text-transform:uppercase;"
+          required>
+      </div>
+
+      <button type="submit" class="btn">
+        🔗 加入旅程
+      </button>
+
+    </form>
+
+    <div
+      id="join-trip-result"
+      style="font-size:.8rem;margin-top:10px;text-align:center;">
+    </div>
+
+  </div>
+</div>
           <span>➕ 新增自由行程</span>
           <span id="trip-form-icon">＋</span>
         </div>
@@ -518,7 +682,7 @@
 
     <!-- 第二頁：行程與代購細項 -->
     <div id="view-detail" class="view">
-      <!-- 置頂快速工具列 -->
+      <!-- 置頂快速工具列：平時只佔一排，按下才展開 -->
       <div id="quick-toolbar" class="quick-toolbar">
         <button class="quick-btn sync" type="button"><span class="sync-dot"></span>同步中</button>
         <button class="quick-btn primary" type="button" onclick="toggleQuickPanel('add-panel')">＋ 新增</button>
@@ -615,10 +779,10 @@
               <input type="text" id="sch-duration" placeholder="例如：記得出示 Visit Japan Web QR Code">
             </div>
             <div class="form-group">
-              <label>照片（可選）</label>
-              <input type="file" id="sch-photo" accept="image/*">
-              <div id="sch-photo-preview" class="photo-preview"></div>
-            </div>
+  <label>照片（可選）</label>
+  <input type="file" id="sch-photo" accept="image/*">
+  <div id="sch-photo-preview" class="photo-preview"></div>
+</div>
             <button type="submit" class="btn">新增行程</button>
           </form>
         </div>
@@ -663,16 +827,17 @@
             </div>
 
             <div class="form-group">
-              <label>商品照片（可選）</label>
-              <input type="file" id="buy-photo" accept="image/*">
-              <div id="buy-photo-preview" class="photo-preview"></div>
-            </div>
+  <label>商品照片（可選）</label>
+  <input type="file" id="buy-photo" accept="image/*">
+  <div id="buy-photo-preview" class="photo-preview"></div>
+</div>
             <button type="submit" class="btn">新增代購項</button>
           </form>
         </div>
         <div id="buy-list"></div>
       </div>
     </div>
+
   </div>
 
   <!-- 編輯行程 Modal -->
@@ -784,12 +949,13 @@
     </button>
   </nav>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
+ <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script>
+    // 貼在 <script> 標籤內的最上方
+const CLIENT_ID = '199956450968-4ufruphi7ebvglp45g5muqhivb6unsgl.apps.googleusercontent.com';
+    // 您的 Firebase 設定
     const firebaseConfig = {
       apiKey: "AIzaSyDCNbwIV1iMoxwlPL7a4xEbMwpMv75sOak",
       authDomain: "japan-trip-701cd.firebaseapp.com",
@@ -806,32 +972,51 @@
 
     let trips = [];
     let currentTripId = null;
-    let googleDriveAccessToken = sessionStorage.getItem('gdrive_token') || null;
 
-    function updateUserArea(user) {
-      const userArea = document.getElementById('user-area');
-      if (user) {
-        const hasToken = !!(googleDriveAccessToken || sessionStorage.getItem('gdrive_token'));
-        const name = user.displayName || user.email || 'Google 使用者';
-        if (hasToken) {
-          userArea.innerHTML = `<span style="color:var(--success-color);">●</span> ${name}`;
-        } else {
-          userArea.innerHTML = `<button onclick="reauthDrive()" class="btn-sm btn-edit" style="font-size:0.7rem; padding:3px 6px;">🔑 授權 Drive</button> ${name}`;
-        }
-      } else {
-        userArea.textContent = '未登入';
-      }
+   auth.onAuthStateChanged(user => {
+
+  const overlay =
+    document.getElementById('login-overlay');
+
+  const userArea =
+    document.getElementById('user-area');
+
+  if (user) {
+
+    overlay.classList.remove('show');
+
+    userArea.innerHTML = `
+      <span style="color:var(--success-color);">●</span>
+      ${user.displayName || user.email || 'Google 使用者'}
+    `;
+
+    console.log(
+      'Google 使用者登入：',
+      user.email,
+      user.uid
+    );
+
+    // ⭐ 登入後只同步自己的旅程
+    startTripSync(user);
+
+  } else {
+
+    overlay.classList.add('show');
+
+    userArea.textContent = '未登入';
+
+    trips = [];
+    currentTripId = null;
+
+    if (tripsUnsubscribe) {
+      tripsUnsubscribe();
+      tripsUnsubscribe = null;
     }
 
-    auth.onAuthStateChanged(user => {
-      const overlay = document.getElementById('login-overlay');
-      if (user) {
-        overlay.classList.remove('show');
-      } else {
-        overlay.classList.add('show');
-      }
-      updateUserArea(user);
-    });
+    renderTripsList();
+  }
+
+});
 
     document.getElementById('google-login-btn').addEventListener('click', async () => {
       const btn = document.getElementById('google-login-btn');
@@ -843,11 +1028,7 @@
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.addScope('https://www.googleapis.com/auth/drive.file');
         const result = await auth.signInWithPopup(provider);
-        if (result.credential && result.credential.accessToken) {
-          googleDriveAccessToken = result.credential.accessToken;
-          sessionStorage.setItem('gdrive_token', googleDriveAccessToken);
-        }
-        updateUserArea(auth.currentUser);
+        googleDriveAccessToken = result.credential && result.credential.accessToken;
       } catch (err) {
         console.error(err);
         error.textContent = '登入失敗：' + (err.message || err);
@@ -856,40 +1037,92 @@
         btn.innerHTML = '<span style="font-weight:800; color:#4285f4; margin-right:8px;">G</span> 使用 Google 帳號登入';
       }
     });
-
-    async function reauthDrive() {
-      try {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        provider.addScope('https://www.googleapis.com/auth/drive.file');
-        const result = await auth.signInWithPopup(provider);
-        if (result.credential && result.credential.accessToken) {
-          googleDriveAccessToken = result.credential.accessToken;
-          sessionStorage.setItem('gdrive_token', googleDriveAccessToken);
-          alert('Google Drive 授權成功！');
-          updateUserArea(auth.currentUser);
-        }
-      } catch (err) {
-        alert('授權失敗：' + err.message);
-      }
-    }
-
     const TODAY_REFERENCE_RATE = 0.2057;
     const TODAY_REFERENCE_DATE = '2026-09-16';
     let exchangeRate = TODAY_REFERENCE_RATE;
 
-    // Realtime Sync
-    db.collection("trips").onSnapshot(snapshot => {
-      trips = [];
-      snapshot.forEach(doc => {
-        trips.push({ id: doc.id, ...doc.data() });
-      });
-      renderTripsList();
-      if (currentTripId) {
-        renderSchedules();
-        updateOwnerFilterOptions();
-        renderBuyList();
+   // ========================================
+// 🔐 只同步目前 Google 使用者參與的旅程
+// ========================================
+
+let tripsUnsubscribe = null;
+
+function startTripSync(user) {
+
+  // 避免重複建立 listener
+  if (tripsUnsubscribe) {
+    tripsUnsubscribe();
+    tripsUnsubscribe = null;
+  }
+
+  if (!user) {
+    trips = [];
+    renderTripsList();
+    return;
+  }
+
+  console.log('開始同步旅程：', user.uid);
+
+  tripsUnsubscribe = db
+    .collection("trips")
+    .where("memberUids", "array-contains", user.uid)
+    .onSnapshot(
+
+      snapshot => {
+
+        trips = [];
+
+        snapshot.forEach(doc => {
+
+          trips.push({
+            id: doc.id,
+            ...doc.data()
+          });
+
+        });
+
+        // 日期排序
+        trips.sort((a, b) =>
+          (a.startDate || '').localeCompare(b.startDate || '')
+        );
+
+        console.log(
+          `目前共有 ${trips.length} 個共享旅程`
+        );
+
+        renderTripsList();
+
+        if (currentTripId) {
+
+          const currentTrip =
+            trips.find(t => t.id === currentTripId);
+
+          // 如果被移出旅程
+          if (!currentTrip) {
+            showTripsView();
+            alert('你已不在這個旅程的成員名單中。');
+            return;
+          }
+
+          renderSchedules();
+          updateOwnerFilterOptions();
+          renderBuyList();
+        }
+      },
+
+      error => {
+
+        console.error(
+          '旅程同步失敗：',
+          error
+        );
+
+        document.getElementById('sync-notice').innerHTML =
+          '🔴 雲端同步失敗：' +
+          (error.message || '');
       }
-    });
+    );
+}
 
     db.collection("settings").doc("rate").onSnapshot(doc => {
       if (doc.exists) {
@@ -905,6 +1138,7 @@
     document.getElementById('rate-reference-date').textContent = TODAY_REFERENCE_DATE;
     document.getElementById('rate-reference-value').textContent = TODAY_REFERENCE_RATE.toFixed(4);
 
+    // 折疊表單控制
     function toggleCollapsible(bodyId, iconId) {
       const body = document.getElementById(bodyId);
       const icon = document.getElementById(iconId);
@@ -913,10 +1147,12 @@
       icon.innerText = isOpen ? '＋' : '✕';
     }
 
+    // Modal 控制
     function closeModal(modalId) {
       document.getElementById(modalId).classList.remove('show');
     }
 
+    // 頁面切換
     function showTripsView() {
       currentTripId = null;
       document.getElementById('view-trips').classList.add('active');
@@ -990,51 +1226,141 @@
     }
 
     // 1. 旅程管理
-    document.getElementById('trip-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const newTrip = {
-        name: document.getElementById('trip-name').value.trim(),
-        startDate: document.getElementById('trip-start-date').value,
-        endDate: document.getElementById('trip-end-date').value,
-        schedules: [],
-        buyItems: []
-      };
-      db.collection("trips").add(newTrip);
-      this.reset();
-      toggleCollapsible('trip-form-body', 'trip-form-icon');
-    });
+   // ========================================
+// ✈️ 建立新旅程
+// ========================================
 
-    function deleteTrip(id, e) {
-      e.stopPropagation();
-      if (confirm('確定要刪除整個旅程嗎？')) {
-        db.collection("trips").doc(id).delete();
-      }
-    }
+document.getElementById('trip-form')
+.addEventListener('submit', async function(e) {
 
-    function renderTripsList() {
-      const listEl = document.getElementById('trips-list');
-      listEl.innerHTML = '';
+  e.preventDefault();
 
-      if (trips.length === 0) {
-        listEl.innerHTML = '<div style="text-align:center; color:var(--sub-text); padding:30px 0;">尚無旅程，請點擊上方 + 新增自由行程</div>';
-        return;
-      }
+  const user = auth.currentUser;
 
-      trips.forEach(trip => {
-        const card = document.createElement('div');
-        card.className = 'card trip-card';
-        card.onclick = () => openTripDetail(trip.id);
-        card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <span style="font-size:1.15rem; font-weight:700;">${trip.name}</span>
-            <button class="btn-sm btn-danger" onclick="deleteTrip('${trip.id}', event)">刪除</button>
-          </div>
-          <div style="font-size:0.85rem; color:var(--sub-text);">🗓️ ${trip.startDate} ～ ${trip.endDate}</div>
-        `;
-        listEl.appendChild(card);
-      });
-    }
+  if (!user) {
+    alert('請先登入 Google 帳號');
+    return;
+  }
 
+  const name =
+    document.getElementById('trip-name')
+    .value
+    .trim();
+
+  const startDate =
+    document.getElementById('trip-start-date')
+    .value;
+
+  const endDate =
+    document.getElementById('trip-end-date')
+    .value;
+
+  if (!name || !startDate || !endDate) {
+    alert('請完整填寫旅程資料');
+    return;
+  }
+
+  // 產生 6 碼邀請碼
+  const inviteCode =
+    generateInviteCode();
+
+  const newTrip = {
+
+    name,
+
+    startDate,
+
+    endDate,
+
+    schedules: [],
+
+    buyItems: [],
+
+    // ⭐ 建立者
+    ownerUid: user.uid,
+
+    ownerName:
+      user.displayName ||
+      user.email ||
+      'Google 使用者',
+
+    // ⭐ 第一位成員就是建立者
+    memberUids: [
+      user.uid
+    ],
+
+    // ⭐ 給 Bao 加入
+    inviteCode,
+
+    createdAt:
+      firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  try {
+
+    const docRef =
+  await db
+    .collection("trips")
+    .add(newTrip);
+
+// 建立邀請碼索引
+await db
+  .collection("tripInvites")
+  .doc(inviteCode)
+  .set({
+
+    tripId: docRef.id,
+
+    createdBy: user.uid,
+
+    createdAt:
+      firebase.firestore.FieldValue.serverTimestamp()
+
+  });
+
+    console.log(
+      '旅程建立成功：',
+      docRef.id
+    );
+
+    this.reset();
+
+    toggleCollapsible(
+      'trip-form-body',
+      'trip-form-icon'
+    );
+
+    // 顯示邀請碼
+    setTimeout(() => {
+
+      alert(
+        `旅程建立成功！\n\n` +
+        `旅程：${name}\n\n` +
+        `邀請碼：${inviteCode}\n\n` +
+        `把這組邀請碼給 Bao，` +
+        `她登入 Google 後就可以加入。`
+      );
+
+    }, 200);
+
+  } catch (error) {
+
+    console.error(
+      '建立旅程失敗：',
+      error
+    );
+
+    alert(
+      '建立旅程失敗：\n' +
+      error.message
+    );
+  }
+
+});
+     
+
+
+    // ===== 行程連續輸入 / 照片上傳 =====
     function setScheduleDefaults() {
       const trip = trips.find(t => t.id === currentTripId);
       if (!trip) return;
@@ -1071,25 +1397,18 @@
       };
     }
 
-    async function ensureGoogleDriveToken() {
-      if (!googleDriveAccessToken) {
-        googleDriveAccessToken = sessionStorage.getItem('gdrive_token');
-      }
-      if (googleDriveAccessToken) return googleDriveAccessToken;
+    // ===== Google Drive 照片上傳 =====
+    // 使用 Firebase Google 登入取得 Drive OAuth token；照片會存到「目前登入者」的 Google Drive。
+    // 需要在 Firebase Console → Authentication → Sign-in method 開啟 Google。
+    let googleDriveAccessToken = null;
 
+    async function ensureGoogleDriveToken() {
+      if (googleDriveAccessToken) return googleDriveAccessToken;
       if (!auth.currentUser) throw new Error('請先登入 Google 帳號');
-      try {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        provider.addScope('https://www.googleapis.com/auth/drive.file');
-        const result = await auth.currentUser.reauthenticateWithPopup(provider);
-        googleDriveAccessToken = result.credential && result.credential.accessToken;
-        if (googleDriveAccessToken) {
-          sessionStorage.setItem('gdrive_token', googleDriveAccessToken);
-          updateUserArea(auth.currentUser);
-        }
-      } catch (err) {
-        throw new Error('Google Drive 授權失敗：請點擊右上角「🔑 授權 Drive」按鈕再重新試一次。');
-      }
+      const provider = new GoogleAuthProvider();
+      provider.addScope('https://www.googleapis.com/auth/drive.file');
+      const result = await auth.currentUser.reauthenticateWithPopup(provider);
+      googleDriveAccessToken = result.credential && result.credential.accessToken;
       if (!googleDriveAccessToken) throw new Error('沒有取得 Google Drive 授權');
       return googleDriveAccessToken;
     }
@@ -1100,9 +1419,7 @@
       const response = await fetch(url, Object.assign({}, options, { headers }));
       if (response.status === 401) {
         googleDriveAccessToken = null;
-        sessionStorage.removeItem('gdrive_token');
-        updateUserArea(auth.currentUser);
-        throw new Error('Google Drive 授權已過期，請點擊右上角「🔑 授權 Drive」重新授權');
+        throw new Error('Google Drive 授權已過期，請重新上傳一次');
       }
       if (!response.ok) {
         let detail = '';
@@ -1130,6 +1447,7 @@
       if (!file) return null;
       if (!auth.currentUser) throw new Error('請先登入 Google 帳號');
 
+      // 瀏覽器端先壓縮，降低 Drive 用量；長邊最多 1600px、JPEG 約 82%。
       const compressed = await compressImage(file, 1600, 0.82);
       const safeName = (file.name || 'photo.jpg').replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.[^.]+$/, '') + '.jpg';
       const subFolder = await getOrCreateDriveFolder(folder === 'schedulePhotos' ? '行程照片' : '代購照片');
@@ -1157,15 +1475,12 @@
       });
       const uploaded = await response.json();
 
-      try {
-        await driveApi(`https://www.googleapis.com/drive/v3/files/${uploaded.id}/permissions`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'anyone', role: 'reader' })
-        });
-      } catch (err) {
-        console.warn('權限設定警告', err);
-      }
+      // 設為「知道連結的人可查看」，讓其他家庭成員的瀏覽器也能看到照片。
+      await driveApi(`https://www.googleapis.com/drive/v3/files/${uploaded.id}/permissions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'anyone', role: 'reader' })
+      });
 
       return {
         fileId: uploaded.id,
@@ -1237,9 +1552,10 @@
       }
 
       const updatedSchedules = [...(trip.schedules || []), newItem];
+      // 按日期與時間排序
       updatedSchedules.sort((a, b) => (a.date + a.startTime).localeCompare(b.date + b.startTime));
 
-      await db.collection("trips").doc(currentTripId).update({ schedules: updatedSchedules });
+      db.collection("trips").doc(currentTripId).update({ schedules: updatedSchedules });
       this.reset();
       document.getElementById('sch-form-body').classList.remove('show');
       document.getElementById('add-panel').classList.remove('show');
@@ -1248,7 +1564,7 @@
     function openEditSchedule(id) {
       const trip = trips.find(t => t.id === currentTripId);
       if (!trip) return;
-      const item = (trip.schedules || []).find(s => s.id === id);
+      const item = trip.schedules.find(s => s.id === id);
       if (!item) return;
 
       document.getElementById('edit-sch-id').value = item.id;
@@ -1269,24 +1585,16 @@
       if (!trip) return;
 
       const id = parseInt(document.getElementById('edit-sch-id').value);
-      const oldItem = (trip.schedules || []).find(s => s.id === id);
-      if (!oldItem) return;
-
+      const oldItem = trip.schedules.find(s => s.id === id);
       const photoFile = document.getElementById('edit-sch-photo').files[0];
       let photoUrl = oldItem.photoUrl || null;
       let photoFileId = oldItem.photoFileId || null;
       if (photoFile) {
-        try {
-          const uploaded = await uploadPhoto(photoFile, 'schedulePhotos', id);
-          photoUrl = uploaded.photoUrl;
-          photoFileId = uploaded.fileId;
-        } catch (err) {
-          alert('照片上傳失敗：' + err.message);
-          return;
-        }
+        try { const uploaded = await uploadPhoto(photoFile, 'schedulePhotos', id); photoUrl = uploaded.photoUrl; photoFileId = uploaded.fileId; }
+        catch (err) { alert('照片上傳失敗：' + err.message); return; }
       }
 
-      const updatedSchedules = (trip.schedules || []).map(item => {
+      const updatedSchedules = trip.schedules.map(item => {
         if (item.id === id) {
           return {
             ...item,
@@ -1313,7 +1621,7 @@
       if (confirm('確定刪除此行程細項？')) {
         const trip = trips.find(t => t.id === currentTripId);
         if (trip) {
-          const updatedSchedules = (trip.schedules || []).filter(s => s.id !== id);
+          const updatedSchedules = trip.schedules.filter(s => s.id !== id);
           db.collection("trips").doc(currentTripId).update({ schedules: updatedSchedules });
         }
       }
@@ -1341,6 +1649,8 @@
       dates.forEach((date, index) => {
         const items = groups[date];
         const day = items[0].day || `Day ${index + 1}`;
+        const completed = items.filter(i => i.completed).length;
+        const progress = Math.round((completed / items.length) * 100);
         const wrap = document.createElement('div');
         wrap.className = 'schedule-day';
         wrap.innerHTML = `
@@ -1348,8 +1658,9 @@
             <span class="schedule-day-arrow" id="arrow-${date}">›</span>
             <div class="schedule-day-main">
               <div class="schedule-day-title">${day} · ${date}</div>
-              <div class="schedule-day-sub">${items.length} 個行程項目</div>
+              <div class="schedule-day-sub">${items.length} 個時間段 · ${completed}/${items.length} 已完成</div>
             </div>
+            <div class="schedule-progress"><span style="width:${progress}%"></span></div>
           </div>
           <div class="schedule-items ${index === 0 ? 'show' : ''}" id="day-items-${date}">
             ${items.map(item => `
@@ -1359,7 +1670,6 @@
                 <div class="timeline-content">
                   <div class="timeline-title">${item.place}</div>
                   ${item.duration ? `<div class="timeline-note">📌 ${item.duration}</div>` : ''}
-                  ${item.photoUrl ? `<div style="margin-top:6px;"><img class="photo-thumb" src="${item.photoUrl}" alt="行程照片"></div>` : ''}
                 </div>
                 <div class="timeline-actions">
                   <button class="btn-sm btn-edit" onclick="openEditSchedule(${item.id})">編輯</button>
@@ -1417,7 +1727,7 @@
       }
 
       const updatedBuyItems = [...(trip.buyItems || []), newItem];
-      await db.collection("trips").doc(currentTripId).update({ buyItems: updatedBuyItems });
+      db.collection("trips").doc(currentTripId).update({ buyItems: updatedBuyItems });
       this.reset();
       document.getElementById('buy-form-body').classList.remove('show');
       document.getElementById('add-panel').classList.remove('show');
@@ -1426,7 +1736,7 @@
     function openEditBuyItem(id) {
       const trip = trips.find(t => t.id === currentTripId);
       if (!trip) return;
-      const item = (trip.buyItems || []).find(i => i.id === id);
+      const item = trip.buyItems.find(i => i.id === id);
       if (!item) return;
 
       document.getElementById('edit-buy-id').value = item.id;
@@ -1446,24 +1756,16 @@
       if (!trip) return;
 
       const id = parseInt(document.getElementById('edit-buy-id').value);
-      const oldItem = (trip.buyItems || []).find(i => i.id === id);
-      if (!oldItem) return;
-
+      const oldItem = trip.buyItems.find(i => i.id === id);
       const photoFile = document.getElementById('edit-buy-photo').files[0];
       let photoUrl = oldItem.photoUrl || null;
       let photoFileId = oldItem.photoFileId || null;
       if (photoFile) {
-        try {
-          const uploaded = await uploadPhoto(photoFile, 'buyPhotos', id);
-          photoUrl = uploaded.photoUrl;
-          photoFileId = uploaded.fileId;
-        } catch (err) {
-          alert('照片上傳失敗：' + err.message);
-          return;
-        }
+        try { const uploaded = await uploadPhoto(photoFile, 'buyPhotos', id); photoUrl = uploaded.photoUrl; photoFileId = uploaded.fileId; }
+        catch (err) { alert('照片上傳失敗：' + err.message); return; }
       }
 
-      const updatedBuyItems = (trip.buyItems || []).map(item => {
+      const updatedBuyItems = trip.buyItems.map(item => {
         if (item.id === id) {
           return {
             ...item,
@@ -1583,13 +1885,13 @@
               return `
                 <div class="buy-item-line" onclick="event.stopPropagation()">
                   <div class="checkbox-custom ${item.bought ? 'checked' : ''}" onclick="toggleBought(${item.id})"></div>
-                  ${item.photoUrl ? `<img class="photo-thumb" src="${item.photoUrl}" alt="商品照片">` : '<div></div>'}
+                  ${item.photoUrl ? `<img class="photo-thumb" src="${item.photoUrl}" alt="商品照片">` : ''}
                   <div style="min-width:0;">
                     <div class="buy-main-line">
                       <span class="buy-name">${item.name}</span>
                       <span class="tag">${item.category}</span>
                     </div>
-                    <div class="buy-meta">×${item.qty} ¥${Number(item.priceJpy).toLocaleString()} → NT$ ${total.toLocaleString()}</div>
+                    <div class="buy-meta">×${item.qty}　¥${Number(item.priceJpy).toLocaleString()}　→　NT$ ${total.toLocaleString()}</div>
                   </div>
                   <div class="buy-actions" onclick="event.stopPropagation()">
                     <button class="btn-sm btn-edit" onclick="openEditBuyItem(${item.id})">編輯</button>
@@ -1604,6 +1906,175 @@
     }
 
     renderTripsList();
+    // ========================================
+// 🔑 產生邀請碼
+// ========================================
+
+function generateInviteCode() {
+
+  const chars =
+    'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+  let code = 'JPN-';
+
+  for (let i = 0; i < 4; i++) {
+
+    code +=
+      chars.charAt(
+        Math.floor(
+          Math.random() * chars.length
+        )
+      );
+
+  }
+
+  return code;
+}
+    // ========================================
+// 🔗 加入家庭旅程
+// ========================================
+
+document.getElementById('join-trip-form')
+.addEventListener('submit', async function(e) {
+
+  e.preventDefault();
+
+  const user = auth.currentUser;
+
+  if (!user) {
+    alert('請先登入 Google 帳號');
+    return;
+  }
+
+  const code =
+    document.getElementById('join-trip-code')
+    .value
+    .trim()
+    .toUpperCase();
+
+  const resultEl =
+    document.getElementById('join-trip-result');
+
+  resultEl.textContent =
+    '🔍 查找旅程中…';
+
+  try {
+
+    // 找邀請碼
+    const snapshot =
+      await db
+        .collection('tripInvites')
+        .doc(code)
+        .get();
+
+    if (!snapshot.exists) {
+
+      resultEl.style.color =
+        'var(--danger-color)';
+
+      resultEl.textContent =
+        '❌ 找不到這組邀請碼';
+
+      return;
+    }
+
+    const invite =
+      snapshot.data();
+
+    const tripId =
+      invite.tripId;
+
+    // 取得旅程
+    const tripRef =
+      db.collection('trips').doc(tripId);
+
+    const tripSnap =
+      await tripRef.get();
+
+    if (!tripSnap.exists) {
+
+      resultEl.style.color =
+        'var(--danger-color)';
+
+      resultEl.textContent =
+        '❌ 這個旅程已不存在';
+
+      return;
+    }
+
+    const trip =
+      tripSnap.data();
+
+    const members =
+      Array.isArray(trip.memberUids)
+        ? trip.memberUids
+        : [];
+
+    // 已經加入
+    if (members.includes(user.uid)) {
+
+      resultEl.style.color =
+        'var(--success-color)';
+
+      resultEl.textContent =
+        '✅ 你已經是這個旅程的成員';
+
+      setTimeout(() => {
+
+        openTripDetail(tripId);
+
+      }, 500);
+
+      return;
+    }
+
+    // 加入成員
+    await tripRef.update({
+
+      memberUids:
+        firebase.firestore.FieldValue.arrayUnion(
+          user.uid
+        )
+
+    });
+
+    resultEl.style.color =
+      'var(--success-color)';
+
+    resultEl.textContent =
+      `✅ 已加入「${trip.name}」`;
+
+    document.getElementById(
+      'join-trip-code'
+    ).value = '';
+
+    setTimeout(() => {
+
+      toggleCollapsible(
+        'join-trip-body',
+        'join-trip-icon'
+      );
+
+      openTripDetail(tripId);
+
+    }, 600);
+
+  } catch (error) {
+
+    console.error(
+      '加入旅程失敗：',
+      error
+    );
+
+    resultEl.style.color =
+      'var(--danger-color)';
+
+    resultEl.textContent =
+      '❌ 加入失敗：' +
+      error.message;
+  }
+
+});
   </script>
 </body>
 </html>
