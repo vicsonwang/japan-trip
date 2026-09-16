@@ -611,46 +611,117 @@
     <div id="sync-notice" class="sync-status">🟢 雲端連線同步中</div>
 
     <!-- 第一頁：旅程選擇頁 (首頁) -->
-    <div id="view-trips" class="view active">
-      <div class="card">
-        <div class="collapsible-header" onclick="toggleCollapsible('trip-form-body', 'trip-form-icon')">
-          <div class="card">
-  <div class="collapsible-header" onclick="toggleCollapsible('join-trip-body', 'join-trip-icon')">
-    <span>🔗 加入家庭旅程</span>
-    <span id="join-trip-icon">＋</span>
-  </div>
+  <div id="view-trips" class="view active">
 
-  <div id="join-trip-body" class="collapsible-body">
+  <!-- 加入家庭旅程 -->
+  <div class="card">
 
-    <div style="font-size:.82rem;color:var(--sub-text);margin-bottom:12px;">
-      請輸入旅程建立者提供的邀請碼
+    <div class="collapsible-header"
+         onclick="toggleCollapsible('join-trip-body', 'join-trip-icon')">
+
+      <span>🔗 加入家庭旅程</span>
+      <span id="join-trip-icon">＋</span>
+
     </div>
 
-    <form id="join-trip-form">
+    <div id="join-trip-body" class="collapsible-body">
 
-      <div class="form-group">
-        <label>旅程邀請碼</label>
-        <input
-          type="text"
-          id="join-trip-code"
-          placeholder="例如：JPN-8K4P"
-          maxlength="12"
-          style="text-transform:uppercase;"
-          required>
+      <div style="font-size:.82rem;color:var(--sub-text);margin-bottom:12px;">
+        請輸入旅程建立者提供的邀請碼
       </div>
 
-      <button type="submit" class="btn">
-        🔗 加入旅程
-      </button>
+      <form id="join-trip-form">
 
-    </form>
+        <div class="form-group">
+          <label>旅程邀請碼</label>
 
-    <div
-      id="join-trip-result"
-      style="font-size:.8rem;margin-top:10px;text-align:center;">
+          <input
+            type="text"
+            id="join-trip-code"
+            placeholder="例如：JPN-8K4P"
+            maxlength="8"
+            style="text-transform:uppercase;"
+            required>
+
+        </div>
+
+        <button type="submit" class="btn">
+          🔗 加入旅程
+        </button>
+
+      </form>
+
+      <div
+        id="join-trip-result"
+        style="font-size:.8rem;margin-top:10px;text-align:center;">
+      </div>
+
     </div>
 
   </div>
+
+
+  <!-- 新增旅程 -->
+  <div class="card">
+
+    <div class="collapsible-header"
+         onclick="toggleCollapsible('trip-form-body', 'trip-form-icon')">
+
+      <span>➕ 新增自由行程</span>
+      <span id="trip-form-icon">＋</span>
+
+    </div>
+
+    <div id="trip-form-body" class="collapsible-body">
+
+      <form id="trip-form">
+
+        <div class="form-group">
+          <label>旅程名稱</label>
+          <input
+            type="text"
+            id="trip-name"
+            placeholder="例如：東京 6 天 5 夜自由行"
+            required>
+        </div>
+
+        <div class="form-row">
+
+          <div class="form-group">
+            <label>開始日期</label>
+            <input
+              type="date"
+              id="trip-start-date"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label>結束日期</label>
+            <input
+              type="date"
+              id="trip-end-date"
+              required>
+          </div>
+
+        </div>
+
+        <button type="submit" class="btn">
+          建立旅程
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <h3 style="margin:15px 5px 10px;font-size:.9rem;color:var(--sub-text);">
+    我的旅程清單
+  </h3>
+
+  <div id="trips-list"></div>
+
 </div>
           <span>➕ 新增自由行程</span>
           <span id="trip-form-icon">＋</span>
@@ -1061,9 +1132,12 @@ function startTripSync(user) {
     return;
   }
 
-  console.log('開始同步旅程：', user.uid);
+ console.log('開始同步旅程：', user.uid);
 
-  tripsUnsubscribe = db
+const savedTripId =
+  localStorage.getItem('currentTripId');
+
+tripsUnsubscribe = db
     .collection("trips")
     .where("memberUids", "array-contains", user.uid)
     .onSnapshot(
@@ -1090,25 +1164,58 @@ function startTripSync(user) {
           `目前共有 ${trips.length} 個共享旅程`
         );
 
-        renderTripsList();
+       renderTripsList();
 
-        if (currentTripId) {
+// ------------------------------------
+// 自動恢復上次開啟的旅程
+// ------------------------------------
 
-          const currentTrip =
-            trips.find(t => t.id === currentTripId);
+if (!currentTripId && savedTripId) {
 
-          // 如果被移出旅程
-          if (!currentTrip) {
-            showTripsView();
-            alert('你已不在這個旅程的成員名單中。');
-            return;
-          }
+  const savedTrip =
+    trips.find(t => t.id === savedTripId);
 
-          renderSchedules();
-          updateOwnerFilterOptions();
-          renderBuyList();
-        }
-      },
+  if (savedTrip) {
+
+    console.log(
+      '恢復上次旅程：',
+      savedTrip.name
+    );
+
+    openTripDetail(
+      savedTrip.id,
+      savedTrip
+    );
+
+  } else {
+
+    // 已經不存在或已被移除
+    localStorage.removeItem('currentTripId');
+
+  }
+}
+
+if (currentTripId) {
+
+  const currentTrip =
+    trips.find(t => t.id === currentTripId);
+
+  // 如果被移出旅程
+  if (!currentTrip) {
+
+    localStorage.removeItem(
+      'currentTripId'
+    );
+
+    showTripsView();
+
+    return;
+  }
+
+  renderSchedules();
+  updateOwnerFilterOptions();
+  renderBuyList();
+}
 
       error => {
 
@@ -1153,8 +1260,12 @@ function startTripSync(user) {
     }
 
     // 頁面切換
-    function showTripsView() {
-      currentTripId = null;
+   function showTripsView() {
+
+  currentTripId = null;
+
+  // 使用者主動返回旅程列表時才清除
+  localStorage.removeItem('currentTripId');
       document.getElementById('view-trips').classList.add('active');
       document.getElementById('view-detail').classList.remove('active');
       document.getElementById('detail-nav-bar').style.display = 'none';
@@ -1442,7 +1553,7 @@ await db
     async function ensureGoogleDriveToken() {
       if (googleDriveAccessToken) return googleDriveAccessToken;
       if (!auth.currentUser) throw new Error('請先登入 Google 帳號');
-      const provider = new GoogleAuthProvider();
+      const provider = new firebase.auth.GoogleAuthProvider();
       provider.addScope('https://www.googleapis.com/auth/drive.file');
       const result = await auth.currentUser.reauthenticateWithPopup(provider);
       googleDriveAccessToken = result.credential && result.credential.accessToken;
