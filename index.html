@@ -917,6 +917,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
   <script>
+    // 貼在 <script> 標籤內的最上方
+const CLIENT_ID = '199956450968-4ufruphi7ebvglp45g5muqhivb6unsgl.apps.googleusercontent.com';
     // 您的 Firebase 設定
     const firebaseConfig = {
       apiKey: "AIzaSyDCNbwIV1iMoxwlPL7a4xEbMwpMv75sOak",
@@ -1177,7 +1179,7 @@
     async function ensureGoogleDriveToken() {
       if (googleDriveAccessToken) return googleDriveAccessToken;
       if (!auth.currentUser) throw new Error('請先登入 Google 帳號');
-      const provider = new firebase.auth.GoogleAuthProvider();
+      const provider = new GoogleAuthProvider();
       provider.addScope('https://www.googleapis.com/auth/drive.file');
       const result = await auth.currentUser.reauthenticateWithPopup(provider);
       googleDriveAccessToken = result.credential && result.credential.accessToken;
