@@ -1435,9 +1435,7 @@
       // 某些 Google Workspace 管理員會禁止 anyone 權限。
       // 上傳成功後若無法公開分享，仍保留 fileId，但照片可能只有同帳號可見。
       try {
-        await driveApi(`https://www.googleapis.com/drive/v3/files/${uploaded.id}/permissions`, {
-          method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'anyone',role:'reader'})
-        });
+       
       } catch (permissionError) {
         console.warn('Google Drive 公開分享權限設定失敗，照片仍已上傳：', permissionError);
       }
