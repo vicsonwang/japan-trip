@@ -1798,7 +1798,7 @@ console.log('📸 新照片 File ID =', newItem.photoFileId);
       document.getElementById('add-panel').classList.remove('show');
     });
 
-   function openEditSchedule(id) {
+ async function openEditSchedule(id) {
   const trip = trips.find(t => t.id === currentTripId);
   if (!trip) return;
 
@@ -1821,31 +1821,36 @@ console.log('📸 新照片 File ID =', newItem.photoFileId);
   document.getElementById('edit-sch-place').value = item.place;
   document.getElementById('edit-sch-duration').value = item.duration || '';
 
- console.log('🚀 準備直接測試 Drive 圖片');
-console.log('🚀 File ID =', item.photoFileId);
+  document.getElementById('edit-sch-modal').classList.add('show');
 
-const testDriveUrl = await getDrivePhotoUrl(item.photoFileId);
+  // ========================================
+  // 直接測試 Google Drive 圖片
+  // ========================================
+  console.log('🚀 準備直接測試 Drive 圖片');
 
-console.log('🚀 getDrivePhotoUrl 回傳 =', testDriveUrl);
+  const testDriveUrl = await getDrivePhotoUrl(item.photoFileId);
 
-if (testDriveUrl) {
-  const preview = document.getElementById('edit-sch-photo-preview');
+  console.log('🚀 getDrivePhotoUrl 回傳 =', testDriveUrl);
 
-  preview.innerHTML = '';
+  if (testDriveUrl) {
+    const preview = document.getElementById('edit-sch-photo-preview');
 
-  const img = document.createElement('img');
-  img.src = testDriveUrl;
-  img.alt = 'Google Drive 照片測試';
+    preview.innerHTML = '';
 
-  img.onload = () => {
-    console.log('🎉🎉🎉 Google Drive 圖片真的載入成功！');
-  };
+    const img = document.createElement('img');
+    img.src = testDriveUrl;
+    img.alt = 'Google Drive 照片測試';
 
-  img.onerror = () => {
-    console.error('❌ Google Drive 圖片 Blob 載入失敗');
-  };
+    img.onload = () => {
+      console.log('🎉🎉🎉 Google Drive 圖片真的載入成功！');
+    };
 
-  preview.appendChild(img);
+    img.onerror = () => {
+      console.error('❌ Google Drive 圖片 Blob 載入失敗');
+    };
+
+    preview.appendChild(img);
+  }
 }
 
   document.getElementById('edit-sch-modal').classList.add('show');
