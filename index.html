@@ -659,9 +659,9 @@
       <!-- 置頂快速工具列：平時只佔一排，按下才展開 -->
       <div id="quick-toolbar" class="quick-toolbar">
         <button class="quick-btn sync" type="button"><span class="sync-dot"></span>同步中</button>
-      <button class="quick-btn primary" type="button"
-        onclick="openAddSchedule()">
-  ＋ 新增行程
+    <button class="quick-btn primary" type="button"
+        onclick="openAddBuy()">
+  ＋ 新增代購
 </button>
         <button id="quick-rate-btn" class="quick-btn" type="button" onclick="toggleQuickPanel('rate-panel')">💴 匯率</button>
         <button id="quick-filter-btn" class="quick-btn" type="button" onclick="toggleQuickPanel('filter-panel')">☷ 篩選</button>
@@ -1172,12 +1172,19 @@
   document.getElementById('sch-place').focus();
 }
 
-    function openAddBuy() {
-      document.querySelectorAll('.quick-panel').forEach(p => p.classList.remove('show'));
-      document.getElementById('buy-form-body').classList.add('show');
-      document.getElementById('add-panel').classList.add('show');
-      document.getElementById('buy-name').focus();
-    }
+function openAddBuy() {
+  document.querySelectorAll('.quick-panel').forEach(p => {
+    p.classList.remove('show');
+  });
+
+  const panel = document.getElementById('buy-form-body');
+
+  if (panel) {
+    panel.classList.add('show');
+    const firstInput = panel.querySelector('input, select, textarea');
+    if (firstInput) firstInput.focus();
+  }
+}
 
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
