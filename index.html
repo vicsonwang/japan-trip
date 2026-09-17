@@ -1291,32 +1291,91 @@ function openAddBuy() {
       }
     }
 
-    function showPhotoPreview(inputId, previewId, existingUrl='') {
-      const input = document.getElementById(inputId);
-      const preview = document.getElementById(previewId);
-      const status = document.getElementById(inputId + '-status');
-      if (!input || !preview) return;
-      preview.innerHTML = existingUrl ? `<img src="${existingUrl}" alt="照片預覽">` : '';
-      if (status) {
-        status.textContent = existingUrl ? '已存在照片' : '';
-        status.className = 'photo-upload-status';
-      }
-      input.onchange = () => {
-        const file = input.files && input.files[0];
-        if (!file) {
-          preview.innerHTML = '';
-          if (status) { status.textContent = ''; status.className = 'photo-upload-status'; }
-          return;
-        }
-        if (status) {
-          status.textContent = `已選擇：${file.name}（${Math.round(file.size / 1024)} KB），按下儲存後會上傳 Google Drive`;
-          status.className = 'photo-upload-status';
-        }
-        const reader = new FileReader();
-        reader.onload = e => preview.innerHTML = `<img src="${e.target.result}" alt="照片預覽">`;
-        reader.readAsDataURL(file);
-      };
+   async function showPhotoPreview(inputId, previewId, existingUrl = '', fileId = '') {
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(previewId);
+  const status = document.getElementById(inputId + '-status');
+
+  if (!input || !preview) return;
+
+  // 先清空
+  preview.innerHTML = '';
+
+  // ================================
+  // ① 已有 Google Drive 私人照片
+  // ================================
+  if (fileId) {
+    if (status) {
+      status.textContent = '⏳ 正在載入 Google Drive 照片…';
+      status.className = 'photo-upload-status';
     }
+
+    const driveUrl = await getDrivePhotoUrl(fileId);
+
+    if (driveUrl) {
+      preview.innerHTML = `
+        <img src="${driveUrl}" alt="照片預覽">
+      `;
+
+      if (status) {
+        status.textContent = '✅ 已載入照片';
+        status.className = 'photo-upload-status success';
+      }
+    } else {
+      preview.innerHTML = `
+        <div style="padding:12px;color:var(--sub-text);">
+          ⚠️ 照片無法載入
+        </div>
+      `;
+
+      if (status) {
+        status.textContent = '❌ 無法讀取 Google Drive 照片';
+        status.className = 'photo-upload-status error';
+      }
+    }
+  }
+  // ================================
+  // ② 舊資料只有 photoUrl
+  // 暫時保留相容性
+  // ================================
+  else if (existingUrl) {
+    preview.innerHTML = `
+      <img src="${existingUrl}" alt="照片預覽">
+    `;
+
+    if (status) {
+      status.textContent = '已存在照片';
+      status.className = 'photo-upload-status';
+    }
+  }
+
+  // ================================
+  // ③ 使用者重新選照片
+  // ================================
+  input.onchange = () => {
+    const file = input.files && input.files[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (status) {
+      status.textContent =
+        `已選擇：${file.name}（${Math.round(file.size / 1024)} KB），按下儲存後會上傳 Google Drive`;
+      status.className = 'photo-upload-status';
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = e => {
+      preview.innerHTML = `
+        <img src="${e.target.result}" alt="照片預覽">
+      `;
+    };
+
+    reader.readAsDataURL(file);
+  };
+}
 
     // ===== Google Drive 照片上傳 =====
     // 使用 Firebase Google 登入取得 Drive OAuth token；照片會存到「目前登入者」的 Google Drive。
@@ -1398,7 +1457,48 @@ function openAddBuy() {
         }
       });
     }
+async function getDrivePhotoUrl(fileId) {
+  if (!fileId) return null;
 
+  try {
+    const token = await ensureGoogleDriveToken();
+
+    console.log('🖼️ 讀取 Google Drive 照片：', fileId);
+
+    const response = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    if (response.status === 401) {
+      googleDriveAccessToken = null;
+      throw new Error('Google Drive 授權已失效');
+    }
+
+    if (!response.ok) {
+      const text = await response.text().catch(() => '');
+      throw new Error(
+        `照片讀取失敗 HTTP ${response.status}\n${text}`
+      );
+    }
+
+    const blob = await response.blob();
+
+    if (!blob.size) {
+      throw new Error('Google Drive 回傳的照片是空的');
+    }
+
+    return URL.createObjectURL(blob);
+
+  } catch (err) {
+    console.error('🖼️ Google Drive 照片讀取失敗：', err);
+    return null;
+  }
+}
     async function getOrCreateDriveFolder(folderName) {
       console.log(`📁 [1/3] 查詢 Drive 資料夾：${folderName}`);
 
@@ -1510,11 +1610,11 @@ function openAddBuy() {
 
         // 不設定 anyone/reader，避免 Workspace 網域政策造成 403。
         // 仍保留 fileId，照片屬於目前登入者自己的 Drive。
-        return {
-          fileId: uploaded.id,
-          photoUrl: `https://drive.google.com/thumbnail?id=${uploaded.id}&sz=w1200`,
-          webViewLink: uploaded.webViewLink || null
-        };
+      return {
+  fileId: uploaded.id,
+  photoUrl: null,
+  webViewLink: uploaded.webViewLink || null
+};
       } catch (err) {
         throw new Error(`Google Drive 照片上傳失敗\n${err.message || err}`);
       }
@@ -1613,7 +1713,14 @@ function openAddBuy() {
       document.getElementById('edit-sch-end').value = item.endTime;
       document.getElementById('edit-sch-place').value = item.place;
       document.getElementById('edit-sch-duration').value = item.duration || '';
-      showPhotoPreview('edit-sch-photo','edit-sch-photo-preview', item.photoUrl || '');
+     showPhotoPreview('edit-sch-photo', 'edit-sch-photo-preview');
+
+if (item.photoFileId) {
+  loadDrivePhotoToPreview(
+    item.photoFileId,
+    'edit-sch-photo-preview'
+  );
+}
 
       document.getElementById('edit-sch-modal').classList.add('show');
     }
@@ -1626,13 +1733,23 @@ function openAddBuy() {
       const id = parseInt(document.getElementById('edit-sch-id').value);
       const oldItem = trip.schedules.find(s => s.id === id);
       const photoFile = document.getElementById('edit-sch-photo').files[0];
-      let photoUrl = oldItem.photoUrl || null;
+     
       let photoFileId = oldItem.photoFileId || null;
-      if (photoFile) {
-        try { const uploaded = await uploadPhoto(photoFile, 'schedulePhotos', id); photoUrl = uploaded.photoUrl; photoFileId = uploaded.fileId; }
-        catch (err) { alert('照片上傳失敗：' + err.message); return; }
-      }
+     if (photoFile) {
+  try {
+    const uploaded = await uploadPhoto(
+      photoFile,
+      'schedulePhotos',
+      id
+    );
 
+    photoFileId = uploaded.fileId;
+
+  } catch (err) {
+    alert('照片上傳失敗：' + err.message);
+    return;
+  }
+}
       const updatedSchedules = trip.schedules.map(item => {
         if (item.id === id) {
           return {
@@ -1644,7 +1761,6 @@ function openAddBuy() {
             endTime: document.getElementById('edit-sch-end').value,
             place: document.getElementById('edit-sch-place').value.trim(),
             duration: document.getElementById('edit-sch-duration').value.trim(),
-            photoUrl,
             photoFileId
           };
         }
@@ -1797,7 +1913,7 @@ function openAddBuy() {
         try {
           if (photoStatus) { photoStatus.textContent = '⏳ 正在上傳 Google Drive…'; photoStatus.className = 'photo-upload-status'; }
           const uploaded = await uploadPhoto(photoFile, 'buyPhotos', newItem.id);
-          newItem.photoUrl = uploaded.photoUrl;
+          
           newItem.photoFileId = uploaded.fileId;
           if (photoStatus) { photoStatus.textContent = `✅ Google Drive 上傳成功（File ID: ${uploaded.fileId}）`; photoStatus.className = 'photo-upload-status success'; }
         } catch (err) {
@@ -1838,7 +1954,12 @@ function openAddBuy() {
       document.getElementById('edit-buy-qty').value = item.qty;
       document.getElementById('edit-buy-price').value = item.priceJpy;
       document.getElementById('edit-buy-owner').value = item.owner;
-      showPhotoPreview('edit-buy-photo','edit-buy-photo-preview', item.photoUrl || '');
+     showPhotoPreview(
+  'edit-sch-photo',
+  'edit-sch-photo-preview',
+  item.photoUrl || '',
+  item.photoFileId || ''
+);
 
       document.getElementById('edit-buy-modal').classList.add('show');
     }
