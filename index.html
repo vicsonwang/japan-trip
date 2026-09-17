@@ -1291,20 +1291,30 @@ function openAddBuy() {
       }
     }
 
-   async function showPhotoPreview(inputId, previewId, existingUrl = '', fileId = '') {
+  async function showPhotoPreview(
+  inputId,
+  previewId,
+  existingUrl = '',
+  fileId = ''
+) {
   const input = document.getElementById(inputId);
   const preview = document.getElementById(previewId);
   const status = document.getElementById(inputId + '-status');
 
   if (!input || !preview) return;
 
-  // 先清空
+  console.log('📷 showPhotoPreview');
+  console.log('📷 inputId:', inputId);
+  console.log('📷 existingUrl:', existingUrl);
+  console.log('📷 fileId:', fileId);
+
   preview.innerHTML = '';
 
   // ================================
-  // ① 已有 Google Drive 私人照片
+  // Google Drive 私人照片
   // ================================
   if (fileId) {
+
     if (status) {
       status.textContent = '⏳ 正在載入 Google Drive 照片…';
       status.className = 'photo-upload-status';
@@ -1313,18 +1323,42 @@ function openAddBuy() {
     const driveUrl = await getDrivePhotoUrl(fileId);
 
     if (driveUrl) {
-      preview.innerHTML = `
-        <img src="${driveUrl}" alt="照片預覽">
-      `;
 
-      if (status) {
-        status.textContent = '✅ 已載入照片';
-        status.className = 'photo-upload-status success';
-      }
+      const img = document.createElement('img');
+
+      img.alt = '照片預覽';
+      img.src = driveUrl;
+
+      img.onload = () => {
+        console.log('✅ IMG 成功顯示照片');
+
+        if (status) {
+          status.textContent = '✅ 已載入照片';
+          status.className = 'photo-upload-status success';
+        }
+      };
+
+      img.onerror = () => {
+        console.error('❌ IMG 顯示失敗');
+
+        if (status) {
+          status.textContent = '❌ 圖片顯示失敗';
+          status.className = 'photo-upload-status error';
+        }
+      };
+
+      preview.appendChild(img);
+
     } else {
+
       preview.innerHTML = `
-        <div style="padding:12px;color:var(--sub-text);">
-          ⚠️ 照片無法載入
+        <div style="
+          padding:15px;
+          color:#d33;
+          background:#fff3f3;
+          border-radius:8px;
+        ">
+          ❌ 無法讀取 Google Drive 照片
         </div>
       `;
 
@@ -1334,14 +1368,29 @@ function openAddBuy() {
       }
     }
   }
+
   // ================================
-  // ② 舊資料只有 photoUrl
-  // 暫時保留相容性
+  // 舊資料相容
   // ================================
   else if (existingUrl) {
-    preview.innerHTML = `
-      <img src="${existingUrl}" alt="照片預覽">
-    `;
+
+    console.log('⚠️ 沒有 photoFileId，使用舊 photoUrl');
+
+    preview.innerHTML = '';
+
+    const img = document.createElement('img');
+    img.alt = '照片預覽';
+    img.src = existingUrl;
+
+    img.onload = () => {
+      console.log('⚠️ 舊 photoUrl 載入成功');
+    };
+
+    img.onerror = () => {
+      console.error('❌ 舊 photoUrl 載入失敗：', existingUrl);
+    };
+
+    preview.appendChild(img);
 
     if (status) {
       status.textContent = '已存在照片';
@@ -1350,27 +1399,31 @@ function openAddBuy() {
   }
 
   // ================================
-  // ③ 使用者重新選照片
+  // 使用者選擇新照片
   // ================================
   input.onchange = () => {
+
     const file = input.files && input.files[0];
 
-    if (!file) {
-      return;
-    }
+    if (!file) return;
 
     if (status) {
       status.textContent =
         `已選擇：${file.name}（${Math.round(file.size / 1024)} KB），按下儲存後會上傳 Google Drive`;
+
       status.className = 'photo-upload-status';
     }
 
     const reader = new FileReader();
 
     reader.onload = e => {
-      preview.innerHTML = `
-        <img src="${e.target.result}" alt="照片預覽">
-      `;
+      preview.innerHTML = '';
+
+      const img = document.createElement('img');
+      img.alt = '照片預覽';
+      img.src = e.target.result;
+
+      preview.appendChild(img);
     };
 
     reader.readAsDataURL(file);
@@ -1458,44 +1511,83 @@ function openAddBuy() {
       });
     }
 async function getDrivePhotoUrl(fileId) {
-  if (!fileId) return null;
+  console.log('========================================');
+  console.log('🖼️ 開始讀取 Google Drive 照片');
+  console.log('🖼️ fileId =', fileId);
+
+  if (!fileId) {
+    console.error('❌ 沒有 fileId');
+    return null;
+  }
 
   try {
+    console.log('🖼️ [1/4] 取得 Google Drive Token');
+
     const token = await ensureGoogleDriveToken();
 
-    console.log('🖼️ 讀取 Google Drive 照片：', fileId);
-
-    const response = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
+    console.log(
+      '🖼️ [2/4] Token OK，長度：',
+      token ? token.length : 0
     );
 
-    if (response.status === 401) {
-      googleDriveAccessToken = null;
-      throw new Error('Google Drive 授權已失效');
-    }
+    const url =
+      `https://www.googleapis.com/drive/v3/files/` +
+      `${encodeURIComponent(fileId)}?alt=media`;
+
+    console.log('🖼️ [3/4] GET：', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    console.log('🖼️ [3/4] HTTP：', response.status);
+    console.log(
+      '🖼️ [3/4] Content-Type：',
+      response.headers.get('Content-Type')
+    );
 
     if (!response.ok) {
       const text = await response.text().catch(() => '');
+
+      console.error('❌ Drive 圖片下載失敗');
+      console.error('❌ HTTP：', response.status);
+      console.error('❌ Response：', text);
+
+      if (response.status === 401) {
+        googleDriveAccessToken = null;
+      }
+
       throw new Error(
-        `照片讀取失敗 HTTP ${response.status}\n${text}`
+        `Google Drive 圖片讀取失敗 HTTP ${response.status}\n${text}`
       );
     }
 
+    console.log('🖼️ [4/4] 開始取得 Blob');
+
     const blob = await response.blob();
 
+    console.log('🖼️ Blob type：', blob.type);
+    console.log('🖼️ Blob size：', blob.size);
+
     if (!blob.size) {
-      throw new Error('Google Drive 回傳的照片是空的');
+      throw new Error('Google Drive 回傳的圖片是空的');
     }
 
-    return URL.createObjectURL(blob);
+    const objectUrl = URL.createObjectURL(blob);
+
+    console.log('✅ 圖片 Blob 成功');
+    console.log('✅ Object URL：', objectUrl);
+    console.log('========================================');
+
+    return objectUrl;
 
   } catch (err) {
-    console.error('🖼️ Google Drive 照片讀取失敗：', err);
+    console.error('❌ getDrivePhotoUrl 發生錯誤：', err);
+    console.error('========================================');
+
     return null;
   }
 }
@@ -1678,9 +1770,15 @@ async function getDrivePhotoUrl(fileId) {
       if (photoFile) {
         try {
           if (photoStatus) { photoStatus.textContent = '⏳ 正在上傳 Google Drive…'; photoStatus.className = 'photo-upload-status'; }
-          const uploaded = await uploadPhoto(photoFile, 'schedulePhotos', newItem.id);
-          newItem.photoUrl = uploaded.photoUrl;
-          newItem.photoFileId = uploaded.fileId;
+        const uploaded = await uploadPhoto(
+  photoFile,
+  'schedulePhotos',
+  newItem.id
+);
+
+newItem.photoFileId = uploaded.fileId;
+
+console.log('📸 新照片 File ID =', newItem.photoFileId);
           if (photoStatus) { photoStatus.textContent = `✅ Google Drive 上傳成功（File ID: ${uploaded.fileId}）`; photoStatus.className = 'photo-upload-status success'; }
         } catch (err) {
           console.error('行程照片上傳失敗：', err);
@@ -1700,30 +1798,38 @@ async function getDrivePhotoUrl(fileId) {
       document.getElementById('add-panel').classList.remove('show');
     });
 
-    function openEditSchedule(id) {
-      const trip = trips.find(t => t.id === currentTripId);
-      if (!trip) return;
-      const item = trip.schedules.find(s => s.id === id);
-      if (!item) return;
+   function openEditSchedule(id) {
+  const trip = trips.find(t => t.id === currentTripId);
+  if (!trip) return;
 
-      document.getElementById('edit-sch-id').value = item.id;
-      document.getElementById('edit-sch-date').value = item.date;
-      document.getElementById('edit-sch-day').value = item.day;
-      document.getElementById('edit-sch-start').value = item.startTime;
-      document.getElementById('edit-sch-end').value = item.endTime;
-      document.getElementById('edit-sch-place').value = item.place;
-      document.getElementById('edit-sch-duration').value = item.duration || '';
-     showPhotoPreview('edit-sch-photo', 'edit-sch-photo-preview');
+  const item = trip.schedules.find(s => s.id === id);
+  if (!item) return;
 
-if (item.photoFileId) {
-  loadDrivePhotoToPreview(
-    item.photoFileId,
-    'edit-sch-photo-preview'
+  console.log('========================================');
+  console.log('🧪 編輯行程照片診斷');
+  console.log('🧪 行程 ID:', id);
+  console.log('🧪 完整 item:', item);
+  console.log('🧪 photoUrl:', item.photoUrl);
+  console.log('🧪 photoFileId:', item.photoFileId);
+  console.log('========================================');
+
+  document.getElementById('edit-sch-id').value = item.id;
+  document.getElementById('edit-sch-date').value = item.date;
+  document.getElementById('edit-sch-day').value = item.day;
+  document.getElementById('edit-sch-start').value = item.startTime;
+  document.getElementById('edit-sch-end').value = item.endTime;
+  document.getElementById('edit-sch-place').value = item.place;
+  document.getElementById('edit-sch-duration').value = item.duration || '';
+
+  showPhotoPreview(
+    'edit-sch-photo',
+    'edit-sch-photo-preview',
+    item.photoUrl || '',
+    item.photoFileId || ''
   );
-}
 
-      document.getElementById('edit-sch-modal').classList.add('show');
-    }
+  document.getElementById('edit-sch-modal').classList.add('show');
+}
 
     document.getElementById('edit-sch-form').addEventListener('submit', async function(e) {
       e.preventDefault();
