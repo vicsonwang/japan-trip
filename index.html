@@ -659,7 +659,10 @@
       <!-- 置頂快速工具列：平時只佔一排，按下才展開 -->
       <div id="quick-toolbar" class="quick-toolbar">
         <button class="quick-btn sync" type="button"><span class="sync-dot"></span>同步中</button>
-        <button class="quick-btn primary" type="button" onclick="toggleQuickPanel('add-panel')">＋ 新增</button>
+      <button class="quick-btn primary" type="button"
+        onclick="openAddSchedule()">
+  ＋ 新增行程
+</button>
         <button id="quick-rate-btn" class="quick-btn" type="button" onclick="toggleQuickPanel('rate-panel')">💴 匯率</button>
         <button id="quick-filter-btn" class="quick-btn" type="button" onclick="toggleQuickPanel('filter-panel')">☷ 篩選</button>
       </div>
@@ -1113,12 +1116,61 @@
       }
     }
 
-    function openAddSchedule() {
-      document.querySelectorAll('.quick-panel').forEach(p => p.classList.remove('show'));
-      document.getElementById('sch-form-body').classList.add('show');
-      document.getElementById('add-panel').classList.add('show');
-      document.getElementById('sch-date').focus();
+   function openAddSchedule() {
+  document.querySelectorAll('.quick-panel').forEach(p => {
+    p.classList.remove('show');
+  });
+
+  const formBody = document.getElementById('sch-form-body');
+  formBody.classList.add('show');
+
+  const trip = trips.find(t => t.id === currentTripId);
+
+  // 如果有上一筆行程，就自動接續上一筆的結束時間
+  if (trip && trip.schedules && trip.schedules.length > 0) {
+    const schedules = [...trip.schedules].sort((a, b) => {
+      return (a.date + a.startTime).localeCompare(b.date + b.startTime);
+    });
+
+    const last = schedules[schedules.length - 1];
+
+    // 日期
+    if (last.date) {
+      document.getElementById('sch-date').value = last.date;
     }
+
+    // Day
+    if (last.day) {
+      document.getElementById('sch-day').value = last.day;
+    }
+
+    // 上一筆結束時間 → 下一筆開始時間
+    if (last.endTime) {
+      document.getElementById('sch-start').value = last.endTime;
+
+      // 預設再給 1 小時
+      const [hour, minute] = last.endTime.split(':').map(Number);
+
+      let endMinutes = hour * 60 + minute + 60;
+
+      // 超過 24:00
+      if (endMinutes >= 1440) {
+        endMinutes = 1439;
+      }
+
+      const newHour = Math.floor(endMinutes / 60);
+      const newMinute = endMinutes % 60;
+
+      document.getElementById('sch-end').value =
+        `${String(newHour).padStart(2, '0')}:${String(newMinute).padStart(2, '0')}`;
+    }
+  } else {
+    // 第一筆才使用原本的預設值
+    setScheduleDefaults();
+  }
+
+  document.getElementById('sch-place').focus();
+}
 
     function openAddBuy() {
       document.querySelectorAll('.quick-panel').forEach(p => p.classList.remove('show'));
