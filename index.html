@@ -1853,9 +1853,6 @@ console.log('📸 新照片 File ID =', newItem.photoFileId);
   }
 }
 
-  document.getElementById('edit-sch-modal').classList.add('show');
-}
-
     document.getElementById('edit-sch-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       const trip = trips.find(t => t.id === currentTripId);
