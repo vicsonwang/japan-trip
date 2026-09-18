@@ -3,2141 +3,382 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-
   <title>日本自由行規劃</title>
-
   <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      min-height: 100%;
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "SF Pro Text",
-        "Noto Sans TC",
-        "Microsoft JhengHei",
-        sans-serif;
-      background: #f5f5f7;
-      color: #1d1d1f;
-    }
-
-    body {
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-
-    button,
-    input,
-    select,
-    textarea {
-      font-family: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    /* =========================
-       Login
-    ========================= */
-
-    #login-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 3000;
-      background: rgba(245, 245, 247, 0.98);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-
-    .login-card {
-      width: min(420px, 100%);
-      background: #fff;
-      border-radius: 28px;
-      padding: 40px 28px;
-      text-align: center;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-    }
-
-    .login-logo {
-      width: 76px;
-      height: 76px;
-      margin: 0 auto 20px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, #ff5f6d, #ffc371);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 34px;
-      font-weight: 800;
-    }
-
-    .login-card h1 {
-      margin: 0 0 8px;
-      font-size: 26px;
-    }
-
-    .login-card p {
-      margin: 0 0 28px;
-      color: #86868b;
-      line-height: 1.6;
-      font-size: 14px;
-    }
-
-    #google-login-btn {
-      width: 100%;
-      min-height: 52px;
-      border: 1px solid #d2d2d7;
-      background: #fff;
-      border-radius: 14px;
-      font-size: 16px;
-      font-weight: 600;
-      color: #1d1d1f;
-      transition: 0.2s;
-    }
-
-    #google-login-btn:hover {
-      background: #f5f5f7;
-    }
-
-    #google-login-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    #login-error {
-      margin-top: 14px;
-      color: #ff3b30;
-      font-size: 13px;
-      line-height: 1.5;
-      white-space: pre-wrap;
-    }
-
-    /* =========================
-       Header
-    ========================= */
-
-    .app-header {
-      position: sticky;
-      top: 0;
-      z-index: 500;
-      background: rgba(245, 245, 247, 0.88);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    }
-
-    .header-inner {
-      width: min(1100px, calc(100% - 32px));
-      margin: 0 auto;
-      min-height: 66px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .brand-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #ff5f6d, #ff9966);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      flex: 0 0 auto;
-    }
-
-    .brand-text {
-      min-width: 0;
-    }
-
-    .brand-title {
-      font-size: 17px;
-      font-weight: 800;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .brand-subtitle {
-      font-size: 11px;
-      color: #86868b;
-    }
-
-    .user-area {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 0;
-    }
-
-    .user-name {
-      max-width: 130px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      font-size: 13px;
-      color: #6e6e73;
-    }
-
-    .logout-btn {
-      border: 0;
-      background: #fff;
-      color: #ff3b30;
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    /* =========================
-       Main
-    ========================= */
-
-    .app-main {
-      width: min(1100px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 28px 0 110px;
-    }
-
-    .view {
-      display: none;
-    }
-
-    .view.active {
-      display: block;
-    }
-
-    .page-title-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 22px;
-    }
-
-    .page-title {
-      margin: 0;
-      font-size: 28px;
-      letter-spacing: -0.5px;
-    }
-
-    .page-subtitle {
-      margin: 6px 0 0;
-      color: #86868b;
-      font-size: 13px;
-    }
-
-    /* =========================
-       Buttons
-    ========================= */
-
-    .btn {
-      border: 0;
-      border-radius: 12px;
-      min-height: 42px;
-      padding: 0 16px;
-      font-size: 14px;
-      font-weight: 700;
-      transition: 0.18s;
-    }
-
-    .btn:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-    }
-
-    .btn-primary {
-      background: #007aff;
-      color: #fff;
-    }
-
-    .btn-primary:hover {
-      background: #006ee6;
-    }
-
-    .btn-secondary {
-      background: #f2f2f7;
-      color: #1d1d1f;
-    }
-
-    .btn-danger {
-      background: #fff0ef;
-      color: #ff3b30;
-    }
-
-    .btn-small {
-      min-height: 34px;
-      padding: 0 11px;
-      font-size: 12px;
-      border-radius: 9px;
-    }
-
-    .icon-btn {
-      width: 38px;
-      height: 38px;
-      padding: 0;
-      border: 0;
-      border-radius: 11px;
-      background: #f2f2f7;
-      font-size: 17px;
-    }
-
-    /* =========================
-       Trip list
-    ========================= */
-
-    .trip-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .trip-card {
-      background: #fff;
-      border-radius: 20px;
-      padding: 22px;
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
-      transition: 0.2s;
-      cursor: pointer;
-    }
-
-    .trip-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08);
-    }
-
-    .trip-card-header {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .trip-name {
-      font-size: 19px;
-      font-weight: 800;
-      line-height: 1.35;
-    }
-
-    .trip-date {
-      color: #86868b;
-      font-size: 13px;
-      margin-top: 8px;
-    }
-
-    .trip-owner {
-      margin-top: 18px;
-      font-size: 12px;
-      color: #86868b;
-    }
-
-    .trip-code {
-      display: inline-flex;
-      margin-top: 12px;
-      background: #f2f2f7;
-      border-radius: 8px;
-      padding: 5px 8px;
-      font-size: 11px;
-      color: #6e6e73;
-      letter-spacing: 0.4px;
-    }
-
-    .empty-state {
-      background: #fff;
-      border-radius: 20px;
-      padding: 48px 24px;
-      text-align: center;
-      color: #86868b;
-    }
-
-    .empty-state-icon {
-      font-size: 42px;
-      margin-bottom: 12px;
-    }
-
-    /* =========================
-       Trip detail
-    ========================= */
-
-    .trip-detail-header {
-      margin-bottom: 20px;
-    }
-
-    .back-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    .trip-detail-title {
-      font-size: 28px;
-      font-weight: 800;
-      margin: 0;
-    }
-
-    .trip-detail-date {
-      margin-top: 6px;
-      color: #86868b;
-      font-size: 13px;
-    }
-
-    /* =========================
-       Tabs
-    ========================= */
-
-    .tab-bar {
-      background: #e9e9ee;
-      padding: 4px;
-      border-radius: 13px;
-      display: flex;
-      gap: 3px;
-      margin-bottom: 16px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      border: 0;
-      background: transparent;
-      min-height: 42px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      color: #6e6e73;
-    }
-
-    .tab-btn.active {
-      background: #fff;
-      color: #1d1d1f;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
-
-    /* =========================
-       Toolbar
-    ========================= */
-
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-
-    .toolbar-item {
-      background: #fff;
-      border-radius: 11px;
-      min-height: 38px;
-      padding: 0 12px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 12px;
-      color: #6e6e73;
-      border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    .toolbar-item strong {
-      color: #1d1d1f;
-    }
-
-    .filter-panel {
-      background: #fff;
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 18px;
-      display: none;
-      border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    .filter-panel.show {
-      display: block;
-    }
-
-    .filter-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .filter-label {
-      display: block;
-      font-size: 11px;
-      color: #86868b;
-      margin-bottom: 5px;
-    }
-
-    /* =========================
-       Schedule
-    ========================= */
-
-    .schedule-day {
-      margin-bottom: 22px;
-    }
-
-    .day-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .day-badge {
-      min-width: 56px;
-      padding: 6px 10px;
-      border-radius: 10px;
-      background: #1d1d1f;
-      color: #fff;
-      text-align: center;
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .day-date {
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .day-toggle {
-      margin-left: auto;
-      border: 0;
-      background: transparent;
-      color: #86868b;
-      font-size: 13px;
-    }
-
-    .schedule-list {
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
-    }
-
-    .schedule-card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 14px;
-      display: grid;
-      grid-template-columns: 72px minmax(0, 1fr) auto;
-      gap: 13px;
-      align-items: start;
-      border: 1px solid rgba(0, 0, 0, 0.04);
-    }
-
-    .schedule-time {
-      font-size: 12px;
-      color: #007aff;
-      font-weight: 800;
-      line-height: 1.45;
-    }
-
-    .schedule-place {
-      font-size: 15px;
-      font-weight: 800;
-      line-height: 1.4;
-      word-break: break-word;
-    }
-
-    .schedule-meta {
-      margin-top: 4px;
-      font-size: 11px;
-      color: #86868b;
-    }
-
-    .schedule-actions {
-      display: flex;
-      gap: 5px;
-    }
-
-    .schedule-action {
-      width: 31px;
-      height: 31px;
-      border: 0;
-      border-radius: 8px;
-      background: #f2f2f7;
-      font-size: 13px;
-    }
-
-    /* =========================
-       Buy list
-    ========================= */
-
-    .buy-owner-section {
-      margin-bottom: 20px;
-    }
-
-    .buy-owner-header {
-      background: #fff;
-      border-radius: 15px 15px 0 0;
-      padding: 13px 15px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      border-bottom: 1px solid #f0f0f2;
-    }
-
-    .buy-owner-title {
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .buy-owner-summary {
-      color: #86868b;
-      font-size: 11px;
-    }
-
-    .buy-owner-items {
-      background: #fff;
-      border-radius: 0 0 15px 15px;
-      overflow: hidden;
-    }
-
-    .buy-item-line {
-      display: grid;
-      grid-template-columns: 24px minmax(0, 1fr) auto;
-      gap: 9px;
-      align-items: center;
-      padding: 11px 13px;
-      border-bottom: 1px solid #f2f2f7;
-    }
-
-    .buy-item-line:last-child {
-      border-bottom: 0;
-    }
-
-    .buy-item-body {
-      min-width: 0;
-      display: flex;
-      align-items: center;
-      gap: 9px;
-    }
-
-    .buy-item-content {
-      min-width: 0;
-      flex: 1;
-    }
-
-    .buy-item-name {
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 1.35;
-      word-break: break-word;
-    }
-
-    .buy-item-meta {
-      margin-top: 3px;
-      color: #86868b;
-      font-size: 10px;
-      line-height: 1.4;
-    }
-
-    .buy-item-price {
-      margin-top: 3px;
-      font-size: 11px;
-      color: #1d1d1f;
-      font-weight: 700;
-    }
-
-    .buy-actions {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-    }
-
-    .buy-action {
-      width: 31px;
-      height: 31px;
-      border: 0;
-      border-radius: 8px;
-      background: #f2f2f7;
-      font-size: 13px;
-    }
-
-    .checkbox-custom {
-      width: 20px;
-      height: 20px;
-      border-radius: 6px;
-      border: 2px solid #c7c7cc;
-      background: #fff;
-      position: relative;
-      cursor: pointer;
-    }
-
-    .checkbox-custom.checked {
-      background: #34c759;
-      border-color: #34c759;
-    }
-
-    .checkbox-custom.checked::after {
-      content: "✓";
-      color: #fff;
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    /* =========================
-       Photos
-    ========================= */
-
-    .photo-thumb {
-      width: 58px;
-      height: 58px;
-      flex: 0 0 58px;
-      border-radius: 10px;
-      object-fit: cover;
-      background: #f2f2f7;
-      display: block;
-    }
-
-    .photo-loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #8e8e93;
-      font-size: 19px;
-    }
-
-    .photo-preview {
-      margin-top: 10px;
-      min-height: 0;
-    }
-
-    .photo-preview img {
-      display: block;
-      width: 100%;
-      max-width: 220px;
-      max-height: 180px;
-      object-fit: cover;
-      border-radius: 12px;
-      background: #f2f2f7;
-    }
-
-    .photo-status {
-      margin-top: 7px;
-      color: #86868b;
-      font-size: 11px;
-    }
-
-    /* =========================
-       Form
-    ========================= */
-
-    .form-card {
-      background: #fff;
-      border-radius: 18px;
-      padding: 18px;
-      margin-bottom: 18px;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 13px;
-    }
-
-    .form-group {
-      min-width: 0;
-    }
-
-    .form-group.full {
-      grid-column: 1 / -1;
-    }
-
-    .form-label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #6e6e73;
-    }
-
-    .form-input,
-    .form-select,
-    .form-textarea {
-      width: 100%;
-      border: 1px solid #d2d2d7;
-      background: #fff;
-      border-radius: 11px;
-      min-height: 42px;
-      padding: 9px 11px;
-      outline: none;
-      font-size: 14px;
-      color: #1d1d1f;
-    }
-
-    .form-textarea {
-      min-height: 90px;
-      resize: vertical;
-    }
-
-    .form-input:focus,
-    .form-select:focus,
-    .form-textarea:focus {
-      border-color: #007aff;
-      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-    }
-
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 16px;
-    }
-
-    /* =========================
-       Modal
-    ========================= */
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      z-index: 2000;
-      background: rgba(0, 0, 0, 0.42);
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-      padding: 0;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-card {
-      width: min(650px, 100%);
-      max-height: 92vh;
-      overflow-y: auto;
-      background: #fff;
-      border-radius: 24px 24px 0 0;
-      padding: 22px;
-      animation: modalUp 0.2s ease;
-    }
-
-    @keyframes modalUp {
-      from {
-        transform: translateY(30px);
-        opacity: 0;
-      }
-
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    .modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-
-    .modal-title {
-      margin: 0;
-      font-size: 21px;
-      font-weight: 800;
-    }
-
-    .modal-close {
-      width: 36px;
-      height: 36px;
-      border: 0;
-      border-radius: 50%;
-      background: #f2f2f7;
-      font-size: 20px;
-    }
-
-    /* =========================
-       Quick panel
-    ========================= */
-
-    .quick-panel {
-      display: none;
-      background: #fff;
-      border-radius: 16px;
-      padding: 15px;
-      margin-bottom: 16px;
-      border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    .quick-panel.show {
-      display: block;
-    }
-
-    .quick-panel-title {
-      font-size: 13px;
-      font-weight: 800;
-      margin-bottom: 10px;
-    }
-
-    .quick-rate-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .rate-value {
-      font-size: 22px;
-      font-weight: 800;
-    }
-
-    .rate-note {
-      color: #86868b;
-      font-size: 11px;
-    }
-
-    /* =========================
-       Bottom navigation
-    ========================= */
-
-    .bottom-nav {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 1000;
-      padding:
-        7px
-        max(8px, env(safe-area-inset-right))
-        calc(7px + env(safe-area-inset-bottom))
-        max(8px, env(safe-area-inset-left));
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(0, 0, 0, 0.08);
-    }
-
-    .bottom-nav-inner {
-      width: min(700px, 100%);
-      margin: 0 auto;
-      display: flex;
-      justify-content: center;
-      gap: 5px;
-    }
-
-    .nav-btn {
-      flex: 1;
-      max-width: 180px;
-      border: 0;
-      background: transparent;
-      border-radius: 12px;
-      min-height: 45px;
-      color: #86868b;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .nav-btn.active {
-      background: #f2f2f7;
-      color: #007aff;
-    }
-
-    /* =========================
-       Loading
-    ========================= */
-
-    .loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 45px 20px;
-      color: #86868b;
-      font-size: 13px;
-    }
-
-    .loading-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #007aff;
-      margin-right: 8px;
-      animation: loadingPulse 0.9s infinite alternate;
-    }
-
-    @keyframes loadingPulse {
-      from {
-        opacity: 0.3;
-      }
-
-      to {
-        opacity: 1;
-      }
-    }
-
-    /* =========================
-       Responsive
-    ========================= */
-
-    @media (max-width: 760px) {
-      .app-main,
-      .header-inner {
-        width: min(100% - 22px, 1100px);
-      }
-
-      .trip-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .filter-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .schedule-card {
-        grid-template-columns: 62px minmax(0, 1fr) auto;
-      }
-    }
-
-    @media (max-width: 520px) {
-      .app-main {
-        padding-top: 20px;
-      }
-
-      .page-title {
-        font-size: 24px;
-      }
-
-      .brand-subtitle {
-        display: none;
-      }
-
-      .user-name {
-        display: none;
-      }
-
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .form-group.full {
-        grid-column: auto;
-      }
-
-      .schedule-card {
-        grid-template-columns: 56px minmax(0, 1fr);
-      }
-
-      .schedule-actions {
-        grid-column: 2;
-      }
-
-      .buy-item-line {
-        grid-template-columns: 22px minmax(0, 1fr) auto;
-        padding: 10px 9px;
-      }
-
-      .buy-actions {
-        gap: 3px;
-      }
-
-      .buy-action {
-        width: 29px;
-        height: 29px;
-      }
-
-      .photo-thumb {
-        width: 50px;
-        height: 50px;
-        flex-basis: 50px;
-      }
-
-      .modal-card {
-        padding: 18px 15px;
-      }
-    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; padding: 0; width: 100%; min-height: 100%; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Noto Sans TC", "Microsoft JhengHei", sans-serif; background: #f5f5f7; color: #1d1d1f; }
+    body { padding-bottom: env(safe-area-inset-bottom); }
+    button, input, select, textarea { font-family: inherit; }
+    button { cursor: pointer; }
+    /* Login */
+    #login-overlay { position: fixed; inset: 0; z-index: 3000; background: rgba(245, 245, 247, 0.98); display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .login-card { width: min(420px, 100%); background: #fff; border-radius: 28px; padding: 40px 28px; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12); }
+    .login-logo { width: 76px; height: 76px; margin: 0 auto 20px; border-radius: 22px; background: linear-gradient(135deg, #ff5f6d, #ffc371); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 34px; font-weight: 800; }
+    .login-card h1 { margin: 0 0 8px; font-size: 26px; }
+    .login-card p { margin: 0 0 28px; color: #86868b; line-height: 1.6; font-size: 14px; }
+    #google-login-btn { width: 100%; min-height: 52px; border: 1px solid #d2d2d7; background: #fff; border-radius: 14px; font-size: 16px; font-weight: 600; color: #1d1d1f; transition: 0.2s; }
+    #google-login-btn:hover { background: #f5f5f7; }
+    #google-login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    #login-error { margin-top: 14px; color: #ff3b30; font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+    /* Header */
+    .app-header { position: sticky; top: 0; z-index: 500; background: rgba(245, 245, 247, 0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0, 0, 0, 0.06); }
+    .header-inner { width: min(1100px, calc(100% - 32px)); margin: 0 auto; min-height: 66px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .brand-icon { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #ff5f6d, #ff9966); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; flex: 0 0 auto; }
+    .brand-text { min-width: 0; }
+    .brand-title { font-size: 17px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .brand-subtitle { font-size: 11px; color: #86868b; }
+    .user-area { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .user-name { max-width: 130px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; color: #6e6e73; }
+    .logout-btn { border: 0; background: #fff; color: #ff3b30; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+    /* Main */
+    .app-main { width: min(1100px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 110px; }
+    .view { display: none; }
+    .view.active { display: block; }
+    .page-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }
+    .page-title { margin: 0; font-size: 28px; letter-spacing: -0.5px; }
+    .page-subtitle { margin: 6px 0 0; color: #86868b; font-size: 13px; }
+    /* Buttons */
+    .btn { border: 0; border-radius: 12px; min-height: 42px; padding: 0 16px; font-size: 14px; font-weight: 700; transition: 0.18s; }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-primary { background: #007aff; color: #fff; }
+    .btn-primary:hover { background: #006ee6; }
+    .btn-secondary { background: #f2f2f7; color: #1d1d1f; }
+    .btn-danger { background: #fff0ef; color: #ff3b30; }
+    .btn-small { min-height: 34px; padding: 0 11px; font-size: 12px; border-radius: 9px; }
+    .icon-btn { width: 38px; height: 38px; padding: 0; border: 0; border-radius: 11px; background: #f2f2f7; font-size: 17px; }
+    /* Trip list */
+    .trip-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .trip-card { background: #fff; border-radius: 20px; padding: 22px; border: 1px solid rgba(0, 0, 0, 0.05); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04); transition: 0.2s; cursor: pointer; }
+    .trip-card:hover { transform: translateY(-2px); box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08); }
+    .trip-card-header { display: flex; justify-content: space-between; gap: 12px; }
+    .trip-name { font-size: 19px; font-weight: 800; line-height: 1.35; }
+    .trip-date { color: #86868b; font-size: 13px; margin-top: 8px; }
+    .trip-owner { margin-top: 18px; font-size: 12px; color: #86868b; }
+    .trip-code { display: inline-flex; margin-top: 12px; background: #f2f2f7; border-radius: 8px; padding: 5px 8px; font-size: 11px; color: #6e6e73; letter-spacing: 0.4px; }
+    .empty-state { background: #fff; border-radius: 20px; padding: 48px 24px; text-align: center; color: #86868b; }
+    .empty-state-icon { font-size: 42px; margin-bottom: 12px; }
+    /* Trip detail */
+    .trip-detail-header { margin-bottom: 20px; }
+    .back-row { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .trip-detail-title { font-size: 28px; font-weight: 800; margin: 0; }
+    .trip-detail-date { margin-top: 6px; color: #86868b; font-size: 13px; }
+    /* Tabs */
+    .tab-bar { background: #e9e9ee; padding: 4px; border-radius: 13px; display: flex; gap: 3px; margin-bottom: 16px; }
+    .tab-btn { flex: 1; border: 0; background: transparent; min-height: 42px; border-radius: 10px; font-size: 14px; font-weight: 700; color: #6e6e73; }
+    .tab-btn.active { background: #fff; color: #1d1d1f; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+    /* Toolbar */
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .toolbar-item { background: #fff; border-radius: 11px; min-height: 38px; padding: 0 12px; display: flex; align-items: center; gap: 7px; font-size: 12px; color: #6e6e73; border: 1px solid rgba(0, 0, 0, 0.05); }
+    .toolbar-item strong { color: #1d1d1f; }
+    .filter-panel { background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 18px; display: none; border: 1px solid rgba(0, 0, 0, 0.05); }
+    .filter-panel.show { display: block; }
+    .filter-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .filter-label { display: block; font-size: 11px; color: #86868b; margin-bottom: 5px; }
+    /* Schedule */
+    .schedule-day { margin-bottom: 22px; }
+    .day-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .day-badge { min-width: 56px; padding: 6px 10px; border-radius: 10px; background: #1d1d1f; color: #fff; text-align: center; font-size: 12px; font-weight: 800; }
+    .day-date { font-size: 14px; font-weight: 700; }
+    .day-toggle { margin-left: auto; border: 0; background: transparent; color: #86868b; font-size: 13px; }
+    .schedule-list { display: flex; flex-direction: column; gap: 9px; }
+    .schedule-card { background: #fff; border-radius: 16px; padding: 14px; display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: 13px; align-items: start; border: 1px solid rgba(0, 0, 0, 0.04); }
+    .schedule-time { font-size: 12px; color: #007aff; font-weight: 800; line-height: 1.45; }
+    .schedule-place { font-size: 15px; font-weight: 800; line-height: 1.4; word-break: break-word; }
+    .schedule-meta { margin-top: 4px; font-size: 11px; color: #86868b; }
+    .schedule-actions { display: flex; gap: 5px; }
+    .schedule-action { width: 31px; height: 31px; border: 0; border-radius: 8px; background: #f2f2f7; font-size: 13px; }
+    /* Buy list */
+    .buy-owner-section { margin-bottom: 20px; }
+    .buy-owner-header { background: #fff; border-radius: 15px 15px 0 0; padding: 13px 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid #f0f0f2; }
+    .buy-owner-title { font-size: 14px; font-weight: 800; }
+    .buy-owner-summary { color: #86868b; font-size: 11px; }
+    .buy-owner-items { background: #fff; border-radius: 0 0 15px 15px; overflow: hidden; }
+    .buy-item-line { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 9px; align-items: center; padding: 11px 13px; border-bottom: 1px solid #f2f2f7; }
+    .buy-item-line:last-child { border-bottom: 0; }
+    .buy-item-body { min-width: 0; display: flex; align-items: center; gap: 9px; }
+    .buy-item-content { min-width: 0; flex: 1; }
+    .buy-item-name { font-size: 13px; font-weight: 700; line-height: 1.35; word-break: break-word; }
+    .buy-item-meta { margin-top: 3px; color: #86868b; font-size: 10px; line-height: 1.4; }
+    .buy-item-price { margin-top: 3px; font-size: 11px; color: #1d1d1f; font-weight: 700; }
+    .buy-actions { display: flex; gap: 5px; align-items: center; }
+    .buy-action { width: 31px; height: 31px; border: 0; border-radius: 8px; background: #f2f2f7; font-size: 13px; }
+    .checkbox-custom { width: 20px; height: 20px; border-radius: 6px; border: 2px solid #c7c7cc; background: #fff; position: relative; cursor: pointer; }
+    .checkbox-custom.checked { background: #34c759; border-color: #34c759; }
+    .checkbox-custom.checked::after { content: "✓"; color: #fff; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; }
+    /* Photos */
+    .photo-thumb { width: 58px; height: 58px; flex: 0 0 58px; border-radius: 10px; object-fit: cover; background: #f2f2f7; display: block; }
+    .photo-loading { display: flex; align-items: center; justify-content: center; color: #8e8e93; font-size: 19px; }
+    .photo-preview { margin-top: 10px; min-height: 0; }
+    .photo-preview img { display: block; width: 100%; max-width: 220px; max-height: 180px; object-fit: cover; border-radius: 12px; background: #f2f2f7; }
+    .photo-status { margin-top: 7px; color: #86868b; font-size: 11px; }
+    /* Form */
+    .form-card { background: #fff; border-radius: 18px; padding: 18px; margin-bottom: 18px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+    .form-group { min-width: 0; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; color: #6e6e73; }
+    .form-input, .form-select, .form-textarea { width: 100%; border: 1px solid #d2d2d7; background: #fff; border-radius: 11px; min-height: 42px; padding: 9px 11px; outline: none; font-size: 14px; color: #1d1d1f; }
+    .form-textarea { min-height: 90px; resize: vertical; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #007aff; box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1); }
+    .form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+    /* Modal */
+    .modal { position: fixed; inset: 0; z-index: 2000; background: rgba(0, 0, 0, 0.42); display: none; align-items: flex-end; justify-content: center; padding: 0; }
+    .modal.show { display: flex; }
+    .modal-card { width: min(650px, 100%); max-height: 92vh; overflow-y: auto; background: #fff; border-radius: 24px 24px 0 0; padding: 22px; animation: modalUp 0.2s ease; }
+    @keyframes modalUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+    .modal-title { margin: 0; font-size: 21px; font-weight: 800; }
+    .modal-close { width: 36px; height: 36px; border: 0; border-radius: 50%; background: #f2f2f7; font-size: 20px; }
+    /* Quick panel */
+    .quick-panel { display: none; background: #fff; border-radius: 16px; padding: 15px; margin-bottom: 16px; border: 1px solid rgba(0, 0, 0, 0.05); }
+    .quick-panel.show { display: block; }
+    .quick-panel-title { font-size: 13px; font-weight: 800; margin-bottom: 10px; }
+    .quick-rate-row { display: flex; align-items: center; gap: 10px; }
+    .rate-value { font-size: 22px; font-weight: 800; }
+    .rate-note { color: #86868b; font-size: 11px; }
+    /* Bottom navigation */
+    .bottom-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000; padding: 7px max(8px, env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(0, 0, 0, 0.08); }
+    .bottom-nav-inner { width: min(700px, 100%); margin: 0 auto; display: flex; justify-content: center; gap: 5px; }
+    .nav-btn { flex: 1; max-width: 180px; border: 0; background: transparent; border-radius: 12px; min-height: 45px; color: #86868b; font-size: 11px; font-weight: 700; }
+    .nav-btn.active { background: #f2f2f7; color: #007aff; }
+    /* Loading */
+    .loading { display: flex; align-items: center; justify-content: center; padding: 45px 20px; color: #86868b; font-size: 13px; }
+    .loading-dot { width: 7px; height: 7px; border-radius: 50%; background: #007aff; margin-right: 8px; animation: loadingPulse 0.9s infinite alternate; }
+    @keyframes loadingPulse { from { opacity: 0.3; } to { opacity: 1; } }
+    /* Responsive */
+    @media (max-width: 760px) { .app-main, .header-inner { width: min(100% - 22px, 1100px); } .trip-grid, .filter-grid { grid-template-columns: 1fr; } .schedule-card { grid-template-columns: 62px minmax(0, 1fr) auto; } }
+    @media (max-width: 520px) { .app-main { padding-top: 20px; } .page-title { font-size: 24px; } .brand-subtitle, .user-name { display: none; } .form-grid { grid-template-columns: 1fr; } .form-group.full { grid-column: auto; } .schedule-card { grid-template-columns: 56px minmax(0, 1fr); } .schedule-actions { grid-column: 2; } .buy-item-line { grid-template-columns: 22px minmax(0, 1fr) auto; padding: 10px 9px; } .buy-actions { gap: 3px; } .buy-action { width: 29px; height: 29px; } .photo-thumb { width: 50px; height: 50px; flex-basis: 50px; } .modal-card { padding: 18px 15px; } }
   </style>
 </head>
-
 <body>
 
-  <!-- =========================
-       Login
-  ========================== -->
-
+  <!-- Login -->
   <div id="login-overlay">
     <div class="login-card">
       <div class="login-logo">✈️</div>
-
       <h1>日本自由行</h1>
-
-      <p>
-        登入 Google 後即可同步旅程資料，<br>
-        並使用 Google Drive 私人照片儲存功能。
-      </p>
-
-      <button id="google-login-btn">
-        <span style="font-weight:800; color:#4285f4; margin-right:8px;">G</span>
-        使用 Google 帳號登入
-      </button>
-
+      <p>登入 Google 後即可同步旅程資料，<br>並使用 Google Drive 私人照片儲存功能。</p>
+      <button id="google-login-btn"><span style="font-weight:800; color:#4285f4; margin-right:8px;">G</span>使用 Google 帳號登入</button>
       <div id="login-error"></div>
     </div>
   </div>
 
-  <!-- =========================
-       Header
-  ========================== -->
-
+  <!-- Header -->
   <header class="app-header">
     <div class="header-inner">
-
       <div class="brand">
         <div class="brand-icon">🇯🇵</div>
-
         <div class="brand-text">
           <div class="brand-title">日本自由行</div>
           <div class="brand-subtitle">Trip Planner</div>
         </div>
       </div>
-
       <div class="user-area">
         <div id="user-name" class="user-name"></div>
-
-        <button
-          id="logout-btn"
-          class="logout-btn"
-          style="display:none;"
-        >
-          登出
-        </button>
+        <button id="logout-btn" class="logout-btn" style="display:none;">登出</button>
       </div>
-
     </div>
   </header>
 
-  <!-- =========================
-       Main
-  ========================== -->
-
+  <!-- Main -->
   <main class="app-main">
-
-    <!-- =====================
-         Trips View
-    ====================== -->
-
+    <!-- Trips View -->
     <section id="trips-view" class="view active">
-
       <div class="page-title-row">
-
         <div>
           <h1 class="page-title">我的旅程</h1>
-
-          <p class="page-subtitle">
-            建立、管理你的日本旅行計畫
-          </p>
+          <p class="page-subtitle">建立、管理你的日本旅行計畫</p>
         </div>
-
-        <button
-          class="btn btn-primary"
-          onclick="openCreateTrip()"
-        >
-          ＋ 新增旅程
-        </button>
-
-      </div>
-
-      <div id="trips-list">
-        <div class="loading">
-          <span class="loading-dot"></span>
-          載入旅程中…
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-secondary" onclick="openJoinTrip()">🤝 加入旅程</button>
+          <button class="btn btn-primary" onclick="openCreateTrip()">＋ 新增旅程</button>
         </div>
       </div>
-
+      <div id="trips-list"><div class="loading"><span class="loading-dot"></span>載入旅程中…</div></div>
     </section>
 
-    <!-- =====================
-         Trip Detail View
-    ====================== -->
-
+    <!-- Trip Detail View -->
     <section id="trip-view" class="view">
-
       <div class="trip-detail-header">
-
         <div class="back-row">
-
-          <button
-            class="icon-btn"
-            onclick="showTripsView()"
-          >
-            ←
-          </button>
-
+          <button class="icon-btn" onclick="showTripsView()">←</button>
           <div style="min-width:0;">
-            <h1
-              id="trip-detail-title"
-              class="trip-detail-title"
-            >
-              旅程
-            </h1>
-
-            <div
-              id="trip-detail-date"
-              class="trip-detail-date"
-            ></div>
+            <h1 id="trip-detail-title" class="trip-detail-title">旅程</h1>
+            <div id="trip-detail-date" class="trip-detail-date"></div>
           </div>
-
         </div>
-
       </div>
-
-      <!-- Tabs -->
-
       <div class="tab-bar">
-
-        <button
-          id="tab-schedule"
-          class="tab-btn active"
-          onclick="switchTab('schedule')"
-        >
-          🗓 行程
-        </button>
-
-        <button
-          id="tab-buy"
-          class="tab-btn"
-          onclick="switchTab('buy')"
-        >
-          🛍 代購
-        </button>
-
+        <button id="tab-schedule" class="tab-btn active" onclick="switchTab('schedule')">🗓 行程</button>
+        <button id="tab-buy" class="tab-btn" onclick="switchTab('buy')">🛍 代購</button>
       </div>
 
-      <!-- =====================
-           Schedule tab
-      ====================== -->
-
+      <!-- Schedule Tab -->
       <div id="schedule-tab">
-
         <div class="toolbar">
-
-          <button
-            class="btn btn-primary btn-small"
-            onclick="openAddSchedule()"
-          >
-            ＋ 新增行程
-          </button>
-
-          <button
-            class="btn btn-secondary btn-small"
-            onclick="toggleScheduleForm()"
-          >
-            展開表單
-          </button>
-
-          <button
-            class="btn btn-secondary btn-small"
-            onclick="showSyncStatus()"
-          >
-            ☁ 同步中
-          </button>
-
+          <button class="btn btn-primary btn-small" onclick="openAddSchedule()">＋ 新增行程</button>
+          <button class="btn btn-secondary btn-small" onclick="toggleScheduleForm()">展開表單</button>
+          <button class="btn btn-secondary btn-small" onclick="showSyncStatus()">☁ 同步中</button>
         </div>
-
-        <div
-          id="sch-form-body"
-          class="form-card"
-          style="display:none;"
-        >
-
+        <div id="sch-form-body" class="form-card" style="display:none;">
           <div class="modal-header">
             <h2 class="modal-title">新增行程</h2>
-
-            <button
-              class="modal-close"
-              onclick="toggleScheduleForm(false)"
-            >
-              ×
-            </button>
+            <button class="modal-close" onclick="toggleScheduleForm(false)">×</button>
           </div>
-
           <form id="schedule-form">
-
             <div class="form-grid">
-
-              <div class="form-group">
-                <label class="form-label">
-                  日期
-                </label>
-
-                <input
-                  id="sch-date"
-                  class="form-input"
-                  type="date"
-                  required
-                >
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  Day
-                </label>
-
-                <input
-                  id="sch-day"
-                  class="form-input"
-                  type="text"
-                  placeholder="Day 1"
-                >
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  開始時間
-                </label>
-
-                <input
-                  id="sch-start"
-                  class="form-input"
-                  type="time"
-                  required
-                >
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  結束時間
-                </label>
-
-                <input
-                  id="sch-end"
-                  class="form-input"
-                  type="time"
-                >
-              </div>
-
-              <div class="form-group full">
-                <label class="form-label">
-                  地點 / 行程
-                </label>
-
-                <input
-                  id="sch-place"
-                  class="form-input"
-                  type="text"
-                  placeholder="例如：大阪城、USJ、心齋橋"
-                  required
-                >
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  預估時間
-                </label>
-
-                <input
-                  id="sch-duration"
-                  class="form-input"
-                  type="text"
-                  placeholder="例如：2 小時"
-                >
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  照片
-                </label>
-
-                <input
-                  id="sch-photo"
-                  class="form-input"
-                  type="file"
-                  accept="image/*"
-                >
-
-                <div
-                  id="sch-photo-preview"
-                  class="photo-preview"
-                ></div>
-
-                <div
-                  id="sch-photo-status"
-                  class="photo-status"
-                ></div>
-              </div>
-
+              <div class="form-group"><label class="form-label">日期</label><input id="sch-date" class="form-input" type="date" required></div>
+              <div class="form-group"><label class="form-label">Day</label><input id="sch-day" class="form-input" type="text" placeholder="Day 1"></div>
+              <div class="form-group"><label class="form-label">開始時間</label><input id="sch-start" class="form-input" type="time" required></div>
+              <div class="form-group"><label class="form-label">結束時間</label><input id="sch-end" class="form-input" type="time"></div>
+              <div class="form-group full"><label class="form-label">地點 / 行程</label><input id="sch-place" class="form-input" type="text" placeholder="例如：大阪城、USJ、心齋橋" required></div>
+              <div class="form-group"><label class="form-label">預估時間</label><input id="sch-duration" class="form-input" type="text" placeholder="例如：2 小時"></div>
+              <div class="form-group"><label class="form-label">照片</label><input id="sch-photo" class="form-input" type="file" accept="image/*"><div id="sch-photo-preview" class="photo-preview"></div><div id="sch-photo-status" class="photo-status"></div></div>
             </div>
-
             <div class="form-actions">
-
-              <button
-                type="button"
-                class="btn btn-secondary"
-                onclick="toggleScheduleForm(false)"
-              >
-                取消
-              </button>
-
-              <button
-                type="submit"
-                class="btn btn-primary"
-              >
-                新增行程
-              </button>
-
+              <button type="button" class="btn btn-secondary" onclick="toggleScheduleForm(false)">取消</button>
+              <button type="submit" class="btn btn-primary">新增行程</button>
             </div>
-
           </form>
-
         </div>
-
         <div id="schedule-list"></div>
-
       </div>
 
-      <!-- =====================
-           Buy tab
-      ====================== -->
-
+      <!-- Buy Tab -->
       <div id="buy-tab" style="display:none;">
-
         <div class="toolbar">
-
-          <button
-            class="btn btn-primary btn-small"
-            onclick="openAddBuy()"
-          >
-            ＋ 新增代購
-          </button>
-
-          <button
-            class="btn btn-secondary btn-small"
-            onclick="toggleRatePanel()"
-          >
-            💴 匯率
-          </button>
-
-          <button
-            class="btn btn-secondary btn-small"
-            onclick="toggleFilterPanel()"
-          >
-            🔎 篩選
-          </button>
-
+          <button class="btn btn-primary btn-small" onclick="openAddBuy()">＋ 新增代購</button>
+          <button class="btn btn-secondary btn-small" onclick="toggleRatePanel()">💴 匯率</button>
+          <button class="btn btn-secondary btn-small" onclick="toggleFilterPanel()">🔎 篩選</button>
         </div>
-
-        <!-- Rate -->
-
-        <div
-          id="rate-panel"
-          class="quick-panel"
-        >
-
-          <div class="quick-panel-title">
-            日圓匯率
-          </div>
-
-          <div class="quick-rate-row">
-
-            <div
-              id="exchange-rate"
-              class="rate-value"
-            >
-              —
-            </div>
-
-            <div class="rate-note">
-              JPY → TWD
-            </div>
-
-          </div>
-
+        <div id="rate-panel" class="quick-panel">
+          <div class="quick-panel-title">日圓匯率</div>
+          <div class="quick-rate-row"><div id="exchange-rate" class="rate-value">—</div><div class="rate-note">JPY → TWD</div></div>
         </div>
-
-        <!-- Filter -->
-
-        <div
-          id="filter-panel"
-          class="filter-panel"
-        >
-
+        <div id="filter-panel" class="filter-panel">
           <div class="filter-grid">
-
-            <div>
-              <label class="filter-label">
-                分類
-              </label>
-
-              <select
-                id="buy-filter-category"
-                class="form-select"
-                onchange="renderBuyList()"
-              >
-                <option value="">全部分類</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="filter-label">
-                狀態
-              </label>
-
-              <select
-                id="buy-filter-status"
-                class="form-select"
-                onchange="renderBuyList()"
-              >
-                <option value="">全部</option>
-                <option value="todo">未購買</option>
-                <option value="done">已購買</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="filter-label">
-                代購人
-              </label>
-
-              <select
-                id="buy-filter-owner"
-                class="form-select"
-                onchange="renderBuyList()"
-              >
-                <option value="">全部</option>
-              </select>
-            </div>
-
+            <div><label class="filter-label">分類</label><select id="buy-filter-category" class="form-select" onchange="renderBuyList()"><option value="">全部分類</option></select></div>
+            <div><label class="filter-label">狀態</label><select id="buy-filter-status" class="form-select" onchange="renderBuyList()"><option value="">全部</option><option value="todo">未購買</option><option value="done">已購買</option></select></div>
+            <div><label class="filter-label">代購人</label><select id="buy-filter-owner" class="form-select" onchange="renderBuyList()"><option value="">全部</option></select></div>
           </div>
-
         </div>
-
         <div id="buy-list"></div>
-
       </div>
-
     </section>
-
   </main>
 
-  <!-- =========================
-       Bottom Nav
-  ========================== -->
-
+  <!-- Bottom Nav -->
   <nav class="bottom-nav">
-
     <div class="bottom-nav-inner">
-
-      <button
-        id="nav-trips"
-        class="nav-btn active"
-        onclick="showTripsView()"
-      >
-        🧳<br>
-        我的旅程
-      </button>
-
-      <button
-        id="nav-schedule"
-        class="nav-btn"
-        onclick="currentTripId ? switchTab('schedule') : showTripsView()"
-      >
-        🗓<br>
-        行程
-      </button>
-
-      <button
-        id="nav-buy"
-        class="nav-btn"
-        onclick="currentTripId ? switchTab('buy') : showTripsView()"
-      >
-        🛍<br>
-        代購
-      </button>
-
+      <button id="nav-trips" class="nav-btn active" onclick="showTripsView()">🧳<br>我的旅程</button>
+      <button id="nav-schedule" class="nav-btn" onclick="currentTripId ? switchTab('schedule') : showTripsView()">🗓<br>行程</button>
+      <button id="nav-buy" class="nav-btn" onclick="currentTripId ? switchTab('buy') : showTripsView()">🛍<br>代購</button>
     </div>
-
   </nav>
 
-  <!-- =========================
-       Create Trip Modal
-  ========================== -->
-
-  <div
-    id="create-trip-modal"
-    class="modal"
-  >
-
+  <!-- Create Trip Modal -->
+  <div id="create-trip-modal" class="modal">
     <div class="modal-card">
-
       <div class="modal-header">
-
-        <h2 class="modal-title">
-          新增旅程
-        </h2>
-
-        <button
-          class="modal-close"
-          onclick="closeModal('create-trip-modal')"
-        >
-          ×
-        </button>
-
+        <h2 class="modal-title">新增旅程</h2>
+        <button class="modal-close" onclick="closeModal('create-trip-modal')">×</button>
       </div>
-
       <form id="create-trip-form">
-
         <div class="form-grid">
-
-          <div class="form-group full">
-            <label class="form-label">
-              旅程名稱
-            </label>
-
-            <input
-              id="trip-name"
-              class="form-input"
-              type="text"
-              placeholder="例如：2026 大阪家庭旅行"
-              required
-            >
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              開始日期
-            </label>
-
-            <input
-              id="trip-start"
-              class="form-input"
-              type="date"
-              required
-            >
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              結束日期
-            </label>
-
-            <input
-              id="trip-end"
-              class="form-input"
-              type="date"
-              required
-            >
-          </div>
-
+          <div class="form-group full"><label class="form-label">旅程名稱</label><input id="trip-name" class="form-input" type="text" placeholder="例如：2026 大阪家庭旅行" required></div>
+          <div class="form-group"><label class="form-label">開始日期</label><input id="trip-start" class="form-input" type="date" required></div>
+          <div class="form-group"><label class="form-label">結束日期</label><input id="trip-end" class="form-input" type="date" required></div>
         </div>
-
         <div class="form-actions">
-
-          <button
-            type="button"
-            class="btn btn-secondary"
-            onclick="closeModal('create-trip-modal')"
-          >
-            取消
-          </button>
-
-          <button
-            type="submit"
-            class="btn btn-primary"
-          >
-            建立旅程
-          </button>
-
+          <button type="button" class="btn btn-secondary" onclick="closeModal('create-trip-modal')">取消</button>
+          <button type="submit" class="btn btn-primary">建立旅程</button>
         </div>
-
       </form>
-
     </div>
-
   </div>
 
-  <!-- =========================
-       Edit Schedule Modal
-  ========================== -->
-
-  <div
-    id="edit-sch-modal"
-    class="modal"
-  >
-
+  <!-- Join Trip Modal -->
+  <div id="join-trip-modal" class="modal">
     <div class="modal-card">
-
       <div class="modal-header">
-
-        <h2 class="modal-title">
-          編輯行程
-        </h2>
-
-        <button
-          class="modal-close"
-          onclick="closeModal('edit-sch-modal')"
-        >
-          ×
-        </button>
-
+        <h2 class="modal-title">加入旅程</h2>
+        <button class="modal-close" onclick="closeModal('join-trip-modal')">×</button>
       </div>
+      <form id="join-trip-form">
+        <div class="form-grid">
+          <div class="form-group full"><label class="form-label">請輸入邀請碼</label><input id="join-trip-code" class="form-input" type="text" placeholder="例如：A1B2C3" required style="text-transform: uppercase;"></div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('join-trip-modal')">取消</button>
+          <button type="submit" class="btn btn-primary">確認加入</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
+  <!-- Edit Schedule Modal -->
+  <div id="edit-sch-modal" class="modal">
+    <div class="modal-card">
+      <div class="modal-header"><h2 class="modal-title">編輯行程</h2><button class="modal-close" onclick="closeModal('edit-sch-modal')">×</button></div>
       <form id="edit-schedule-form">
-
-        <input
-          id="edit-sch-id"
-          type="hidden"
-        >
-
+        <input id="edit-sch-id" type="hidden">
         <div class="form-grid">
-
-          <div class="form-group">
-            <label class="form-label">
-              日期
-            </label>
-
-            <input
-              id="edit-sch-date"
-              class="form-input"
-              type="date"
-              required
-            >
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              Day
-            </label>
-
-            <input
-              id="edit-sch-day"
-              class="form-input"
-              type="text"
-            >
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              開始時間
-            </label>
-
-            <input
-              id="edit-sch-start"
-              class="form-input"
-              type="time"
-              required
-            >
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              結束時間
-            </label>
-
-            <input
-              id="edit-sch-end"
-              class="form-input"
-              type="time"
-            >
-          </div>
-
-          <div class="form-group full">
-            <label class="form-label">
-              地點 / 行程
-            </label>
-
-            <input
-              id="edit-sch-place"
-              class="form-input"
-              type="text"
-              required
-            >
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              預估時間
-            </label>
-
-            <input
-              id="edit-sch-duration"
-              class="form-input"
-              type="text"
-            >
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              更換照片
-            </label>
-
-            <input
-              id="edit-sch-photo"
-              class="form-input"
-              type="file"
-              accept="image/*"
-            >
-
-            <div
-              id="edit-sch-photo-preview"
-              class="photo-preview"
-            ></div>
-
-            <div
-              id="edit-sch-photo-status"
-              class="photo-status"
-            ></div>
-          </div>
-
+          <div class="form-group"><label class="form-label">日期</label><input id="edit-sch-date" class="form-input" type="date" required></div>
+          <div class="form-group"><label class="form-label">Day</label><input id="edit-sch-day" class="form-input" type="text"></div>
+          <div class="form-group"><label class="form-label">開始時間</label><input id="edit-sch-start" class="form-input" type="time" required></div>
+          <div class="form-group"><label class="form-label">結束時間</label><input id="edit-sch-end" class="form-input" type="time"></div>
+          <div class="form-group full"><label class="form-label">地點 / 行程</label><input id="edit-sch-place" class="form-input" type="text" required></div>
+          <div class="form-group"><label class="form-label">預估時間</label><input id="edit-sch-duration" class="form-input" type="text"></div>
+          <div class="form-group"><label class="form-label">更換照片</label><input id="edit-sch-photo" class="form-input" type="file" accept="image/*"><div id="edit-sch-photo-preview" class="photo-preview"></div><div id="edit-sch-photo-status" class="photo-status"></div></div>
         </div>
-
-        <div class="form-actions">
-
-          <button
-            type="button"
-            class="btn btn-secondary"
-            onclick="closeModal('edit-sch-modal')"
-          >
-            取消
-          </button>
-
-          <button
-            type="submit"
-            class="btn btn-primary"
-          >
-            儲存修改
-          </button>
-
-        </div>
-
+        <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('edit-sch-modal')">取消</button><button type="submit" class="btn btn-primary">儲存修改</button></div>
       </form>
-
     </div>
-
   </div>
 
-  <!-- =========================
-       Add Buy Modal
-  ========================== -->
-
-  <div
-    id="add-buy-modal"
-    class="modal"
-  >
-
+  <!-- Add Buy Modal -->
+  <div id="add-buy-modal" class="modal">
     <div class="modal-card">
-
-      <div class="modal-header">
-
-        <h2 class="modal-title">
-          新增代購
-        </h2>
-
-        <button
-          class="modal-close"
-          onclick="closeModal('add-buy-modal')"
-        >
-          ×
-        </button>
-
-      </div>
-
+      <div class="modal-header"><h2 class="modal-title">新增代購</h2><button class="modal-close" onclick="closeModal('add-buy-modal')">×</button></div>
       <form id="buy-form">
-
         <div class="form-grid">
-
+          <div class="form-group full"><label class="form-label">商品名稱</label><input id="buy-name" class="form-input" type="text" placeholder="例如：Pokemon Center 限定商品" required></div>
+          <div class="form-group"><label class="form-label">分類</label><input id="buy-category" class="form-input" type="text" placeholder="例如：Pokemon"></div>
+          <div class="form-group"><label class="form-label">代購人</label><input id="buy-owner" class="form-input" type="text" placeholder="例如：Vicson"></div>
+          <div class="form-group"><label class="form-label">數量</label><input id="buy-qty" class="form-input" type="number" min="1" value="1" required></div>
+          <div class="form-group"><label class="form-label">單價（日圓）</label><input id="buy-price" class="form-input" type="number" min="0" value="0" required></div>
           <div class="form-group full">
-            <label class="form-label">
-              商品名稱
-            </label>
-
-            <input
-              id="buy-name"
-              class="form-input"
-              type="text"
-              placeholder="例如：Pokemon Center 限定商品"
-              required
-            >
+            <label class="form-label">照片</label>
+            <input id="buy-photo" class="form-input" type="file" accept="image/*">
+            <div id="buy-photo-preview" class="photo-preview"></div>
+            <div id="buy-photo-status" class="photo-status"></div>
+            <button id="confirm-buy-photo-btn" type="button" class="btn btn-secondary btn-small" style="margin-top:8px;">確認照片</button>
           </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              分類
-            </label>
-
-            <input
-              id="buy-category"
-              class="form-input"
-              type="text"
-              placeholder="例如：Pokemon"
-            >
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              代購人
-            </label>
-
-            <input
-              id="buy-owner"
-              class="form-input"
-              type="text"
-              placeholder="例如：Vicson"
-            >
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              數量
-            </label>
-
-            <input
-              id="buy-qty"
-              class="form-input"
-              type="number"
-              min="1"
-              value="1"
-              required
-            >
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              單價（日圓）
-            </label>
-
-            <input
-              id="buy-price"
-              class="form-input"
-              type="number"
-              min="0"
-              value="0"
-              required
-            >
-          </div>
-
-          <div class="form-group full">
-            <label class="form-label">
-              照片
-            </label>
-
-            <input
-              id="buy-photo"
-              class="form-input"
-              type="file"
-              accept="image/*"
-            >
-
-            <div
-              id="buy-photo-preview"
-              class="photo-preview"
-            ></div>
-
-            <div
-              id="buy-photo-status"
-              class="photo-status"
-            ></div>
-
-            <button
-              id="confirm-buy-photo-btn"
-              type="button"
-              class="btn btn-secondary btn-small"
-              style="margin-top:8px;"
-            >
-              確認照片
-            </button>
-          </div>
-
         </div>
-
-        <div class="form-actions">
-
-          <button
-            type="button"
-            class="btn btn-secondary"
-            onclick="closeModal('add-buy-modal')"
-          >
-            取消
-          </button>
-
-          <button
-            type="submit"
-            class="btn btn-primary"
-          >
-            新增代購
-          </button>
-
-        </div>
-
+        <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('add-buy-modal')">取消</button><button type="submit" class="btn btn-primary">新增代購</button></div>
       </form>
-
     </div>
-
   </div>
 
-  <!-- =========================
-       Edit Buy Modal
-  ========================== -->
-
-  <div
-    id="edit-buy-modal"
-    class="modal"
-  >
-
+  <!-- Edit Buy Modal -->
+  <div id="edit-buy-modal" class="modal">
     <div class="modal-card">
-
-      <div class="modal-header">
-
-        <h2 class="modal-title">
-          編輯代購
-        </h2>
-
-        <button
-          class="modal-close"
-          onclick="closeModal('edit-buy-modal')"
-        >
-          ×
-        </button>
-
-      </div>
-
+      <div class="modal-header"><h2 class="modal-title">編輯代購</h2><button class="modal-close" onclick="closeModal('edit-buy-modal')">×</button></div>
       <form id="edit-buy-form">
-
-        <input
-          id="edit-buy-id"
-          type="hidden"
-        >
-
+        <input id="edit-buy-id" type="hidden">
         <div class="form-grid">
-
-          <div class="form-group full">
-            <label class="form-label">
-              商品名稱
-            </label>
-
-            <input
-              id="edit-buy-name"
-              class="form-input"
-              type="text"
-              required
-            >
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              分類
-            </label>
-
-            <input
-              id="edit-buy-category"
-              class="form-input"
-              type="text"
-            >
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              代購人
-            </label>
-
-            <input
-              id="edit-buy-owner"
-              class="form-input"
-              type="text"
-            >
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              數量
-            </label>
-
-            <input
-              id="edit-buy-qty"
-              class="form-input"
-              type="number"
-              min="1"
-              required
-            >
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              單價（日圓）
-            </label>
-
-            <input
-              id="edit-buy-price"
-              class="form-input"
-              type="number"
-              min="0"
-              required
-            >
-          </div>
-
-          <div class="form-group full">
-            <label class="form-label">
-              更換照片
-            </label>
-
-            <input
-              id="edit-buy-photo"
-              class="form-input"
-              type="file"
-              accept="image/*"
-            >
-
-            <div
-              id="edit-buy-photo-preview"
-              class="photo-preview"
-            ></div>
-
-            <div
-              id="edit-buy-photo-status"
-              class="photo-status"
-            ></div>
-          </div>
-
+          <div class="form-group full"><label class="form-label">商品名稱</label><input id="edit-buy-name" class="form-input" type="text" required></div>
+          <div class="form-group"><label class="form-label">分類</label><input id="edit-buy-category" class="form-input" type="text"></div>
+          <div class="form-group"><label class="form-label">代購人</label><input id="edit-buy-owner" class="form-input" type="text"></div>
+          <div class="form-group"><label class="form-label">數量</label><input id="edit-buy-qty" class="form-input" type="number" min="1" required></div>
+          <div class="form-group"><label class="form-label">單價（日圓）</label><input id="edit-buy-price" class="form-input" type="number" min="0" required></div>
+          <div class="form-group full"><label class="form-label">更換照片</label><input id="edit-buy-photo" class="form-input" type="file" accept="image/*"><div id="edit-buy-photo-preview" class="photo-preview"></div><div id="edit-buy-photo-status" class="photo-status"></div></div>
         </div>
-
-        <div class="form-actions">
-
-          <button
-            type="button"
-            class="btn btn-secondary"
-            onclick="closeModal('edit-buy-modal')"
-          >
-            取消
-          </button>
-
-          <button
-            type="submit"
-            class="btn btn-primary"
-          >
-            儲存修改
-          </button>
-
-        </div>
-
+        <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('edit-buy-modal')">取消</button><button type="submit" class="btn btn-primary">儲存修改</button></div>
       </form>
-
     </div>
-
   </div>
-
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -2145,11 +386,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
   <script>
-
-    /* =========================================================
-       Firebase
-    ========================================================= */
-
     const firebaseConfig = {
       apiKey: "AIzaSyDCNbwIV1iMoxwlPL7a4xEbMwpMv75sOak",
       authDomain: "japan-trip-701cd.firebaseapp.com",
@@ -2161,4408 +397,527 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-
     const db = firebase.firestore();
     const auth = firebase.auth();
 
-
-    /* =========================================================
-       Global State
-    ========================================================= */
-
     const TODAY_REFERENCE_RATE = 0.22;
-
     let trips = [];
     let currentTripId = null;
-
     let tripsUnsubscribe = null;
     let rateUnsubscribe = null;
-
-    /*
-      Google Drive OAuth token
-
-      注意：
-      Firebase Auth 本身不會在重新整理頁面後保留 Drive access token，
-      因此第一次需要照片時，會透過 reauthenticateWithPopup 重新取得。
-    */
     let googleDriveAccessToken = null;
-
     let exchangeRate = TODAY_REFERENCE_RATE;
 
-
-    /* =========================================================
-       Utility
-    ========================================================= */
-
     function escapeHtml(value) {
-      if (value === null || value === undefined) {
-        return '';
-      }
-
-      return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+      if (value == null) return '';
+      return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
-
-
     function formatDate(dateString) {
       if (!dateString) return '';
-
       const date = new Date(dateString + 'T00:00:00');
-
-      if (Number.isNaN(date.getTime())) {
-        return dateString;
-      }
-
-      return date.toLocaleDateString('zh-TW', {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric'
-      });
+      if (Number.isNaN(date.getTime())) return dateString;
+      return date.toLocaleDateString('zh-TW', { year: 'numeric', month: 'numeric', day: 'numeric' });
     }
-
-
-    function formatNumber(value) {
-      const number = Number(value) || 0;
-
-      return number.toLocaleString('zh-TW');
-    }
-
-
+    function formatNumber(value) { return (Number(value) || 0).toLocaleString('zh-TW'); }
     function addMinutesToTime(timeString, minutes) {
       if (!timeString) return '';
-
       const parts = timeString.split(':');
-
-      if (parts.length < 2) {
-        return '';
-      }
-
-      let hours = parseInt(parts[0], 10);
-      let mins = parseInt(parts[1], 10);
-
-      if (
-        Number.isNaN(hours) ||
-        Number.isNaN(mins)
-      ) {
-        return '';
-      }
-
-      let total = hours * 60 + mins + minutes;
-
-      total = Math.min(total, 23 * 60 + 59);
-
-      hours = Math.floor(total / 60);
-      mins = total % 60;
-
-      return (
-        String(hours).padStart(2, '0') +
-        ':' +
-        String(mins).padStart(2, '0')
-      );
+      if (parts.length < 2) return '';
+      let hours = parseInt(parts[0], 10), mins = parseInt(parts[1], 10);
+      if (Number.isNaN(hours) || Number.isNaN(mins)) return '';
+      let total = Math.min(hours * 60 + mins + minutes, 23 * 60 + 59);
+      return String(Math.floor(total / 60)).padStart(2, '0') + ':' + String(total % 60).padStart(2, '0');
     }
-
-
     function getDayLabel(dateString) {
       if (!dateString) return '';
-
       const date = new Date(dateString + 'T00:00:00');
-
-      if (Number.isNaN(date.getTime())) {
-        return '';
-      }
-
-      const weekday = [
-        '日',
-        '一',
-        '二',
-        '三',
-        '四',
-        '五',
-        '六'
-      ];
-
-      return '週' + weekday[date.getDay()];
+      if (Number.isNaN(date.getTime())) return '';
+      return '週' + ['日','一','二','三','四','五','六'][date.getDay()];
     }
-
-
-    function getCurrentTrip() {
-      return trips.find(
-        trip => trip.id === currentTripId
-      );
-    }
-
-
-    /* =========================================================
-       Authentication
-    ========================================================= */
+    function getCurrentTrip() { return trips.find(t => t.id === currentTripId); }
 
     auth.onAuthStateChanged(async user => {
-
-      const loginOverlay =
-        document.getElementById('login-overlay');
-
-      const userName =
-        document.getElementById('user-name');
-
-      const logoutBtn =
-        document.getElementById('logout-btn');
-
+      const loginOverlay = document.getElementById('login-overlay');
+      const userName = document.getElementById('user-name');
+      const logoutBtn = document.getElementById('logout-btn');
       if (user) {
-
-        console.log('✅ Firebase 使用者登入：', user.email);
-
         loginOverlay.style.display = 'none';
-
-        userName.textContent =
-          user.displayName ||
-          user.email ||
-          '';
-
+        userName.textContent = user.displayName || user.email || '';
         logoutBtn.style.display = 'block';
-
-        /*
-          每次 Firebase Auth 狀態重新建立後，
-          舊的 Drive token 不應直接假設仍然有效。
-        */
         googleDriveAccessToken = null;
-
         startTripSync(user);
         startRateSync();
-
       } else {
-
-        console.log('ℹ️ 尚未登入');
-
         loginOverlay.style.display = 'flex';
-
         userName.textContent = '';
-
         logoutBtn.style.display = 'none';
-
         googleDriveAccessToken = null;
-
         stopTripSync();
         stopRateSync();
-
         trips = [];
         currentTripId = null;
-
         localStorage.removeItem('currentTripId');
-
         renderTripsList();
         showTripsView();
       }
-
     });
 
-
-    document
-      .getElementById('google-login-btn')
-      .addEventListener('click', async () => {
-
-        const btn =
-          document.getElementById('google-login-btn');
-
-        const error =
-          document.getElementById('login-error');
-
-        error.textContent = '';
-
-        btn.disabled = true;
-
-        btn.innerHTML =
-          'Google 登入中…';
-
-        try {
-
-          const provider =
-            new firebase.auth.GoogleAuthProvider();
-
-          /*
-            drive.file：
-            允許此 App 建立 / 存取自己建立的 Drive 檔案。
-          */
-          provider.addScope(
-            'https://www.googleapis.com/auth/drive.file'
-          );
-
-          const result =
-            await auth.signInWithPopup(provider);
-
-          googleDriveAccessToken =
-            result &&
-            result.credential
-              ? result.credential.accessToken || null
-              : null;
-
-          console.log(
-            '✅ Google 登入成功'
-          );
-
-          console.log(
-            'Drive Token:',
-            googleDriveAccessToken
-              ? '取得成功'
-              : '尚未取得'
-          );
-
-        } catch (err) {
-
-          console.error(
-            '❌ Google 登入失敗：',
-            err
-          );
-
-          error.textContent =
-            '登入失敗：' +
-            (
-              err.message ||
-              err.code ||
-              err
-            );
-
-        } finally {
-
-          btn.disabled = false;
-
-          btn.innerHTML =
-            '<span style="font-weight:800; color:#4285f4; margin-right:8px;">G</span> 使用 Google 帳號登入';
-
-        }
-
-      });
-
-
-    document
-      .getElementById('logout-btn')
-      .addEventListener('click', async () => {
-
-        try {
-
-          await auth.signOut();
-
-        } catch (err) {
-
-          console.error(
-            '登出失敗：',
-            err
-          );
-
-        }
-
-      });
-
-
-    /* =========================================================
-       Firestore Trip Sync
-    ========================================================= */
-
-    function stopTripSync() {
-
-      if (typeof tripsUnsubscribe === 'function') {
-
-        tripsUnsubscribe();
-
+    document.getElementById('google-login-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('google-login-btn');
+      const error = document.getElementById('login-error');
+      error.textContent = ''; btn.disabled = true; btn.innerHTML = 'Google 登入中…';
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('https://www.googleapis.com/auth/drive.file');
+        const result = await auth.signInWithPopup(provider);
+        googleDriveAccessToken = result?.credential?.accessToken || null;
+      } catch (err) {
+        error.textContent = '登入失敗：' + (err.message || err.code || err);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span style="font-weight:800; color:#4285f4; margin-right:8px;">G</span> 使用 Google 帳號登入';
       }
+    });
 
-      tripsUnsubscribe = null;
-    }
+    document.getElementById('logout-btn').addEventListener('click', async () => { try { await auth.signOut(); } catch (err) { console.error(err); } });
 
-
+    function stopTripSync() { if (tripsUnsubscribe) tripsUnsubscribe(); tripsUnsubscribe = null; }
     function startTripSync(user) {
-
       stopTripSync();
-
-      if (!user) {
-        trips = [];
+      if (!user) { trips = []; renderTripsList(); return; }
+      const savedTripId = localStorage.getItem('currentTripId');
+      tripsUnsubscribe = db.collection('trips').where('memberUids', 'array-contains', user.uid).onSnapshot(snapshot => {
+        trips = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderTripsList();
-        return;
-      }
-
-      const savedTripId =
-        localStorage.getItem('currentTripId');
-
-      tripsUnsubscribe =
-        db
-          .collection('trips')
-          .where(
-            'memberUids',
-            'array-contains',
-            user.uid
-          )
-          .onSnapshot(
-            snapshot => {
-
-              trips = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-              }));
-
-              console.log(
-                '☁️ 旅程同步：',
-                trips.length
-              );
-
-              renderTripsList();
-
-              if (
-                currentTripId &&
-                !trips.some(
-                  trip => trip.id === currentTripId
-                )
-              ) {
-
-                currentTripId = null;
-
-                localStorage.removeItem(
-                  'currentTripId'
-                );
-
-                showTripsView();
-
-                return;
-              }
-
-              if (
-                !currentTripId &&
-                savedTripId &&
-                trips.some(
-                  trip => trip.id === savedTripId
-                )
-              ) {
-
-                openTripDetail(savedTripId);
-
-              }
-
-            },
-            error => {
-
-              console.error(
-                '❌ Trip Snapshot Error：',
-                error
-              );
-
-            }
-          );
+        if (currentTripId && !trips.some(t => t.id === currentTripId)) {
+          currentTripId = null; localStorage.removeItem('currentTripId'); showTripsView(); return;
+        }
+        if (!currentTripId && savedTripId && trips.some(t => t.id === savedTripId)) openTripDetail(savedTripId);
+      }, err => console.error('Trip Sync Error:', err));
     }
 
-
-    /* =========================================================
-       Exchange Rate Sync
-    ========================================================= */
-
-    function stopRateSync() {
-
-      if (typeof rateUnsubscribe === 'function') {
-        rateUnsubscribe();
-      }
-
-      rateUnsubscribe = null;
-    }
-
-
+    function stopRateSync() { if (rateUnsubscribe) rateUnsubscribe(); rateUnsubscribe = null; }
     function startRateSync() {
-
       stopRateSync();
-
-      rateUnsubscribe =
-        db
-          .collection('settings')
-          .doc('rate')
-          .onSnapshot(
-            doc => {
-
-              if (doc.exists) {
-
-                const data = doc.data();
-
-                const rate =
-                  Number(
-                    data.rate ||
-                    data.jpyToTwd ||
-                    data.value
-                  );
-
-                if (
-                  Number.isFinite(rate) &&
-                  rate > 0
-                ) {
-                  exchangeRate = rate;
-                }
-
-              }
-
-              const el =
-                document.getElementById(
-                  'exchange-rate'
-                );
-
-              if (el) {
-
-                el.textContent =
-                  exchangeRate.toFixed(4);
-
-              }
-
-            },
-            error => {
-
-              console.warn(
-                '⚠️ 匯率同步失敗，使用預設匯率：',
-                error
-              );
-
-              const el =
-                document.getElementById(
-                  'exchange-rate'
-                );
-
-              if (el) {
-                el.textContent =
-                  exchangeRate.toFixed(4);
-              }
-
-            }
-          );
+      rateUnsubscribe = db.collection('settings').doc('rate').onSnapshot(doc => {
+        if (doc.exists) {
+          const rate = Number(doc.data().rate || doc.data().jpyToTwd || doc.data().value);
+          if (Number.isFinite(rate) && rate > 0) exchangeRate = rate;
+        }
+        const el = document.getElementById('exchange-rate');
+        if (el) el.textContent = exchangeRate.toFixed(4);
+      }, err => console.warn('Rate sync error:', err));
     }
-
-
-    /* =========================================================
-       Trip View
-    ========================================================= */
 
     function showTripsView() {
-
-      currentTripId = null;
-
-      localStorage.removeItem(
-        'currentTripId'
-      );
-
-      document
-        .getElementById('trips-view')
-        .classList.add('active');
-
-      document
-        .getElementById('trip-view')
-        .classList.remove('active');
-
-      document
-        .getElementById('nav-trips')
-        .classList.add('active');
-
-      document
-        .getElementById('nav-schedule')
-        .classList.remove('active');
-
-      document
-        .getElementById('nav-buy')
-        .classList.remove('active');
-
+      currentTripId = null; localStorage.removeItem('currentTripId');
+      document.getElementById('trips-view').classList.add('active');
+      document.getElementById('trip-view').classList.remove('active');
+      document.getElementById('nav-trips').classList.add('active');
+      document.getElementById('nav-schedule').classList.remove('active');
+      document.getElementById('nav-buy').classList.remove('active');
       closeAllQuickPanels();
     }
-
 
     function openTripDetail(id) {
-
-      const trip =
-        trips.find(
-          item => item.id === id
-        );
-
-      if (!trip) {
-        console.warn(
-          '找不到旅程：',
-          id
-        );
-        return;
-      }
-
-      currentTripId = id;
-
-      localStorage.setItem(
-        'currentTripId',
-        id
-      );
-
-      document
-        .getElementById('trips-view')
-        .classList.remove('active');
-
-      document
-        .getElementById('trip-view')
-        .classList.add('active');
-
-      document
-        .getElementById('trip-detail-title')
-        .textContent =
-        trip.name || '未命名旅程';
-
-      document
-        .getElementById('trip-detail-date')
-        .textContent =
-        `${formatDate(trip.startDate)} ～ ${formatDate(trip.endDate)}`;
-
+      const trip = trips.find(t => t.id === id);
+      if (!trip) return;
+      currentTripId = id; localStorage.setItem('currentTripId', id);
+      document.getElementById('trips-view').classList.remove('active');
+      document.getElementById('trip-view').classList.add('active');
+      document.getElementById('trip-detail-title').textContent = trip.name || '未命名旅程';
+      document.getElementById('trip-detail-date').textContent = `${formatDate(trip.startDate)} ～ ${formatDate(trip.endDate)}`;
       switchTab('schedule');
-
-      setTimeout(() => {
-        setScheduleDefaults();
-      }, 0);
+      setTimeout(() => setScheduleDefaults(), 0);
     }
-
-
-    /* =========================================================
-       Render Trips
-    ========================================================= */
 
     function renderTripsList() {
-
-      const list =
-        document.getElementById(
-          'trips-list'
-        );
-
+      const list = document.getElementById('trips-list');
       if (!list) return;
-
       if (!trips.length) {
-
-        list.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">🗾</div>
-
-            <div style="font-weight:800; color:#1d1d1f; margin-bottom:6px;">
-              還沒有旅程
-            </div>
-
-            <div style="margin-bottom:18px;">
-              建立你的第一個日本旅行吧！
-            </div>
-
-            <button
-              class="btn btn-primary"
-              onclick="openCreateTrip()"
-            >
-              ＋ 建立旅程
-            </button>
-          </div>
-        `;
-
+        list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🗾</div><div style="font-weight:800; color:#1d1d1f; margin-bottom:6px;">還沒有旅程</div><div style="margin-bottom:18px;">建立你的第一個日本旅行吧！</div><button class="btn btn-primary" onclick="openCreateTrip()">＋ 建立旅程</button></div>`;
         return;
       }
-
-      list.innerHTML = `
-        <div class="trip-grid">
-          ${trips.map(trip => {
-
-            const owner =
-              trip.ownerName ||
-              '未知';
-
-            const code =
-              trip.inviteCode ||
-              trip.code ||
-              '';
-
-            return `
-              <div
-                class="trip-card"
-                onclick="openTripDetail('${escapeHtml(trip.id)}')"
-              >
-
-                <div class="trip-card-header">
-
-                  <div style="min-width:0;">
-
-                    <div class="trip-name">
-                      ${escapeHtml(trip.name || '未命名旅程')}
-                    </div>
-
-                    <div class="trip-date">
-                      ${escapeHtml(formatDate(trip.startDate))}
-                      ～ 
-                      ${escapeHtml(formatDate(trip.endDate))}
-                    </div>
-
-                  </div>
-
-                  <div style="font-size:22px;">
-                    🇯🇵
-                  </div>
-
-                </div>
-
-                <div class="trip-owner">
-                  建立者：${escapeHtml(owner)}
-                </div>
-
-                ${
-                  code
-                    ? `
-                      <div class="trip-code">
-                        邀請碼：${escapeHtml(code)}
-                      </div>
-                    `
-                    : ''
-                }
-
-              </div>
-            `;
-
-          }).join('')}
-        </div>
-      `;
+      list.innerHTML = `<div class="trip-grid">${trips.map(trip => `
+        <div class="trip-card" onclick="openTripDetail('${escapeHtml(trip.id)}')">
+          <div class="trip-card-header"><div style="min-width:0;"><div class="trip-name">${escapeHtml(trip.name || '未命名')}</div><div class="trip-date">${escapeHtml(formatDate(trip.startDate))} ～${escapeHtml(formatDate(trip.endDate))}</div></div><div style="font-size:22px;">🇯🇵</div></div>
+          <div class="trip-owner">建立者：${escapeHtml(trip.ownerName || '未知')}</div>
+          ${(trip.inviteCode || trip.code) ? `<div class="trip-code">邀請碼：${escapeHtml(trip.inviteCode || trip.code)}</div>` : ''}
+        </div>`).join('')}</div>`;
     }
-
-
-    /* =========================================================
-       Create Trip
-    ========================================================= */
 
     function openCreateTrip() {
-
-      document
-        .getElementById('create-trip-form')
-        .reset();
-
-      const today =
-        new Date()
-          .toISOString()
-          .slice(0, 10);
-
-      document
-        .getElementById('trip-start')
-        .value = today;
-
-      document
-        .getElementById('trip-end')
-        .value = today;
-
-      document
-        .getElementById('create-trip-modal')
-        .classList.add('show');
+      document.getElementById('create-trip-form').reset();
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById('trip-start').value = today;
+      document.getElementById('trip-end').value = today;
+      document.getElementById('create-trip-modal').classList.add('show');
     }
 
+    document.getElementById('create-trip-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const user = auth.currentUser;
+      if (!user) return alert('請先登入');
+      const name = document.getElementById('trip-name').value.trim();
+      const startDate = document.getElementById('trip-start').value;
+      const endDate = document.getElementById('trip-end').value;
+      if (!name) return alert('請輸入旅程名稱');
+      if (startDate && endDate && startDate > endDate) return alert('結束日期不能早於開始日期');
+      const inviteCode = Math.random().toString(36).slice(2, 8).toUpperCase();
+      try {
+        const tripRef = await db.collection('trips').add({
+          name, startDate, endDate, inviteCode, code: inviteCode, schedules: [], buyItems: [],
+          ownerUid: user.uid, ownerName: user.displayName || user.email || '', memberUids: [user.uid],
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        closeModal('create-trip-modal');
+        currentTripId = tripRef.id; localStorage.setItem('currentTripId', tripRef.id);
+        if (!trips.some(t => t.id === tripRef.id)) trips.push({ id: tripRef.id, name, startDate, endDate, inviteCode, code: inviteCode, schedules: [], buyItems: [], ownerUid: user.uid, ownerName: user.displayName || user.email || '', memberUids: [user.uid] });
+        openTripDetail(tripRef.id);
+      } catch (err) { alert('建立失敗：\n' + err.message); }
+    });
 
-    document
-      .getElementById('create-trip-form')
-      .addEventListener(
-        'submit',
-        async event => {
+    // =========== 新增的「加入旅程」邏輯 ===========
+    function openJoinTrip() {
+      document.getElementById('join-trip-form').reset();
+      document.getElementById('join-trip-modal').classList.add('show');
+      setTimeout(() => document.getElementById('join-trip-code').focus(), 50);
+    }
 
-          event.preventDefault();
-
-          const user =
-            auth.currentUser;
-
-          if (!user) {
-            alert('請先登入 Google 帳號');
-            return;
-          }
-
-          const name =
-            document
-              .getElementById('trip-name')
-              .value
-              .trim();
-
-          const startDate =
-            document
-              .getElementById('trip-start')
-              .value;
-
-          const endDate =
-            document
-              .getElementById('trip-end')
-              .value;
-
-          if (!name) {
-            alert('請輸入旅程名稱');
-            return;
-          }
-
-          if (
-            startDate &&
-            endDate &&
-            startDate > endDate
-          ) {
-            alert('結束日期不能早於開始日期');
-            return;
-          }
-
-          const inviteCode =
-            Math.random()
-              .toString(36)
-              .slice(2, 8)
-              .toUpperCase();
-
-          try {
-
-            const tripRef =
-              await db
-                .collection('trips')
-                .add({
-                  name,
-                  startDate,
-                  endDate,
-                  inviteCode,
-                  code: inviteCode,
-                  schedules: [],
-                  buyItems: [],
-                  ownerUid: user.uid,
-                  ownerName:
-                    user.displayName ||
-                    user.email ||
-                    '',
-                  memberUids: [
-                    user.uid
-                  ],
-                  createdAt:
-                    firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-            console.log(
-              '✅ 建立旅程：',
-              tripRef.id
-            );
-
-            closeModal(
-              'create-trip-modal'
-            );
-
-            currentTripId =
-              tripRef.id;
-
-            localStorage.setItem(
-              'currentTripId',
-              tripRef.id
-            );
-
-            /*
-              直接使用本地建立的資料進入旅程，
-              不必等待 Snapshot 才能開啟。
-            */
-            const newTrip = {
-              id: tripRef.id,
-              name,
-              startDate,
-              endDate,
-              inviteCode,
-              code: inviteCode,
-              schedules: [],
-              buyItems: [],
-              ownerUid: user.uid,
-              ownerName:
-                user.displayName ||
-                user.email ||
-                '',
-              memberUids: [
-                user.uid
-              ]
-            };
-
-            if (
-              !trips.some(
-                trip => trip.id === tripRef.id
-              )
-            ) {
-              trips.push(newTrip);
-            }
-
-            openTripDetail(
-              tripRef.id
-            );
-
-          } catch (err) {
-
-            console.error(
-              '❌ 建立旅程失敗：',
-              err
-            );
-
-            alert(
-              '建立旅程失敗：\n' +
-              (
-                err.message ||
-                err
-              )
-            );
-
-          }
-
+    document.getElementById('join-trip-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const user = auth.currentUser;
+      if (!user) return alert('請先登入 Google 帳號');
+      const code = document.getElementById('join-trip-code').value.trim().toUpperCase();
+      if (!code) return;
+      
+      const submitBtn = event.target.querySelector('button[type="submit"]');
+      submitBtn.disabled = true; submitBtn.textContent = '尋找並加入中…';
+      try {
+        const snapshot = await db.collection('trips').where('inviteCode', '==', code).get();
+        if (snapshot.empty) {
+          alert('找不到此邀請碼對應的旅程！請確認邀請碼是否正確。');
+          submitBtn.disabled = false; submitBtn.textContent = '確認加入'; return;
         }
-      );
-
-
-    /* =========================================================
-       Tab
-    ========================================================= */
+        const tripDoc = snapshot.docs[0];
+        const tripData = tripDoc.data();
+        if (tripData.memberUids && tripData.memberUids.includes(user.uid)) {
+          alert('你已經在這個旅程中了！'); closeModal('join-trip-modal'); return;
+        }
+        await db.collection('trips').doc(tripDoc.id).update({ memberUids: firebase.firestore.FieldValue.arrayUnion(user.uid) });
+        alert(`成功加入「${tripData.name}」！`);
+        closeModal('join-trip-modal');
+      } catch (err) {
+        alert('加入旅程失敗：\n' + (err.message || err));
+      } finally {
+        submitBtn.disabled = false; submitBtn.textContent = '確認加入';
+      }
+    });
 
     function switchTab(tab) {
-
-      const scheduleTab =
-        document.getElementById(
-          'schedule-tab'
-        );
-
-      const buyTab =
-        document.getElementById(
-          'buy-tab'
-        );
-
-      const scheduleButton =
-        document.getElementById(
-          'tab-schedule'
-        );
-
-      const buyButton =
-        document.getElementById(
-          'tab-buy'
-        );
-
-      const navSchedule =
-        document.getElementById(
-          'nav-schedule'
-        );
-
-      const navBuy =
-        document.getElementById(
-          'nav-buy'
-        );
-
-      const ratePanel =
-        document.getElementById(
-          'rate-panel'
-        );
-
-      const filterPanel =
-        document.getElementById(
-          'filter-panel'
-        );
-
-      if (tab === 'schedule') {
-
-        scheduleTab.style.display =
-          'block';
-
-        buyTab.style.display =
-          'none';
-
-        scheduleButton.classList.add(
-          'active'
-        );
-
-        buyButton.classList.remove(
-          'active'
-        );
-
-        navSchedule.classList.add(
-          'active'
-        );
-
-        navBuy.classList.remove(
-          'active'
-        );
-
-        ratePanel.classList.remove(
-          'show'
-        );
-
-        filterPanel.classList.remove(
-          'show'
-        );
-
-      } else {
-
-        scheduleTab.style.display =
-          'none';
-
-        buyTab.style.display =
-          'block';
-
-        scheduleButton.classList.remove(
-          'active'
-        );
-
-        buyButton.classList.add(
-          'active'
-        );
-
-        navSchedule.classList.remove(
-          'active'
-        );
-
-        navBuy.classList.add(
-          'active'
-        );
-
-        renderBuyList();
-      }
+      document.getElementById('schedule-tab').style.display = tab === 'schedule' ? 'block' : 'none';
+      document.getElementById('buy-tab').style.display = tab === 'buy' ? 'block' : 'none';
+      document.getElementById('tab-schedule').classList.toggle('active', tab === 'schedule');
+      document.getElementById('tab-buy').classList.toggle('active', tab === 'buy');
+      document.getElementById('nav-schedule').classList.toggle('active', tab === 'schedule');
+      document.getElementById('nav-buy').classList.toggle('active', tab === 'buy');
+      closeAllQuickPanels();
+      if (tab === 'buy') renderBuyList();
     }
-
-
-    /* =========================================================
-       Schedule Form
-    ========================================================= */
 
     function openAddSchedule() {
-
-      closeAllQuickPanels();
-
-      const form =
-        document.getElementById(
-          'schedule-form'
-        );
-
-      form.reset();
-
-      document
-        .getElementById(
-          'sch-photo-preview'
-        )
-        .innerHTML = '';
-
-      document
-        .getElementById(
-          'sch-photo-status'
-        )
-        .textContent = '';
-
-      const trip =
-        getCurrentTrip();
-
-      if (!trip) return;
-
-      const schedules =
-        Array.isArray(trip.schedules)
-          ? [...trip.schedules]
-          : [];
-
+      closeAllQuickPanels(); document.getElementById('schedule-form').reset();
+      document.getElementById('sch-photo-preview').innerHTML = ''; document.getElementById('sch-photo-status').textContent = '';
+      const trip = getCurrentTrip(); if (!trip) return;
+      const schedules = Array.isArray(trip.schedules) ? [...trip.schedules] : [];
       if (schedules.length) {
-
-        schedules.sort(
-          (a, b) => {
-
-            const aa =
-              `${a.date || ''} ${a.startTime || ''}`;
-
-            const bb =
-              `${b.date || ''} ${b.startTime || ''}`;
-
-            return aa.localeCompare(bb);
-          }
-        );
-
-        const last =
-          schedules[schedules.length - 1];
-
-        document
-          .getElementById('sch-date')
-          .value =
-          last.date ||
-          trip.startDate ||
-          '';
-
-        document
-          .getElementById('sch-day')
-          .value =
-          last.day ||
-          getDayLabel(last.date);
-
-        document
-          .getElementById('sch-start')
-          .value =
-          last.endTime ||
-          last.startTime ||
-          '09:00';
-
-        document
-          .getElementById('sch-end')
-          .value =
-          addMinutesToTime(
-            document.getElementById('sch-start').value,
-            60
-          );
-
-      } else {
-
-        setScheduleDefaults();
-
-      }
-
-      toggleScheduleForm(true);
-
-      setTimeout(() => {
-
-        document
-          .getElementById('sch-place')
-          .focus();
-
-      }, 50);
+        schedules.sort((a, b) => `${a.date||''} ${a.startTime||''}`.localeCompare(`${b.date||''} ${b.startTime||''}`));
+        const last = schedules[schedules.length - 1];
+        document.getElementById('sch-date').value = last.date || trip.startDate || '';
+        document.getElementById('sch-day').value = last.day || getDayLabel(last.date);
+        document.getElementById('sch-start').value = last.endTime || last.startTime || '09:00';
+        document.getElementById('sch-end').value = addMinutesToTime(document.getElementById('sch-start').value, 60);
+      } else setScheduleDefaults();
+      toggleScheduleForm(true); setTimeout(() => document.getElementById('sch-place').focus(), 50);
     }
-
 
     function toggleScheduleForm(force) {
-
-      const body =
-        document.getElementById(
-          'sch-form-body'
-        );
-
-      const shouldShow =
-        typeof force === 'boolean'
-          ? force
-          : body.style.display === 'none';
-
-      body.style.display =
-        shouldShow
-          ? 'block'
-          : 'none';
+      const body = document.getElementById('sch-form-body');
+      body.style.display = (typeof force === 'boolean' ? force : body.style.display === 'none') ? 'block' : 'none';
     }
-
 
     function setScheduleDefaults() {
-
-      const trip =
-        getCurrentTrip();
-
-      if (!trip) return;
-
-      const dateEl =
-        document.getElementById(
-          'sch-date'
-        );
-
-      const dayEl =
-        document.getElementById(
-          'sch-day'
-        );
-
-      const startEl =
-        document.getElementById(
-          'sch-start'
-        );
-
-      const endEl =
-        document.getElementById(
-          'sch-end'
-        );
-
-      if (!dateEl.value) {
-
-        dateEl.value =
-          trip.startDate ||
-          new Date()
-            .toISOString()
-            .slice(0, 10);
-      }
-
-      dayEl.value =
-        dayEl.value ||
-        getDayLabel(
-          dateEl.value
-        );
-
+      const trip = getCurrentTrip(); if (!trip) return;
+      const dateEl = document.getElementById('sch-date'), dayEl = document.getElementById('sch-day'), startEl = document.getElementById('sch-start'), endEl = document.getElementById('sch-end');
+      if (!dateEl.value) dateEl.value = trip.startDate || new Date().toISOString().slice(0, 10);
+      dayEl.value = dayEl.value || getDayLabel(dateEl.value);
       if (!startEl.value) {
-
-        const schedules =
-          Array.isArray(trip.schedules)
-            ? trip.schedules
-            : [];
-
-        if (schedules.length) {
-
-          const sorted =
-            [...schedules].sort(
-              (a, b) => {
-
-                const aa =
-                  `${a.date || ''} ${a.startTime || ''}`;
-
-                const bb =
-                  `${b.date || ''} ${b.startTime || ''}`;
-
-                return aa.localeCompare(bb);
-              }
-            );
-
-          startEl.value =
-            sorted[sorted.length - 1]
-              .endTime ||
-            '09:00';
-
-        } else {
-
-          startEl.value =
-            '09:00';
-        }
+        const sch = Array.isArray(trip.schedules) ? trip.schedules : [];
+        startEl.value = sch.length ? [...sch].sort((a,b)=>`${a.date||''} ${a.startTime||''}`.localeCompare(`${b.date||''} ${b.startTime||''}`)).pop().endTime || '09:00' : '09:00';
       }
-
-      if (!endEl.value) {
-
-        endEl.value =
-          addMinutesToTime(
-            startEl.value,
-            60
-          );
-      }
+      if (!endEl.value) endEl.value = addMinutesToTime(startEl.value, 60);
     }
 
+    document.getElementById('sch-date').addEventListener('change', e => document.getElementById('sch-day').value = getDayLabel(e.target.value));
 
-    document
-      .getElementById('sch-date')
-      .addEventListener(
-        'change',
-        event => {
-
-          document
-            .getElementById('sch-day')
-            .value =
-            getDayLabel(
-              event.target.value
-            );
-
+    document.getElementById('schedule-form').addEventListener('submit', async event => {
+      event.preventDefault(); const user = auth.currentUser, trip = getCurrentTrip(); if (!user || !trip) return alert('請先登入並選擇旅程');
+      const submitBtn = event.target.querySelector('button[type="submit"]'); submitBtn.disabled = true; submitBtn.textContent = '儲存中…';
+      try {
+        const photoFile = document.getElementById('sch-photo').files[0];
+        let photoFileId = null, photoUrl = null;
+        if (photoFile) {
+          setPhotoStatus('sch-photo', '照片上傳 Google Drive 中…');
+          const uploaded = await uploadPhoto(photoFile, 'schedule');
+          photoFileId = uploaded.fileId || null; photoUrl = uploaded.photoUrl || null;
         }
-      );
-
-
-    document
-      .getElementById('schedule-form')
-      .addEventListener(
-        'submit',
-        async event => {
-
-          event.preventDefault();
-
-          const user =
-            auth.currentUser;
-
-          const trip =
-            getCurrentTrip();
-
-          if (!user || !trip) {
-            alert('請先登入並選擇旅程');
-            return;
-          }
-
-          const submitButton =
-            event.target.querySelector(
-              'button[type="submit"]'
-            );
-
-          submitButton.disabled = true;
-          submitButton.textContent =
-            '儲存中…';
-
-          try {
-
-            const photoInput =
-              document.getElementById(
-                'sch-photo'
-              );
-
-            const photoFile =
-              photoInput.files &&
-              photoInput.files[0]
-                ? photoInput.files[0]
-                : null;
-
-            let photoFileId = null;
-            let photoUrl = null;
-
-            if (photoFile) {
-
-              setPhotoStatus(
-                'sch-photo',
-                '照片上傳 Google Drive 中…'
-              );
-
-              const uploaded =
-                await uploadPhoto(
-                  photoFile,
-                  'schedule'
-                );
-
-              photoFileId =
-                uploaded.fileId ||
-                null;
-
-              photoUrl =
-                uploaded.photoUrl ||
-                null;
-
-            }
-
-            const newItem = {
-
-              id: Date.now(),
-
-              date:
-                document
-                  .getElementById('sch-date')
-                  .value,
-
-              day:
-                document
-                  .getElementById('sch-day')
-                  .value
-                  .trim(),
-
-              startTime:
-                document
-                  .getElementById('sch-start')
-                  .value,
-
-              endTime:
-                document
-                  .getElementById('sch-end')
-                  .value,
-
-              place:
-                document
-                  .getElementById('sch-place')
-                  .value
-                  .trim(),
-
-              duration:
-                document
-                  .getElementById('sch-duration')
-                  .value
-                  .trim(),
-
-              photoFileId,
-              photoUrl,
-
-              createdBy:
-                user.uid,
-
-              createdAt:
-                Date.now()
-            };
-
-            const schedules =
-              Array.isArray(trip.schedules)
-                ? [...trip.schedules]
-                : [];
-
-            schedules.push(newItem);
-
-            await db
-              .collection('trips')
-              .doc(trip.id)
-              .update({
-                schedules
-              });
-
-            console.log(
-              '✅ 行程新增成功',
-              newItem
-            );
-
-            event.target.reset();
-
-            document
-              .getElementById(
-                'sch-photo-preview'
-              )
-              .innerHTML = '';
-
-            document
-              .getElementById(
-                'sch-photo-status'
-              )
-              .textContent = '';
-
-            toggleScheduleForm(false);
-
-          } catch (err) {
-
-            console.error(
-              '❌ 新增行程失敗：',
-              err
-            );
-
-            alert(
-              '新增行程失敗：\n' +
-              (
-                err.message ||
-                err
-              )
-            );
-
-          } finally {
-
-            submitButton.disabled =
-              false;
-
-            submitButton.textContent =
-              '新增行程';
-          }
-
-        }
-      );
-
-
-    /* =========================================================
-       Render Schedule
-    ========================================================= */
+        const newItem = { id: Date.now(), date: document.getElementById('sch-date').value, day: document.getElementById('sch-day').value.trim(), startTime: document.getElementById('sch-start').value, endTime: document.getElementById('sch-end').value, place: document.getElementById('sch-place').value.trim(), duration: document.getElementById('sch-duration').value.trim(), photoFileId, photoUrl, createdBy: user.uid, createdAt: Date.now() };
+        const schedules = Array.isArray(trip.schedules) ? [...trip.schedules] : []; schedules.push(newItem);
+        await db.collection('trips').doc(trip.id).update({ schedules });
+        event.target.reset(); document.getElementById('sch-photo-preview').innerHTML = ''; document.getElementById('sch-photo-status').textContent = ''; toggleScheduleForm(false);
+      } catch (err) { alert('新增失敗：\n' + err.message); } finally { submitBtn.disabled = false; submitBtn.textContent = '新增行程'; }
+    });
 
     function renderSchedules() {
-
-      const list =
-        document.getElementById(
-          'schedule-list'
-        );
-
-      const trip =
-        getCurrentTrip();
-
-      if (!list || !trip) {
-        return;
-      }
-
-      const schedules =
-        Array.isArray(trip.schedules)
-          ? [...trip.schedules]
-          : [];
-
-      if (!schedules.length) {
-
-        list.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">🗓</div>
-
-            <div style="font-weight:800; color:#1d1d1f; margin-bottom:6px;">
-              還沒有行程
-            </div>
-
-            <div style="margin-bottom:18px;">
-              從第一個景點開始規劃吧！
-            </div>
-
-            <button
-              class="btn btn-primary"
-              onclick="openAddSchedule()"
-            >
-              ＋ 新增行程
-            </button>
-          </div>
-        `;
-
-        return;
-      }
-
-      schedules.sort(
-        (a, b) => {
-
-          const aa =
-            `${a.date || ''} ${a.startTime || ''}`;
-
-          const bb =
-            `${b.date || ''} ${b.startTime || ''}`;
-
-          return aa.localeCompare(bb);
-        }
-      );
-
-      const groups = {};
-
-      schedules.forEach(item => {
-
-        const key =
-          item.date || '未指定日期';
-
-        if (!groups[key]) {
-          groups[key] = [];
-        }
-
-        groups[key].push(item);
-
-      });
-
-      const dates =
-        Object.keys(groups).sort();
-
-      list.innerHTML =
-        dates.map(date => {
-
-          const items =
-            groups[date];
-
-          const first =
-            items[0];
-
-          return `
-            <div
-              class="schedule-day"
-              data-day="${escapeHtml(date)}"
-            >
-
-              <div class="day-header">
-
-                <div class="day-badge">
-                  ${escapeHtml(first.day || getDayLabel(date))}
-                </div>
-
-                <div class="day-date">
-                  ${escapeHtml(formatDate(date))}
-                </div>
-
-                <button
-                  class="day-toggle"
-                  onclick="toggleDayGroup('${escapeHtml(date)}')"
-                >
-                  收合
-                </button>
-
-              </div>
-
-              <div
-                class="schedule-list"
-                id="day-group-${escapeHtml(date)}"
-              >
-
-                ${items.map(item => {
-
-                  const time =
-                    item.endTime
-                      ? `${item.startTime || '--:--'} ～ ${item.endTime}`
-                      : `${item.startTime || '--:--'}`;
-
-                  return `
-                    <div class="schedule-card">
-
-                      <div class="schedule-time">
-                        ${escapeHtml(time)}
-                      </div>
-
-                      <div style="min-width:0;">
-
-                        <div class="schedule-place">
-                          ${escapeHtml(item.place || '未命名行程')}
-                        </div>
-
-                        <div class="schedule-meta">
-
-                          ${
-                            item.duration
-                              ? `⏱ ${escapeHtml(item.duration)}`
-                              : ''
-                          }
-
-                          ${
-                            item.photoFileId || item.photoUrl
-                              ? '　📷'
-                              : ''
-                          }
-
-                        </div>
-
-                      </div>
-
-                      <div class="schedule-actions">
-
-                        <button
-                          class="schedule-action"
-                          title="編輯"
-                          onclick="openEditSchedule(${Number(item.id)})"
-                        >
-                          ✏️
-                        </button>
-
-                        <button
-                          class="schedule-action"
-                          title="刪除"
-                          onclick="deleteSchedule(${Number(item.id)})"
-                        >
-                          🗑
-                        </button>
-
-                      </div>
-
-                    </div>
-                  `;
-
-                }).join('')}
-
-              </div>
-
-            </div>
-          `;
-
-        }).join('');
+      const list = document.getElementById('schedule-list'), trip = getCurrentTrip(); if (!list || !trip) return;
+      const schedules = Array.isArray(trip.schedules) ? [...trip.schedules] : [];
+      if (!schedules.length) { list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🗓</div><div style="font-weight:800; color:#1d1d1f; margin-bottom:6px;">還沒有行程</div><div style="margin-bottom:18px;">從第一個景點開始規劃吧！</div><button class="btn btn-primary" onclick="openAddSchedule()">＋ 新增行程</button></div>`; return; }
+      schedules.sort((a, b) => `${a.date||''} ${a.startTime||''}`.localeCompare(`${b.date||''} ${b.startTime||''}`));
+      const groups = schedules.reduce((acc, item) => { const k = item.date || '未指定日期'; acc[k] = acc[k] || []; acc[k].push(item); return acc; }, {});
+      list.innerHTML = Object.keys(groups).sort().map(date => {
+        const items = groups[date];
+        return `<div class="schedule-day" data-day="${escapeHtml(date)}"><div class="day-header"><div class="day-badge">${escapeHtml(items[0].day || getDayLabel(date))}</div><div class="day-date">${escapeHtml(formatDate(date))}</div><button class="day-toggle" onclick="toggleDayGroup('${escapeHtml(date)}')">收合</button></div><div class="schedule-list" id="day-group-${escapeHtml(date)}">${items.map(item => `<div class="schedule-card"><div class="schedule-time">${escapeHtml(item.endTime ? `${item.startTime||'--:--'} ～ ${item.endTime}` : item.startTime||'--:--')}</div><div style="min-width:0;"><div class="schedule-place">${escapeHtml(item.place\vert{}\vert{}'未命名')}</div><div class="schedule-meta">${item.duration ? `⏱ ${escapeHtml(item.duration)}` : ''} ${(item.photoFileId||item.photoUrl) ? ' 📷' : ''}</div></div><div class="schedule-actions"><button class="schedule-action" onclick="openEditSchedule(${Number(item.id)})">✏️</button><button class="schedule-action" onclick="deleteSchedule(${Number(item.id)})">🗑</button></div></div>`).join('')}</div></div>`;
+      }).join('');
     }
 
-
-    function toggleDayGroup(date) {
-
-      const group =
-        document.getElementById(
-          'day-group-' + date
-        );
-
-      if (!group) return;
-
-      const hidden =
-        group.style.display === 'none';
-
-      group.style.display =
-        hidden
-          ? 'flex'
-          : 'none';
-    }
-
-
-    /* =========================================================
-       Edit Schedule
-    ========================================================= */
+    function toggleDayGroup(date) { const g = document.getElementById('day-group-' + date); if (g) g.style.display = g.style.display === 'none' ? 'flex' : 'none'; }
 
     async function openEditSchedule(id) {
-
-      const trip =
-        getCurrentTrip();
-
-      if (!trip) return;
-
-      const schedules =
-        Array.isArray(trip.schedules)
-          ? trip.schedules
-          : [];
-
-      const item =
-        schedules.find(
-          schedule =>
-            Number(schedule.id) ===
-            Number(id)
-        );
-
-      if (!item) return;
-
-      console.log(
-        '✏️ 編輯行程：',
-        item
-      );
-
-      document
-        .getElementById('edit-sch-id')
-        .value =
-        item.id;
-
-      document
-        .getElementById('edit-sch-date')
-        .value =
-        item.date || '';
-
-      document
-        .getElementById('edit-sch-day')
-        .value =
-        item.day || '';
-
-      document
-        .getElementById('edit-sch-start')
-        .value =
-        item.startTime || '';
-
-      document
-        .getElementById('edit-sch-end')
-        .value =
-        item.endTime || '';
-
-      document
-        .getElementById('edit-sch-place')
-        .value =
-        item.place || '';
-
-      document
-        .getElementById('edit-sch-duration')
-        .value =
-        item.duration || '';
-
-      document
-        .getElementById('edit-sch-photo')
-        .value = '';
-
-      document
-        .getElementById('edit-sch-modal')
-        .classList.add('show');
-
-      /*
-        這裡是這次的重要修正：
-
-        不再直接使用 Drive webViewLink，
-        而是用 fileId + OAuth Token
-        下載 Blob，再建立 Object URL。
-      */
-      await showPhotoPreview(
-        'edit-sch-photo',
-        'edit-sch-photo-preview',
-        item.photoUrl || '',
-        item.photoFileId || ''
-      );
+      const trip = getCurrentTrip(); if (!trip) return;
+      const item = (trip.schedules || []).find(s => Number(s.id) === Number(id)); if (!item) return;
+      document.getElementById('edit-sch-id').value = item.id;
+      ['date','day','start','end','place','duration','photo'].forEach(k => document.getElementById(`edit-sch-${k}`).value = item[k === 'start' ? 'startTime' : k === 'end' ? 'endTime' : k] || '');
+      document.getElementById('edit-sch-modal').classList.add('show');
+      await showPhotoPreview('edit-sch-photo', 'edit-sch-photo-preview', item.photoUrl || '', item.photoFileId || '');
     }
 
+    document.getElementById('edit-sch-date').addEventListener('change', e => document.getElementById('edit-sch-day').value = getDayLabel(e.target.value));
 
-    document
-      .getElementById('edit-sch-date')
-      .addEventListener(
-        'change',
-        event => {
-
-          document
-            .getElementById('edit-sch-day')
-            .value =
-            getDayLabel(
-              event.target.value
-            );
-
-        }
-      );
-
-
-    document
-      .getElementById('edit-schedule-form')
-      .addEventListener(
-        'submit',
-        async event => {
-
-          event.preventDefault();
-
-          const trip =
-            getCurrentTrip();
-
-          if (!trip) return;
-
-          const id =
-            Number(
-              document
-                .getElementById(
-                  'edit-sch-id'
-                )
-                .value
-            );
-
-          const schedules =
-            Array.isArray(trip.schedules)
-              ? [...trip.schedules]
-              : [];
-
-          const index =
-            schedules.findIndex(
-              item =>
-                Number(item.id) ===
-                Number(id)
-            );
-
-          if (index < 0) return;
-
-          const oldItem =
-            schedules[index];
-
-          const submitButton =
-            event.target.querySelector(
-              'button[type="submit"]'
-            );
-
-          submitButton.disabled = true;
-          submitButton.textContent =
-            '儲存中…';
-
-          try {
-
-            let photoFileId =
-              oldItem.photoFileId ||
-              null;
-
-            let photoUrl =
-              oldItem.photoUrl ||
-              null;
-
-            const photoInput =
-              document.getElementById(
-                'edit-sch-photo'
-              );
-
-            const photoFile =
-              photoInput.files &&
-              photoInput.files[0]
-                ? photoInput.files[0]
-                : null;
-
-            if (photoFile) {
-
-              setPhotoStatus(
-                'edit-sch-photo',
-                '新照片上傳 Google Drive 中…'
-              );
-
-              const uploaded =
-                await uploadPhoto(
-                  photoFile,
-                  'schedule'
-                );
-
-              photoFileId =
-                uploaded.fileId ||
-                null;
-
-              photoUrl =
-                uploaded.photoUrl ||
-                null;
-            }
-
-            schedules[index] = {
-
-              ...oldItem,
-
-              date:
-                document
-                  .getElementById('edit-sch-date')
-                  .value,
-
-              day:
-                document
-                  .getElementById('edit-sch-day')
-                  .value
-                  .trim(),
-
-              startTime:
-                document
-                  .getElementById('edit-sch-start')
-                  .value,
-
-              endTime:
-                document
-                  .getElementById('edit-sch-end')
-                  .value,
-
-              place:
-                document
-                  .getElementById('edit-sch-place')
-                  .value
-                  .trim(),
-
-              duration:
-                document
-                  .getElementById('edit-sch-duration')
-                  .value
-                  .trim(),
-
-              photoFileId,
-              photoUrl,
-
-              updatedAt:
-                Date.now()
-            };
-
-            await db
-              .collection('trips')
-              .doc(trip.id)
-              .update({
-                schedules
-              });
-
-            console.log(
-              '✅ 行程修改成功'
-            );
-
-            event.target.reset();
-
-            document
-              .getElementById(
-                'edit-sch-photo-preview'
-              )
-              .innerHTML = '';
-
-            closeModal(
-              'edit-sch-modal'
-            );
-
-          } catch (err) {
-
-            console.error(
-              '❌ 編輯行程失敗：',
-              err
-            );
-
-            alert(
-              '編輯行程失敗：\n' +
-              (
-                err.message ||
-                err
-              )
-            );
-
-          } finally {
-
-            submitButton.disabled =
-              false;
-
-            submitButton.textContent =
-              '儲存修改';
-          }
-
-        }
-      );
-
+    document.getElementById('edit-schedule-form').addEventListener('submit', async event => {
+      event.preventDefault(); const trip = getCurrentTrip(); if (!trip) return;
+      const id = Number(document.getElementById('edit-sch-id').value), schedules = Array.isArray(trip.schedules) ? [...trip.schedules] : [];
+      const index = schedules.findIndex(s => Number(s.id) === id); if (index < 0) return;
+      const submitBtn = event.target.querySelector('button[type="submit"]'); submitBtn.disabled = true; submitBtn.textContent = '儲存中…';
+      try {
+        let photoFileId = schedules[index].photoFileId || null, photoUrl = schedules[index].photoUrl || null;
+        const photoFile = document.getElementById('edit-sch-photo').files[0];
+        if (photoFile) { setPhotoStatus('edit-sch-photo', '新照片上傳 Google Drive 中…'); const up = await uploadPhoto(photoFile, 'schedule'); photoFileId = up.fileId || null; photoUrl = up.photoUrl || null; }
+        schedules[index] = { ...schedules[index], date: document.getElementById('edit-sch-date').value, day: document.getElementById('edit-sch-day').value.trim(), startTime: document.getElementById('edit-sch-start').value, endTime: document.getElementById('edit-sch-end').value, place: document.getElementById('edit-sch-place').value.trim(), duration: document.getElementById('edit-sch-duration').value.trim(), photoFileId, photoUrl, updatedAt: Date.now() };
+        await db.collection('trips').doc(trip.id).update({ schedules });
+        event.target.reset(); document.getElementById('edit-sch-photo-preview').innerHTML = ''; closeModal('edit-sch-modal');
+      } catch (err) { alert('修改失敗：\n' + err.message); } finally { submitBtn.disabled = false; submitBtn.textContent = '儲存修改'; }
+    });
 
     async function deleteSchedule(id) {
-
-      const trip =
-        getCurrentTrip();
-
-      if (!trip) return;
-
-      const item =
-        (trip.schedules || [])
-          .find(
-            schedule =>
-              Number(schedule.id) ===
-              Number(id)
-          );
-
-      if (!item) return;
-
-      const confirmed =
-        confirm(
-          `確定要刪除「${item.place || '這個行程'}」嗎？`
-        );
-
-      if (!confirmed) return;
-
-      try {
-
-        const schedules =
-          (trip.schedules || [])
-            .filter(
-              schedule =>
-                Number(schedule.id) !==
-                Number(id)
-            );
-
-        await db
-          .collection('trips')
-          .doc(trip.id)
-          .update({
-            schedules
-          });
-
-      } catch (err) {
-
-        console.error(
-          '❌ 刪除行程失敗：',
-          err
-        );
-
-        alert(
-          '刪除行程失敗：\n' +
-          (
-            err.message ||
-            err
-          )
-        );
-
-      }
+      const trip = getCurrentTrip(); if (!trip) return;
+      const item = (trip.schedules || []).find(s => Number(s.id) === Number(id)); if (!item || !confirm(`確定要刪除「${item.place||'這個行程'}」嗎？`)) return;
+      try { await db.collection('trips').doc(trip.id).update({ schedules: trip.schedules.filter(s => Number(s.id) !== Number(id)) }); } catch(e) { alert('刪除失敗'); }
     }
-
-
-    /* =========================================================
-       Buy
-    ========================================================= */
 
     function openAddBuy() {
-
-      closeAllQuickPanels();
-
-      document
-        .getElementById('buy-form')
-        .reset();
-
-      document
-        .getElementById(
-          'buy-photo-preview'
-        )
-        .innerHTML = '';
-
-      document
-        .getElementById(
-          'buy-photo-status'
-        )
-        .textContent = '';
-
-      document
-        .getElementById(
-          'confirm-buy-photo-btn'
-        )
-        .dataset.confirmed = 'false';
-
-      document
-        .getElementById(
-          'add-buy-modal'
-        )
-        .classList.add('show');
-
-      setTimeout(() => {
-
-        document
-          .getElementById('buy-name')
-          .focus();
-
-      }, 50);
+      closeAllQuickPanels(); document.getElementById('buy-form').reset(); document.getElementById('buy-photo-preview').innerHTML = ''; document.getElementById('buy-photo-status').textContent = ''; document.getElementById('confirm-buy-photo-btn').dataset.confirmed = 'false'; document.getElementById('add-buy-modal').classList.add('show'); setTimeout(() => document.getElementById('buy-name').focus(), 50);
     }
 
-
-    document
-      .getElementById(
-        'confirm-buy-photo-btn'
-      )
-      .addEventListener(
-        'click',
-        async () => {
-
-          const input =
-            document.getElementById(
-              'buy-photo'
-            );
-
-          const status =
-            document.getElementById(
-              'buy-photo-status'
-            );
-
-          const button =
-            document.getElementById(
-              'confirm-buy-photo-btn'
-            );
-
-          if (
-            !input.files ||
-            !input.files[0]
-          ) {
-
-            status.textContent =
-              '目前沒有選擇照片。';
-
-            button.dataset.confirmed =
-              'false';
-
-            return;
-          }
-
-          /*
-            這裡只做確認標記。
-            實際上傳仍在送出表單時進行，
-            避免使用者選了照片後又修改表單造成
-            Drive 裡留下大量孤兒檔案。
-          */
-
-          button.dataset.confirmed =
-            'true';
-
-          status.textContent =
-            '✓ 已確認照片，送出代購時會上傳到 Google Drive。';
-
-          status.style.color =
-            '#34c759';
-        }
-      );
-
-
-    document
-      .getElementById('buy-form')
-      .addEventListener(
-        'submit',
-        async event => {
-
-          event.preventDefault();
-
-          const user =
-            auth.currentUser;
-
-          const trip =
-            getCurrentTrip();
-
-          if (!user || !trip) {
-            alert('請先登入並選擇旅程');
-            return;
-          }
-
-          const photoInput =
-            document.getElementById(
-              'buy-photo'
-            );
-
-          const photoFile =
-            photoInput.files &&
-            photoInput.files[0]
-              ? photoInput.files[0]
-              : null;
-
-          if (
-            photoFile &&
-            document
-              .getElementById(
-                'confirm-buy-photo-btn'
-              )
-              .dataset.confirmed !== 'true'
-          ) {
-
-            alert(
-              '請先按「確認照片」'
-            );
-
-            return;
-          }
-
-          const submitButton =
-            event.target.querySelector(
-              'button[type="submit"]'
-            );
-
-          submitButton.disabled = true;
-          submitButton.textContent =
-            '儲存中…';
-
-          try {
-
-            let photoFileId = null;
-            let photoUrl = null;
-
-            if (photoFile) {
-
-              setPhotoStatus(
-                'buy-photo',
-                '商品照片上傳 Google Drive 中…'
-              );
-
-              const uploaded =
-                await uploadPhoto(
-                  photoFile,
-                  'buy'
-                );
-
-              photoFileId =
-                uploaded.fileId ||
-                null;
-
-              photoUrl =
-                uploaded.photoUrl ||
-                null;
-            }
-
-            const qty =
-              Math.max(
-                1,
-                Number(
-                  document
-                    .getElementById(
-                      'buy-qty'
-                    )
-                    .value
-                ) || 1
-              );
-
-            const price =
-              Math.max(
-                0,
-                Number(
-                  document
-                    .getElementById(
-                      'buy-price'
-                    )
-                    .value
-                ) || 0
-              );
-
-            const newItem = {
-
-              id: Date.now(),
-
-              name:
-                document
-                  .getElementById(
-                    'buy-name'
-                  )
-                  .value
-                  .trim(),
-
-              category:
-                document
-                  .getElementById(
-                    'buy-category'
-                  )
-                  .value
-                  .trim(),
-
-              owner:
-                document
-                  .getElementById(
-                    'buy-owner'
-                  )
-                  .value
-                  .trim() ||
-                user.displayName ||
-                user.email ||
-                '未指定',
-
-              qty,
-              price,
-
-              bought: false,
-
-              photoFileId,
-              photoUrl,
-
-              createdBy:
-                user.uid,
-
-              createdAt:
-                Date.now()
-            };
-
-            const buyItems =
-              Array.isArray(trip.buyItems)
-                ? [...trip.buyItems]
-                : [];
-
-            buyItems.push(newItem);
-
-            await db
-              .collection('trips')
-              .doc(trip.id)
-              .update({
-                buyItems
-              });
-
-            console.log(
-              '✅ 代購新增成功：',
-              newItem
-            );
-
-            event.target.reset();
-
-            document
-              .getElementById(
-                'buy-photo-preview'
-              )
-              .innerHTML = '';
-
-            document
-              .getElementById(
-                'buy-photo-status'
-              )
-              .textContent = '';
-
-            document
-              .getElementById(
-                'confirm-buy-photo-btn'
-              )
-              .dataset.confirmed =
-              'false';
-
-            closeModal(
-              'add-buy-modal'
-            );
-
-          } catch (err) {
-
-            console.error(
-              '❌ 新增代購失敗：',
-              err
-            );
-
-            alert(
-              '新增代購失敗：\n' +
-              (
-                err.message ||
-                err
-              )
-            );
-
-          } finally {
-
-            submitButton.disabled =
-              false;
-
-            submitButton.textContent =
-              '新增代購';
-          }
-
-        }
-      );
-
-
-    /* =========================================================
-       Render Buy List
-    ========================================================= */
-
-    function updateOwnerFilterOptions() {
-
-      const select =
-        document.getElementById(
-          'buy-filter-owner'
-        );
-
-      const trip =
-        getCurrentTrip();
-
-      if (!select || !trip) return;
-
-      const currentValue =
-        select.value;
-
-      const owners =
-        [...new Set(
-          (trip.buyItems || [])
-            .map(
-              item =>
-                item.owner ||
-                '未指定'
-            )
-        )]
-          .sort(
-            (a, b) =>
-              a.localeCompare(
-                b,
-                'zh-Hant'
-              )
-          );
-
-      select.innerHTML =
-        '<option value="">全部</option>';
-
-      owners.forEach(owner => {
-
-        const option =
-          document.createElement(
-            'option'
-          );
-
-        option.value =
-          owner;
-
-        option.textContent =
-          owner;
-
-        select.appendChild(
-          option
-        );
-      });
-
-      if (
-        owners.includes(
-          currentValue
-        )
-      ) {
-        select.value =
-          currentValue;
-      }
+    document.getElementById('confirm-buy-photo-btn').addEventListener('click', () => {
+      const input = document.getElementById('buy-photo'), status = document.getElementById('buy-photo-status'), btn = document.getElementById('confirm-buy-photo-btn');
+      if (!input.files || !input.files[0]) { status.textContent = '目前沒有選擇照片。'; btn.dataset.confirmed = 'false'; return; }
+      btn.dataset.confirmed = 'true'; status.textContent = '✓ 已確認照片'; status.style.color = '#34c759';
+    });
+
+    document.getElementById('buy-form').addEventListener('submit', async event => {
+      event.preventDefault(); const user = auth.currentUser, trip = getCurrentTrip(); if (!user || !trip) return alert('請先登入並選擇旅程');
+      const photoFile = document.getElementById('buy-photo').files[0];
+      if (photoFile && document.getElementById('confirm-buy-photo-btn').dataset.confirmed !== 'true') return alert('請先按「確認照片」');
+      const submitBtn = event.target.querySelector('button[type="submit"]'); submitBtn.disabled = true; submitBtn.textContent = '儲存中…';
+      try {
+        let photoFileId = null, photoUrl = null;
+        if (photoFile) { setPhotoStatus('buy-photo', '照片上傳 Google Drive 中…'); const up = await uploadPhoto(photoFile, 'buy'); photoFileId = up.fileId || null; photoUrl = up.photoUrl || null; }
+        const newItem = { id: Date.now(), name: document.getElementById('buy-name').value.trim(), category: document.getElementById('buy-category').value.trim(), owner: document.getElementById('buy-owner').value.trim() || user.displayName || user.email || '未指定', qty: Math.max(1, Number(document.getElementById('buy-qty').value)||1), price: Math.max(0, Number(document.getElementById('buy-price').value)||0), bought: false, photoFileId, photoUrl, createdBy: user.uid, createdAt: Date.now() };
+        const buyItems = Array.isArray(trip.buyItems) ? [...trip.buyItems] : []; buyItems.push(newItem);
+        await db.collection('trips').doc(trip.id).update({ buyItems });
+        event.target.reset(); document.getElementById('buy-photo-preview').innerHTML = ''; document.getElementById('buy-photo-status').textContent = ''; closeModal('add-buy-modal');
+      } catch (err) { alert('新增代購失敗：\n' + err.message); } finally { submitBtn.disabled = false; submitBtn.textContent = '新增代購'; }
+    });
+
+    function updateOptions(selectId, listData) {
+      const select = document.getElementById(selectId), val = select.value;
+      select.innerHTML = `<option value="">${selectId.includes('category') ? '全部分類' : '全部'}</option>` + listData.map(v => `<option value="${v}">${v}</option>`).join('');
+      if(listData.includes(val)) select.value = val;
     }
-
-
-    function updateCategoryFilterOptions() {
-
-      const select =
-        document.getElementById(
-          'buy-filter-category'
-        );
-
-      const trip =
-        getCurrentTrip();
-
-      if (!select || !trip) return;
-
-      const currentValue =
-        select.value;
-
-      const categories =
-        [...new Set(
-          (trip.buyItems || [])
-            .map(
-              item =>
-                item.category ||
-                '未分類'
-            )
-        )]
-          .sort(
-            (a, b) =>
-              a.localeCompare(
-                b,
-                'zh-Hant'
-              )
-          );
-
-      select.innerHTML =
-        '<option value="">全部分類</option>';
-
-      categories.forEach(category => {
-
-        const option =
-          document.createElement(
-            'option'
-          );
-
-        option.value =
-          category;
-
-        option.textContent =
-          category;
-
-        select.appendChild(
-          option
-        );
-      });
-
-      if (
-        categories.includes(
-          currentValue
-        )
-      ) {
-        select.value =
-          currentValue;
-      }
-    }
-
 
     function renderBuyList() {
-
-      const list =
-        document.getElementById(
-          'buy-list'
-        );
-
-      const trip =
-        getCurrentTrip();
-
-      if (!list || !trip) {
-        return;
-      }
-
-      const categoryFilter =
-        document
-          .getElementById(
-            'buy-filter-category'
-          )
-          .value;
-
-      const statusFilter =
-        document
-          .getElementById(
-            'buy-filter-status'
-          )
-          .value;
-
-      const ownerFilter =
-        document
-          .getElementById(
-            'buy-filter-owner'
-          )
-          .value;
-
-      updateOwnerFilterOptions();
-      updateCategoryFilterOptions();
-
-      /*
-        update options 後再讀取目前值，
-        避免某些情況下 select value 被重設。
-      */
-      const actualCategoryFilter =
-        document
-          .getElementById(
-            'buy-filter-category'
-          )
-          .value;
-
-      const actualOwnerFilter =
-        document
-          .getElementById(
-            'buy-filter-owner'
-          )
-          .value;
-
-      const buyItems =
-        Array.isArray(trip.buyItems)
-          ? trip.buyItems
-          : [];
-
-      const filtered =
-        buyItems.filter(item => {
-
-          const category =
-            item.category ||
-            '未分類';
-
-          const owner =
-            item.owner ||
-            '未指定';
-
-          const bought =
-            item.bought === true;
-
-          if (
-            actualCategoryFilter &&
-            category !== actualCategoryFilter
-          ) {
-            return false;
-          }
-
-          if (
-            statusFilter === 'todo' &&
-            bought
-          ) {
-            return false;
-          }
-
-          if (
-            statusFilter === 'done' &&
-            !bought
-          ) {
-            return false;
-          }
-
-          if (
-            actualOwnerFilter &&
-            owner !== actualOwnerFilter
-          ) {
-            return false;
-          }
-
-          return true;
-        });
-
-      if (!filtered.length) {
-
-        list.innerHTML = `
-          <div class="empty-state">
-
-            <div class="empty-state-icon">
-              🛍
-            </div>
-
-            <div style="font-weight:800; color:#1d1d1f; margin-bottom:6px;">
-              沒有符合條件的代購
-            </div>
-
-            <div>
-              可以新增第一筆代購項目。
-            </div>
-
-          </div>
-        `;
-
-        return;
-      }
-
-      const groups = {};
-
-      filtered.forEach(item => {
-
-        const owner =
-          item.owner ||
-          '未指定';
-
-        if (!groups[owner]) {
-          groups[owner] = [];
-        }
-
-        groups[owner].push(item);
-
-      });
-
-      const owners =
-        Object.keys(groups).sort(
-          (a, b) =>
-            a.localeCompare(
-              b,
-              'zh-Hant'
-            )
-        );
-
-      list.innerHTML =
-        owners.map(
-          (owner, ownerIndex) => {
-
-            const items =
-              groups[owner];
-
-            const boughtCount =
-              items.filter(
-                item =>
-                  item.bought === true
-              ).length;
-
-            const boughtAmount =
-              items
-                .filter(
-                  item =>
-                    item.bought === true
-                )
-                .reduce(
-                  (sum, item) =>
-                    sum +
-                    (
-                      Number(item.price) ||
-                      0
-                    ) *
-                    (
-                      Number(item.qty) ||
-                      0
-                    ),
-                  0
-                );
-
-            const ownerKey =
-              `owner-${ownerIndex}`;
-
-            return `
-              <div class="buy-owner-section">
-
-                <div class="buy-owner-header">
-
-                  <div>
-
-                    <div class="buy-owner-title">
-                      👤 ${escapeHtml(owner)}
-                    </div>
-
-                    <div class="buy-owner-summary">
-                      ${items.length} 項
-                      ・已購 ${boughtCount} 項
-                    </div>
-
-                  </div>
-
-                  <div style="font-size:12px; font-weight:800;">
-                    ¥${formatNumber(boughtAmount)}
-                  </div>
-
-                </div>
-
-                <div
-                  id="${ownerKey}"
-                  class="buy-owner-items"
-                >
-
-                  ${items.map(item => {
-
-                    const qty =
-                      Number(item.qty) || 0;
-
-                    const price =
-                      Number(item.price) || 0;
-
-                    const total =
-                      qty * price;
-
-                    let photoHtml = '';
-
-                    if (item.photoFileId) {
-
-                      photoHtml = `
-                        <span
-                          class="photo-thumb photo-loading"
-                          data-drive-photo-id="${escapeHtml(item.photoFileId)}"
-                          title="照片載入中"
-                        >
-                          📷
-                        </span>
-                      `;
-
-                    } else if (item.photoUrl) {
-
-                      photoHtml = `
-                        <img
-                          class="photo-thumb"
-                          src="${escapeHtml(item.photoUrl)}"
-                          alt="商品照片"
-                        >
-                      `;
-
-                    }
-
-                    return `
-                      <div class="buy-item-line">
-
-                        <div
-                          class="checkbox-custom ${item.bought ? 'checked' : ''}"
-                          onclick="toggleBuyItem(${Number(item.id)})"
-                          title="切換購買狀態"
-                        ></div>
-
-                        <div class="buy-item-body">
-
-                          ${photoHtml}
-
-                          <div class="buy-item-content">
-
-                            <div
-                              class="buy-item-name"
-                              style="${item.bought ? 'text-decoration:line-through; color:#8e8e93;' : ''}"
-                            >
-                              ${escapeHtml(item.name || '未命名商品')}
-                            </div>
-
-                            <div class="buy-item-meta">
-                              ${escapeHtml(item.category || '未分類')}
-                              ・
-                              ${qty} 件
-                            </div>
-
-                            <div class="buy-item-price">
-                              ¥${formatNumber(price)}
-                              × ${qty}
-                              ＝ ¥${formatNumber(total)}
-                              <span style="color:#86868b; font-weight:500;">
-                               　約 NT$${formatNumber(Math.round(total * exchangeRate))}
-                              </span>
-                            </div>
-
-                          </div>
-
-                        </div>
-
-                        <div class="buy-actions">
-
-                          <button
-                            class="buy-action"
-                            title="編輯"
-                            onclick="openEditBuyItem(${Number(item.id)})"
-                          >
-                            ✏️
-                          </button>
-
-                          <button
-                            class="buy-action"
-                            title="刪除"
-                            onclick="deleteBuyItem(${Number(item.id)})"
-                          >
-                            🗑
-                          </button>
-
-                        </div>
-
-                      </div>
-                    `;
-
-                  }).join('')}
-
-                </div>
-
-              </div>
-            `;
-          }
-        ).join('');
-
-      /*
-        新版：
-        photoFileId 不公開，
-        必須用 OAuth token 取得 Blob。
-      */
+      const list = document.getElementById('buy-list'), trip = getCurrentTrip(); if (!list || !trip) return;
+      const buyItems = Array.isArray(trip.buyItems) ? trip.buyItems : [];
+      updateOptions('buy-filter-owner', [...new Set(buyItems.map(i => i.owner || '未指定'))].sort());
+      updateOptions('buy-filter-category', [...new Set(buyItems.map(i => i.category || '未分類'))].sort());
+      
+      const catFilter = document.getElementById('buy-filter-category').value, statFilter = document.getElementById('buy-filter-status').value, ownFilter = document.getElementById('buy-filter-owner').value;
+      const filtered = buyItems.filter(i => (!catFilter || (i.category||'未分類') === catFilter) && (statFilter==='' || (statFilter==='todo' && !i.bought) || (statFilter==='done' && i.bought)) && (!ownFilter || (i.owner||'未指定') === ownFilter));
+      
+      if (!filtered.length) { list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🛍</div><div style="font-weight:800; color:#1d1d1f; margin-bottom:6px;">沒有符合條件的代購</div></div>`; return; }
+      
+      const groups = filtered.reduce((acc, item) => { const o = item.owner || '未指定'; acc[o] = acc[o] || []; acc[o].push(item); return acc; }, {});
+      list.innerHTML = Object.keys(groups).sort().map((owner, idx) => {
+        const items = groups[owner], boughtCount = items.filter(i => i.bought).length, boughtAmount = items.filter(i => i.bought).reduce((s, i) => s + (Number(i.price)||0)*(Number(i.qty)||0), 0);
+        return `<div class="buy-owner-section"><div class="buy-owner-header"><div><div class="buy-owner-title">👤 ${escapeHtml(owner)}</div><div class="buy-owner-summary">${items.length} 項・已購 ${boughtCount} 項</div></div><div style="font-size:12px; font-weight:800;">¥${formatNumber(boughtAmount)}</div></div><div class="buy-owner-items" id="owner-${idx}">${items.map(item => {
+          const t = (Number(item.qty)||0) * (Number(item.price)||0);
+          return `<div class="buy-item-line"><div class="checkbox-custom ${item.bought?'checked':''}" onclick="toggleBuyItem(${Number(item.id)})"></div><div class="buy-item-body">${item.photoFileId ? `<span class="photo-thumb photo-loading" data-drive-photo-id="${item.photoFileId}">📷</span>` : item.photoUrl ? `<img class="photo-thumb" src="${escapeHtml(item.photoUrl)}">` : ''}<div class="buy-item-content"><div class="buy-item-name" style="${item.bought?'text-decoration:line-through; color:#8e8e93;':''}">${escapeHtml(item.name||'')}</div><div class="buy-item-meta">${escapeHtml(item.category\vert{}\vert{}'')}・${item.qty} 件</div><div class="buy-item-price">¥${formatNumber(item.price)} ×${item.qty} ＝ ¥${formatNumber(t)} <span style="color:#86868b; font-weight:500;">約 NT$${formatNumber(Math.round(t*exchangeRate))}</span></div></div></div><div class="buy-actions"><button class="buy-action" onclick="openEditBuyItem(${Number(item.id)})">✏️</button><button class="buy-action" onclick="deleteBuyItem(${Number(item.id)})">🗑</button></div></div>`;
+        }).join('')}</div></div>`;
+      }).join('');
       hydrateBuyDrivePhotos(list);
     }
 
-
     async function hydrateBuyDrivePhotos(listEl) {
-
-      if (!listEl) return;
-
-      const nodes =
-        Array.from(
-          listEl.querySelectorAll(
-            '[data-drive-photo-id]'
-          )
-        );
-
-      if (!nodes.length) {
-        return;
-      }
-
+      const nodes = Array.from(listEl.querySelectorAll('[data-drive-photo-id]')); if (!nodes.length) return;
       try {
-
-        /*
-          先確定有 OAuth token。
-          這裡只會在真的有私有 Drive 照片時執行。
-        */
         await ensureGoogleDriveToken();
-
-        await Promise.all(
-          nodes.map(
-            async node => {
-
-              const fileId =
-                node.dataset.drivePhotoId;
-
-              if (!fileId) return;
-
-              try {
-
-                const url =
-                  await getDrivePhotoUrl(
-                    fileId
-                  );
-
-                if (
-                  !url ||
-                  !node.isConnected
-                ) {
-                  return;
-                }
-
-                const img =
-                  document.createElement(
-                    'img'
-                  );
-
-                img.className =
-                  'photo-thumb';
-
-                img.alt =
-                  '商品照片';
-
-                img.src =
-                  url;
-
-                img.onerror = () => {
-
-                  console.error(
-                    '❌ 商品照片顯示失敗：',
-                    fileId
-                  );
-
-                  if (
-                    img.isConnected
-                  ) {
-                    img.remove();
-                  }
-                };
-
-                node.replaceWith(
-                  img
-                );
-
-              } catch (err) {
-
-                console.error(
-                  '❌ 單張商品照片讀取失敗：',
-                  fileId,
-                  err
-                );
-
-                if (
-                  node.isConnected
-                ) {
-                  node.remove();
-                }
-
-              }
-
-            }
-          )
-        );
-
-      } catch (err) {
-
-        console.error(
-          '❌ 商品 Drive 照片載入失敗：',
-          err
-        );
-
-        nodes.forEach(node => {
-
-          if (node.isConnected) {
-            node.remove();
-          }
-
-        });
-      }
+        await Promise.all(nodes.map(async node => {
+          const fileId = node.dataset.drivePhotoId; if (!fileId) return;
+          try {
+            const url = await getDrivePhotoUrl(fileId); if (!url || !node.isConnected) return;
+            const img = document.createElement('img'); img.className = 'photo-thumb'; img.src = url; img.onerror = () => { if (img.isConnected) img.remove(); };
+            node.replaceWith(img);
+          } catch (e) { if(node.isConnected) node.remove(); }
+        }));
+      } catch (err) { nodes.forEach(n => { if(n.isConnected) n.remove(); }); }
     }
-
 
     async function toggleBuyItem(id) {
-
-      const trip =
-        getCurrentTrip();
-
-      if (!trip) return;
-
-      const buyItems =
-        Array.isArray(trip.buyItems)
-          ? [...trip.buyItems]
-          : [];
-
-      const index =
-        buyItems.findIndex(
-          item =>
-            Number(item.id) ===
-            Number(id)
-        );
-
-      if (index < 0) return;
-
-      buyItems[index] = {
-
-        ...buyItems[index],
-
-        bought:
-          !(
-            buyItems[index].bought ===
-            true
-          ),
-
-        updatedAt:
-          Date.now()
-      };
-
-      try {
-
-        await db
-          .collection('trips')
-          .doc(trip.id)
-          .update({
-            buyItems
-          });
-
-      } catch (err) {
-
-        console.error(
-          '❌ 更新購買狀態失敗：',
-          err
-        );
-
-        alert(
-          '更新購買狀態失敗：\n' +
-          (
-            err.message ||
-            err
-          )
-        );
-      }
+      const trip = getCurrentTrip(); if (!trip) return; const buyItems = [...trip.buyItems], idx = buyItems.findIndex(i => Number(i.id) === Number(id)); if (idx < 0) return;
+      buyItems[idx] = { ...buyItems[idx], bought: !buyItems[idx].bought, updatedAt: Date.now() };
+      try { await db.collection('trips').doc(trip.id).update({ buyItems }); } catch (err) { alert('更新失敗'); }
     }
-
-
-    /* =========================================================
-       Edit Buy
-    ========================================================= */
 
     async function openEditBuyItem(id) {
-
-      const trip =
-        getCurrentTrip();
-
-      if (!trip) return;
-
-      const item =
-        (trip.buyItems || [])
-          .find(
-            buyItem =>
-              Number(buyItem.id) ===
-              Number(id)
-          );
-
-      if (!item) return;
-
-      document
-        .getElementById('edit-buy-id')
-        .value =
-        item.id;
-
-      document
-        .getElementById('edit-buy-name')
-        .value =
-        item.name || '';
-
-      document
-        .getElementById('edit-buy-category')
-        .value =
-        item.category || '';
-
-      document
-        .getElementById('edit-buy-owner')
-        .value =
-        item.owner || '';
-
-      document
-        .getElementById('edit-buy-qty')
-        .value =
-        Number(item.qty) || 1;
-
-      document
-        .getElementById('edit-buy-price')
-        .value =
-        Number(item.price) || 0;
-
-      document
-        .getElementById('edit-buy-photo')
-        .value = '';
-
-      document
-        .getElementById('edit-buy-modal')
-        .classList.add('show');
-
-      /*
-        這裡使用正確的 edit-buy-photo，
-        不會再誤用 edit-sch-photo。
-      */
-      await showPhotoPreview(
-        'edit-buy-photo',
-        'edit-buy-photo-preview',
-        item.photoUrl || '',
-        item.photoFileId || ''
-      );
+      const trip = getCurrentTrip(); if (!trip) return; const item = (trip.buyItems || []).find(i => Number(i.id) === Number(id)); if (!item) return;
+      document.getElementById('edit-buy-id').value = item.id;
+      ['name','category','owner','qty','price','photo'].forEach(k => document.getElementById(`edit-buy-${k}`).value = item[k] || (k==='qty'?1:k==='price'?0:''));
+      document.getElementById('edit-buy-modal').classList.add('show');
+      await showPhotoPreview('edit-buy-photo', 'edit-buy-photo-preview', item.photoUrl || '', item.photoFileId || '');
     }
 
-
-    document
-      .getElementById('edit-buy-form')
-      .addEventListener(
-        'submit',
-        async event => {
-
-          event.preventDefault();
-
-          const trip =
-            getCurrentTrip();
-
-          if (!trip) return;
-
-          const id =
-            Number(
-              document
-                .getElementById(
-                  'edit-buy-id'
-                )
-                .value
-            );
-
-          const buyItems =
-            Array.isArray(trip.buyItems)
-              ? [...trip.buyItems]
-              : [];
-
-          const index =
-            buyItems.findIndex(
-              item =>
-                Number(item.id) ===
-                Number(id)
-            );
-
-          if (index < 0) return;
-
-          const oldItem =
-            buyItems[index];
-
-          const submitButton =
-            event.target.querySelector(
-              'button[type="submit"]'
-            );
-
-          submitButton.disabled =
-            true;
-
-          submitButton.textContent =
-            '儲存中…';
-
-          try {
-
-            /*
-              如果沒有更換照片，
-              保留原本的 photoFileId / photoUrl。
-
-              如果有新照片，
-              才替換。
-            */
-            let photoFileId =
-              oldItem.photoFileId ||
-              null;
-
-            let photoUrl =
-              oldItem.photoUrl ||
-              null;
-
-            const photoInput =
-              document.getElementById(
-                'edit-buy-photo'
-              );
-
-            const photoFile =
-              photoInput.files &&
-              photoInput.files[0]
-                ? photoInput.files[0]
-                : null;
-
-            if (photoFile) {
-
-              setPhotoStatus(
-                'edit-buy-photo',
-                '新照片上傳 Google Drive 中…'
-              );
-
-              const uploaded =
-                await uploadPhoto(
-                  photoFile,
-                  'buy'
-                );
-
-              photoFileId =
-                uploaded.fileId ||
-                null;
-
-              photoUrl =
-                uploaded.photoUrl ||
-                null;
-            }
-
-            const qty =
-              Math.max(
-                1,
-                Number(
-                  document
-                    .getElementById(
-                      'edit-buy-qty'
-                    )
-                    .value
-                ) || 1
-              );
-
-            const price =
-              Math.max(
-                0,
-                Number(
-                  document
-                    .getElementById(
-                      'edit-buy-price'
-                    )
-                    .value
-                ) || 0
-              );
-
-            buyItems[index] = {
-
-              ...oldItem,
-
-              name:
-                document
-                  .getElementById(
-                    'edit-buy-name'
-                  )
-                  .value
-                  .trim(),
-
-              category:
-                document
-                  .getElementById(
-                    'edit-buy-category'
-                  )
-                  .value
-                  .trim(),
-
-              owner:
-                document
-                  .getElementById(
-                    'edit-buy-owner'
-                  )
-                  .value
-                  .trim() ||
-                '未指定',
-
-              qty,
-              price,
-
-              photoFileId,
-              photoUrl,
-
-              updatedAt:
-                Date.now()
-            };
-
-            await db
-              .collection('trips')
-              .doc(trip.id)
-              .update({
-                buyItems
-              });
-
-            console.log(
-              '✅ 代購修改成功'
-            );
-
-            event.target.reset();
-
-            document
-              .getElementById(
-                'edit-buy-photo-preview'
-              )
-              .innerHTML = '';
-
-            closeModal(
-              'edit-buy-modal'
-            );
-
-          } catch (err) {
-
-            console.error(
-              '❌ 編輯代購失敗：',
-              err
-            );
-
-            alert(
-              '編輯代購失敗：\n' +
-              (
-                err.message ||
-                err
-              )
-            );
-
-          } finally {
-
-            submitButton.disabled =
-              false;
-
-            submitButton.textContent =
-              '儲存修改';
-          }
-
-        }
-      );
-
+    document.getElementById('edit-buy-form').addEventListener('submit', async event => {
+      event.preventDefault(); const trip = getCurrentTrip(); if (!trip) return;
+      const id = Number(document.getElementById('edit-buy-id').value), buyItems = [...trip.buyItems], idx = buyItems.findIndex(i => Number(i.id) === id); if (idx < 0) return;
+      const submitBtn = event.target.querySelector('button[type="submit"]'); submitBtn.disabled = true; submitBtn.textContent = '儲存中…';
+      try {
+        let photoFileId = buyItems[idx].photoFileId || null, photoUrl = buyItems[idx].photoUrl || null;
+        const photoFile = document.getElementById('edit-buy-photo').files[0];
+        if (photoFile) { setPhotoStatus('edit-buy-photo', '新照片上傳 Google Drive 中…'); const up = await uploadPhoto(photoFile, 'buy'); photoFileId = up.fileId || null; photoUrl = up.photoUrl || null; }
+        buyItems[idx] = { ...buyItems[idx], name: document.getElementById('edit-buy-name').value.trim(), category: document.getElementById('edit-buy-category').value.trim(), owner: document.getElementById('edit-buy-owner').value.trim() || '未指定', qty: Math.max(1, Number(document.getElementById('edit-buy-qty').value)||1), price: Math.max(0, Number(document.getElementById('edit-buy-price').value)||0), photoFileId, photoUrl, updatedAt: Date.now() };
+        await db.collection('trips').doc(trip.id).update({ buyItems });
+        event.target.reset(); document.getElementById('edit-buy-photo-preview').innerHTML = ''; closeModal('edit-buy-modal');
+      } catch (err) { alert('修改失敗：\n' + err.message); } finally { submitBtn.disabled = false; submitBtn.textContent = '儲存修改'; }
+    });
 
     async function deleteBuyItem(id) {
-
-      const trip =
-        getCurrentTrip();
-
-      if (!trip) return;
-
-      const item =
-        (trip.buyItems || [])
-          .find(
-            buyItem =>
-              Number(buyItem.id) ===
-              Number(id)
-          );
-
-      if (!item) return;
-
-      const confirmed =
-        confirm(
-          `確定要刪除「${item.name || '這項商品'}」嗎？`
-        );
-
-      if (!confirmed) return;
-
-      try {
-
-        const buyItems =
-          (trip.buyItems || [])
-            .filter(
-              buyItem =>
-                Number(buyItem.id) !==
-                Number(id)
-            );
-
-        await db
-          .collection('trips')
-          .doc(trip.id)
-          .update({
-            buyItems
-          });
-
-      } catch (err) {
-
-        console.error(
-          '❌ 刪除代購失敗：',
-          err
-        );
-
-        alert(
-          '刪除代購失敗：\n' +
-          (
-            err.message ||
-            err
-          )
-        );
-      }
+      const trip = getCurrentTrip(); if (!trip) return;
+      const item = (trip.buyItems || []).find(i => Number(i.id) === Number(id)); if (!item || !confirm(`確定要刪除「${item.name}」嗎？`)) return;
+      try { await db.collection('trips').doc(trip.id).update({ buyItems: trip.buyItems.filter(i => Number(i.id) !== Number(id)) }); } catch(e) { alert('刪除失敗'); }
     }
 
-
-    /* =========================================================
-       Photo Preview
-    ========================================================= */
-
-    async function showPhotoPreview(
-      inputId,
-      previewId,
-      existingUrl = '',
-      fileId = ''
-    ) {
-
-      const input =
-        document.getElementById(
-          inputId
-        );
-
-      const preview =
-        document.getElementById(
-          previewId
-        );
-
-      if (!input || !preview) {
-        return;
-      }
-
+    async function showPhotoPreview(inputId, previewId, existingUrl = '', fileId = '') {
+      const input = document.getElementById(inputId), preview = document.getElementById(previewId); if (!input || !preview) return;
       preview.innerHTML = '';
-
       if (fileId) {
-
-        const loading =
-          document.createElement(
-            'div'
-          );
-
-        loading.style.color =
-          '#86868b';
-
-        loading.style.fontSize =
-          '11px';
-
-        loading.textContent =
-          'Google Drive 照片載入中…';
-
-        preview.appendChild(
-          loading
-        );
-
+        preview.innerHTML = '<div style="color:#86868b; font-size:11px;">Google Drive 照片載入中…</div>';
         try {
+          const driveUrl = await getDrivePhotoUrl(fileId);
+          preview.innerHTML = driveUrl ? `<img src="${driveUrl}" alt="Drive照片">` : `<div style="color:#ff3b30; font-size:11px;">照片無法讀取</div>`;
+        } catch(e) { preview.innerHTML = `<div style="color:#ff3b30; font-size:11px;">讀取失敗</div>`; }
+      } else if (existingUrl) preview.innerHTML = `<img src="${existingUrl}" alt="照片">`;
 
-          const driveUrl =
-            await getDrivePhotoUrl(
-              fileId
-            );
-
-          if (driveUrl) {
-
-            preview.innerHTML = '';
-
-            const img =
-              document.createElement(
-                'img'
-              );
-
-            img.src =
-              driveUrl;
-
-            img.alt =
-              'Google Drive 照片';
-
-            img.onload = () => {
-
-              console.log(
-                '🎉 Google Drive 照片載入成功：',
-                fileId
-              );
-
-            };
-
-            img.onerror = () => {
-
-              console.error(
-                '❌ Google Drive 照片 Blob 載入失敗'
-              );
-
-            };
-
-            preview.appendChild(
-              img
-            );
-
-          } else {
-
-            preview.innerHTML = `
-              <div style="color:#ff3b30; font-size:11px;">
-                照片無法讀取
-              </div>
-            `;
-
-          }
-
-        } catch (err) {
-
-          console.error(
-            '❌ showPhotoPreview Drive Error：',
-            err
-          );
-
-          preview.innerHTML = `
-            <div style="color:#ff3b30; font-size:11px;">
-              照片讀取失敗
-            </div>
-          `;
-        }
-
-      } else if (existingUrl) {
-
-        const img =
-          document.createElement(
-            'img'
-          );
-
-        img.src =
-          existingUrl;
-
-        img.alt =
-          '照片';
-
-        preview.appendChild(
-          img
-        );
-      }
-
-
-      /*
-        新選擇本機照片時，
-        先用本機 Object URL 顯示預覽。
-      */
       input.onchange = () => {
-
-        const file =
-          input.files &&
-          input.files[0]
-            ? input.files[0]
-            : null;
-
-        if (!file) {
-          return;
-        }
-
-        const localUrl =
-          URL.createObjectURL(
-            file
-          );
-
-        preview.innerHTML = '';
-
-        const img =
-          document.createElement(
-            'img'
-          );
-
-        img.src =
-          localUrl;
-
-        img.alt =
-          '新照片預覽';
-
-        img.onload = () => {
-
-          URL.revokeObjectURL(
-            localUrl
-          );
-
-        };
-
-        preview.appendChild(
-          img
-        );
-
-        setPhotoStatus(
-          inputId,
-          '已選擇照片'
-        );
+        const file = input.files[0]; if (!file) return;
+        const localUrl = URL.createObjectURL(file);
+        preview.innerHTML = `<img src="${localUrl}" alt="新照片預覽" onload="URL.revokeObjectURL(this.src)">`;
+        setPhotoStatus(inputId, '已選擇照片');
       };
     }
-
-
-    function setPhotoStatus(
-      inputId,
-      text
-    ) {
-
-      const status =
-        document.getElementById(
-          inputId + '-status'
-        );
-
-      if (status) {
-        status.textContent =
-          text;
-      }
-    }
-
-
-    /* =========================================================
-       Google Drive OAuth
-    ========================================================= */
+    function setPhotoStatus(id, text) { const s = document.getElementById(id+'-status'); if (s) s.textContent = text; }
 
     async function ensureGoogleDriveToken() {
-
-      if (googleDriveAccessToken) {
-        return googleDriveAccessToken;
-      }
-
-      if (!auth.currentUser) {
-        throw new Error(
-          '請先登入 Google 帳號'
-        );
-      }
-
-      console.log(
-        '🔐 重新取得 Google Drive OAuth Token'
-      );
-
-      const provider =
-        new firebase.auth.GoogleAuthProvider();
-
-      provider.addScope(
-        'https://www.googleapis.com/auth/drive.file'
-      );
-
-      try {
-
-        const result =
-          await auth.currentUser
-            .reauthenticateWithPopup(
-              provider
-            );
-
-        googleDriveAccessToken =
-          result &&
-          result.credential
-            ? result.credential.accessToken ||
-              null
-            : null;
-
-      } catch (err) {
-
-        console.error(
-          '❌ Google Drive 重新授權失敗：',
-          err
-        );
-
-        throw err;
-      }
-
-      if (!googleDriveAccessToken) {
-
-        throw new Error(
-          '沒有取得 Google Drive 授權 Token。\n' +
-          '請確認 Google 登入視窗有允許 Drive 權限。'
-        );
-      }
-
-      console.log(
-        '✅ Google Drive Token 取得成功'
-      );
-
+      if (googleDriveAccessToken) return googleDriveAccessToken;
+      if (!auth.currentUser) throw new Error('請先登入 Google 帳號');
+      const provider = new firebase.auth.GoogleAuthProvider(); provider.addScope('https://www.googleapis.com/auth/drive.file');
+      const result = await auth.currentUser.reauthenticateWithPopup(provider);
+      googleDriveAccessToken = result?.credential?.accessToken || null;
+      if (!googleDriveAccessToken) throw new Error('無 Google Drive 授權');
       return googleDriveAccessToken;
     }
 
-
-    /* =========================================================
-       Google Drive API
-    ========================================================= */
-
-    async function driveApi(
-      url,
-      options = {}
-    ) {
-
-      const token =
-        await ensureGoogleDriveToken();
-
-      const headers =
-        Object.assign(
-          {},
-          options.headers || {},
-          {
-            Authorization:
-              `Bearer ${token}`
-          }
-        );
-
-      const response =
-        await fetch(
-          url,
-          {
-            ...options,
-            headers
-          }
-        );
-
-      const responseText =
-        await response
-          .text()
-          .catch(() => '');
-
-      if (response.status === 401) {
-
-        googleDriveAccessToken =
-          null;
-
-        throw new Error(
-          'Google Drive 授權已失效，請重新操作。'
-        );
-      }
-
-      if (!response.ok) {
-
-        throw new Error(
-          `Google Drive API HTTP ${response.status}\n` +
-          responseText
-        );
-      }
-
-      /*
-        模擬 Response，
-        讓呼叫端可以照原本方式 response.json()
-      */
-      return new Response(
-        responseText,
-        {
-          status:
-            response.status,
-
-          statusText:
-            response.statusText,
-
-          headers:
-            response.headers
-        }
-      );
+    async function getOrCreateDriveFolder(folderName) {
+      const query = `name = '${folderName.replace(/'/g,"\\'")}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
+      const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&spaces=drive&fields=files(id,name)`;
+      const token = await ensureGoogleDriveToken(), res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } }), data = await res.json();
+      if (data.files?.length) return data.files[0].id;
+      const cRes = await fetch('https://www.googleapis.com/drive/v3/files', { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ name: folderName, mimeType: 'application/vnd.google-apps.folder' }) });
+      return (await cRes.json()).id;
     }
 
-
-    /* =========================================================
-       Drive Folder
-    ========================================================= */
-
-    async function getOrCreateDriveFolder(
-      folderName
-    ) {
-
-      const safeName =
-        folderName.replace(
-          /'/g,
-          "\\'"
-        );
-
-      const query =
-        `name = '${safeName}' ` +
-        `and mimeType = 'application/vnd.google-apps.folder' ` +
-        `and trashed = false`;
-
-      const searchUrl =
-        'https://www.googleapis.com/drive/v3/files' +
-        '?q=' +
-        encodeURIComponent(query) +
-        '&spaces=drive' +
-        '&fields=files(id,name)';
-
-      const response =
-        await driveApi(
-          searchUrl
-        );
-
-      const data =
-        await response.json();
-
-      if (
-        data.files &&
-        data.files.length
-      ) {
-
-        console.log(
-          '📁 使用既有 Drive Folder：',
-          data.files[0]
-        );
-
-        return data.files[0].id;
-      }
-
-      const createResponse =
-        await driveApi(
-          'https://www.googleapis.com/drive/v3/files',
-          {
-            method: 'POST',
-
-            headers: {
-              'Content-Type':
-                'application/json'
-            },
-
-            body: JSON.stringify({
-              name:
-                folderName,
-
-              mimeType:
-                'application/vnd.google-apps.folder'
-            })
-          }
-        );
-
-      const folder =
-        await createResponse.json();
-
-      console.log(
-        '📁 建立 Drive Folder：',
-        folder
-      );
-
-      return folder.id;
+    async function uploadPhoto(file, type = 'other') {
+      if (!file) throw new Error('無檔案');
+      const token = await ensureGoogleDriveToken(), folderId = await getOrCreateDriveFolder('行程照片');
+      const boundary = '-------314159265358979323846', delimiter = `\r\n--${boundary}\r\n`, closeDelimiter = `\r\n--${boundary}--`;
+      const fileBuffer = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsArrayBuffer(file); });
+      const body = new Blob([
+        `${delimiter}Content-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({ name: `${Date.now()}_${file.name}`, parents: [folderId], mimeType: file.type || 'application/octet-stream' })}`,
+        `${delimiter}Content-Type: ${file.type || 'application/octet-stream'}\r\n\r\n`, fileBuffer, closeDelimiter
+      ], { type: `multipart/related; boundary="${boundary}"` });
+      
+      const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body });
+      if (response.status === 401) { googleDriveAccessToken = null; throw new Error('授權失效'); }
+      if (!response.ok) throw new Error(`上傳失敗 HTTP ${response.status}`);
+      const uploaded = await response.json();
+      return { fileId: uploaded.id, photoUrl: null, webViewLink: uploaded.webViewLink || null };
     }
 
-
-    /* =========================================================
-       Upload Photo
-    ========================================================= */
-
-    async function uploadPhoto(
-      file,
-      type = 'other'
-    ) {
-
-      if (!file) {
-        throw new Error(
-          '沒有照片檔案'
-        );
-      }
-
-      console.log(
-        '========================================'
-      );
-
-      console.log(
-        '📤 開始上傳 Google Drive'
-      );
-
-      console.log(
-        '📤 檔名：',
-        file.name
-      );
-
-      console.log(
-        '📤 大小：',
-        file.size
-      );
-
-      console.log(
-        '📤 類型：',
-        file.type
-      );
-
+    async function getDrivePhotoUrl(fileId) {
+      if (!fileId) return null;
       try {
-
-        const token =
-          await ensureGoogleDriveToken();
-
-        console.log(
-          '📤 Token OK'
-        );
-
-        const folderName =
-          '行程照片';
-
-        const folderId =
-          await getOrCreateDriveFolder(
-            folderName
-          );
-
-        const metadata = {
-
-          name:
-            `${Date.now()}_${file.name}`,
-
-          parents: [
-            folderId
-          ],
-
-          mimeType:
-            file.type ||
-            'application/octet-stream'
-        };
-
-        const boundary =
-          '-------314159265358979323846';
-
-        const delimiter =
-          '\r\n--' +
-          boundary +
-          '\r\n';
-
-        const closeDelimiter =
-          '\r\n--' +
-          boundary +
-          '--';
-
-        const reader =
-          new FileReader();
-
-        const fileBuffer =
-          await new Promise(
-            (resolve, reject) => {
-
-              reader.onload =
-                () =>
-                  resolve(
-                    reader.result
-                  );
-
-              reader.onerror =
-                reject;
-
-              reader.readAsArrayBuffer(
-                file
-              );
-            }
-          );
-
-        const metadataPart =
-          delimiter +
-          'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
-          JSON.stringify(
-            metadata
-          );
-
-        const body =
-          new Blob(
-            [
-              metadataPart,
-
-              delimiter +
-              `Content-Type: ${file.type || 'application/octet-stream'}\r\n\r\n`,
-
-              fileBuffer,
-
-              closeDelimiter
-            ],
-            {
-              type:
-                `multipart/related; boundary="${boundary}"`
-            }
-          );
-
-        const response =
-          await fetch(
-            'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink,mimeType,size',
-            {
-              method: 'POST',
-
-              headers: {
-                Authorization:
-                  `Bearer ${token}`
-              },
-
-              body
-            }
-          );
-
-        console.log(
-          '📤 Drive Upload HTTP：',
-          response.status
-        );
-
-        const responseText =
-          await response
-            .text()
-            .catch(() => '');
-
-        if (
-          response.status === 401
-        ) {
-
-          googleDriveAccessToken =
-            null;
-
-          throw new Error(
-            'Google Drive 授權已過期，請重新操作。'
-          );
-        }
-
-        if (!response.ok) {
-
-          console.error(
-            '❌ Drive Upload Response：',
-            responseText
-          );
-
-          throw new Error(
-            `Google Drive 上傳失敗 HTTP ${response.status}\n${responseText}`
-          );
-        }
-
-        const uploaded =
-          JSON.parse(
-            responseText
-          );
-
-        console.log(
-          '✅ Google Drive 上傳成功：',
-          uploaded
-        );
-
-        console.log(
-          '========================================'
-        );
-
-        /*
-          重要：
-          不公開圖片。
-          Firestore 只保存 fileId。
-
-          photoUrl 保留 null，
-          讓新架構不依賴 anyone permission。
-        */
-        return {
-
-          fileId:
-            uploaded.id,
-
-          photoUrl:
-            null,
-
-          webViewLink:
-            uploaded.webViewLink ||
-            null
-        };
-
-      } catch (err) {
-
-        console.error(
-          '❌ uploadPhoto 發生錯誤：',
-          err
-        );
-
-        console.log(
-          '========================================'
-        );
-
-        throw err;
-      }
+        let token = await ensureGoogleDriveToken();
+        const url = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media`;
+        let res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+        if (res.status === 401) { googleDriveAccessToken = null; token = await ensureGoogleDriveToken(); res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } }); }
+        if (!res.ok) throw new Error('讀取失敗');
+        return URL.createObjectURL(await res.blob());
+      } catch (err) { return null; }
     }
 
-
-    /* =========================================================
-       Download Private Drive Photo
-    ========================================================= */
-
-    async function getDrivePhotoUrl(
-      fileId
-    ) {
-
-      console.log(
-        '========================================'
-      );
-
-      console.log(
-        '🖼️ 開始讀取 Google Drive 照片'
-      );
-
-      console.log(
-        '🖼️ fileId =',
-        fileId
-      );
-
-      if (!fileId) {
-
-        console.error(
-          '❌ 沒有 fileId'
-        );
-
-        return null;
-      }
-
-      try {
-
-        let token =
-          await ensureGoogleDriveToken();
-
-        const url =
-          `https://www.googleapis.com/drive/v3/files/` +
-          `${encodeURIComponent(fileId)}` +
-          `?alt=media`;
-
-        console.log(
-          '🖼️ GET：',
-          url
-        );
-
-        let response =
-          await fetch(
-            url,
-            {
-              method: 'GET',
-
-              headers: {
-                Authorization:
-                  `Bearer ${token}`
-              }
-            }
-          );
-
-        console.log(
-          '🖼️ HTTP：',
-          response.status
-        );
-
-        /*
-          Token 過期：
-          清掉後重新授權一次，再重試。
-        */
-        if (
-          response.status === 401
-        ) {
-
-          console.warn(
-            '⚠️ Drive Token 已失效，重新取得'
-          );
-
-          googleDriveAccessToken =
-            null;
-
-          token =
-            await ensureGoogleDriveToken();
-
-          response =
-            await fetch(
-              url,
-              {
-                method: 'GET',
-
-                headers: {
-                  Authorization:
-                    `Bearer ${token}`
-                }
-              }
-            );
-
-          console.log(
-            '🖼️ Retry HTTP：',
-            response.status
-          );
-        }
-
-        console.log(
-          '🖼️ Content-Type：',
-          response.headers.get(
-            'Content-Type'
-          )
-        );
-
-        if (!response.ok) {
-
-          const text =
-            await response
-              .text()
-              .catch(() => '');
-
-          console.error(
-            '❌ Drive 圖片下載失敗'
-          );
-
-          console.error(
-            '❌ HTTP：',
-            response.status
-          );
-
-          console.error(
-            '❌ Response：',
-            text
-          );
-
-          throw new Error(
-            `Google Drive 圖片讀取失敗 HTTP ${response.status}\n${text}`
-          );
-        }
-
-        console.log(
-          '🖼️ 開始取得 Blob'
-        );
-
-        const blob =
-          await response.blob();
-
-        console.log(
-          '🖼️ Blob type：',
-          blob.type
-        );
-
-        console.log(
-          '🖼️ Blob size：',
-          blob.size
-        );
-
-        if (!blob.size) {
-
-          throw new Error(
-            'Google Drive 回傳的圖片是空的'
-          );
-        }
-
-        const objectUrl =
-          URL.createObjectURL(
-            blob
-          );
-
-        console.log(
-          '✅ 圖片 Blob 成功'
-        );
-
-        console.log(
-          '✅ Object URL：',
-          objectUrl
-        );
-
-        console.log(
-          '========================================'
-        );
-
-        return objectUrl;
-
-      } catch (err) {
-
-        console.error(
-          '❌ getDrivePhotoUrl 發生錯誤：',
-          err
-        );
-
-        console.error(
-          '========================================'
-        );
-
-        return null;
-      }
-    }
-
-
-    /* =========================================================
-       Quick Panels
-    ========================================================= */
-
-    function closeAllQuickPanels() {
-
-      document
-        .getElementById(
-          'rate-panel'
-        )
-        .classList.remove(
-          'show'
-        );
-
-      document
-        .getElementById(
-          'filter-panel'
-        )
-        .classList.remove(
-          'show'
-        );
-    }
-
-
-    function toggleRatePanel() {
-
-      const panel =
-        document.getElementById(
-          'rate-panel'
-        );
-
-      const willShow =
-        !panel.classList.contains(
-          'show'
-        );
-
-      document
-        .getElementById(
-          'filter-panel'
-        )
-        .classList.remove(
-          'show'
-        );
-
-      panel.classList.toggle(
-        'show',
-        willShow
-      );
-    }
-
-
-    function toggleFilterPanel() {
-
-      const panel =
-        document.getElementById(
-          'filter-panel'
-        );
-
-      const willShow =
-        !panel.classList.contains(
-          'show'
-        );
-
-      document
-        .getElementById(
-          'rate-panel'
-        )
-        .classList.remove(
-          'show'
-        );
-
-      panel.classList.toggle(
-        'show',
-        willShow
-      );
-    }
-
-
-    function showSyncStatus() {
-
-      const user =
-        auth.currentUser;
-
-      if (!user) {
-        alert('尚未登入');
-        return;
-      }
-
-      alert(
-        '☁️ Firebase 即時同步中\n\n' +
-        '旅程、行程與代購資料會自動同步。'
-      );
-    }
-
-
-    /* =========================================================
-       Modal
-    ========================================================= */
-
-    function closeModal(id) {
-
-      const modal =
-        document.getElementById(id);
-
-      if (!modal) return;
-
-      modal.classList.remove(
-        'show'
-      );
-    }
-
-
-    document
-      .querySelectorAll('.modal')
-      .forEach(modal => {
-
-        modal.addEventListener(
-          'click',
-          event => {
-
-            if (
-              event.target ===
-              modal
-            ) {
-              modal.classList.remove(
-                'show'
-              );
-            }
-
-          }
-        );
-
-      });
-
-
-    /* =========================================================
-       Initial Photo Preview Setup
-    ========================================================= */
-
-    showPhotoPreview(
-      'sch-photo',
-      'sch-photo-preview'
-    );
-
-    showPhotoPreview(
-      'edit-sch-photo',
-      'edit-sch-photo-preview'
-    );
-
-    showPhotoPreview(
-      'buy-photo',
-      'buy-photo-preview'
-    );
-
-    showPhotoPreview(
-      'edit-buy-photo',
-      'edit-buy-photo-preview'
-    );
-
-
-    /* =========================================================
-       Firestore Snapshot → UI Refresh
-    ========================================================= */
-
-    /*
-      由於 trips 是透過 onSnapshot 更新，
-      每次資料改變後重新整理目前畫面。
-    */
-
-    const originalStartTripSync =
-      startTripSync;
-
-
-    /*
-      將 render hook 放在 Snapshot 更新後，
-      避免 Firestore 資料變更後 UI 不更新。
-    */
-
-    const originalRenderTripsList =
-      renderTripsList;
-
-
-    /*
-      不改動原始函式名稱，
-      直接用 interval 不合適；
-      因此在 startTripSync 的 snapshot 中，
-      已經 renderTripsList。
-
-      下面只提供目前畫面的手動刷新工具。
-    */
-
-    function refreshCurrentView() {
-
-      if (!currentTripId) {
-        renderTripsList();
-        return;
-      }
-
-      const trip =
-        getCurrentTrip();
-
-      if (!trip) {
-        showTripsView();
-        return;
-      }
-
-      renderSchedules();
-      renderBuyList();
-    }
-
-
-    /* =========================================================
-       Firestore Data Refresh Hook
-    ========================================================= */
-
-    /*
-      使用 Firebase snapshot 後，
-      renderTripsList 已更新。
-      如果使用者正在旅程內，
-      這裡透過小型 observer 方式檢查目前畫面。
-    */
+    function closeAllQuickPanels() { ['rate-panel', 'filter-panel'].forEach(id => document.getElementById(id).classList.remove('show')); }
+    function toggleRatePanel() { const p = document.getElementById('rate-panel'); document.getElementById('filter-panel').classList.remove('show'); p.classList.toggle('show'); }
+    function toggleFilterPanel() { const p = document.getElementById('filter-panel'); document.getElementById('rate-panel').classList.remove('show'); p.classList.toggle('show'); }
+    function showSyncStatus() { if(auth.currentUser) alert('☁️ Firebase 即時同步中\n\n旅程、行程與代購資料會自動同步。'); else alert('尚未登入'); }
+    function closeModal(id) { const m = document.getElementById(id); if (m) m.classList.remove('show'); }
+    document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => { if(e.target === m) m.classList.remove('show'); }));
+    
+    ['sch-photo','edit-sch-photo','buy-photo','edit-buy-photo'].forEach(id => showPhotoPreview(id, id+'-preview'));
 
     let lastRenderedTripDataHash = '';
-
-    function getTripDataHash(trip) {
-
-      if (!trip) {
-        return '';
-      }
-
-      try {
-
-        return JSON.stringify({
-          schedules:
-            trip.schedules || [],
-
-          buyItems:
-            trip.buyItems || []
-        });
-
-      } catch (err) {
-
-        return String(
-          Date.now()
-        );
-      }
-    }
-
-
     setInterval(() => {
-
-      if (!currentTripId) {
-        return;
-      }
-
-      const trip =
-        getCurrentTrip();
-
-      if (!trip) {
-        return;
-      }
-
-      const hash =
-        getTripDataHash(trip);
-
-      if (
-        hash !==
-        lastRenderedTripDataHash
-      ) {
-
-        lastRenderedTripDataHash =
-          hash;
-
-        const tripView =
-          document.getElementById(
-            'trip-view'
-          );
-
-        if (
-          tripView &&
-          tripView.classList.contains(
-            'active'
-          )
-        ) {
-
-          renderSchedules();
-
-          if (
-            document
-              .getElementById(
-                'buy-tab'
-              )
-              .style.display !==
-            'none'
-          ) {
-            renderBuyList();
-          }
+      if (!currentTripId) return;
+      const trip = getCurrentTrip(); if (!trip) return;
+      const hash = JSON.stringify({ s: trip.schedules || [], b: trip.buyItems || [] });
+      if (hash !== lastRenderedTripDataHash) {
+        lastRenderedTripDataHash = hash;
+        const v = document.getElementById('trip-view');
+        if (v && v.classList.contains('active')) {
+          renderSchedules(); if (document.getElementById('buy-tab').style.display !== 'none') renderBuyList();
         }
       }
-
     }, 800);
 
-
-    /* =========================================================
-       Window / Page Events
-    ========================================================= */
-
-    window.addEventListener(
-      'beforeunload',
-      () => {
-
-        /*
-          這裡不做 signOut，
-          只保留瀏覽器 session。
-        */
-
-      }
-    );
-
-
-    /* =========================================================
-       Initial UI
-    ========================================================= */
-
     renderTripsList();
-
   </script>
-
 </body>
 </html>
