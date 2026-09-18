@@ -63,10 +63,6 @@
     .back-row { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
     .trip-detail-title { font-size: 28px; font-weight: 800; margin: 0; }
     .trip-detail-date { margin-top: 6px; color: #86868b; font-size: 13px; }
-    /* Tabs */
-    .tab-bar { background: #e9e9ee; padding: 4px; border-radius: 13px; display: flex; gap: 3px; margin-bottom: 16px; }
-    .tab-btn { flex: 1; border: 0; background: transparent; min-height: 42px; border-radius: 10px; font-size: 14px; font-weight: 700; color: #6e6e73; }
-    .tab-btn.active { background: #fff; color: #1d1d1f; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
     /* Toolbar */
     .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
     .toolbar-item { background: #fff; border-radius: 11px; min-height: 38px; padding: 0 12px; display: flex; align-items: center; gap: 7px; font-size: 12px; color: #6e6e73; border: 1px solid rgba(0, 0, 0, 0.05); }
@@ -75,37 +71,46 @@
     .filter-panel.show { display: block; }
     .filter-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
     .filter-label { display: block; font-size: 11px; color: #86868b; margin-bottom: 5px; }
-    /* Schedule */
+    
+    /* ＝＝＝ Swipe Actions (Req 1) ＝＝＝ */
+    .swipe-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; width: 100%; }
+    .swipe-container::-webkit-scrollbar { display: none; }
+    .swipe-content { flex: 0 0 100%; min-width: 100%; scroll-snap-align: start; }
+    .swipe-actions { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; padding: 0 12px; scroll-snap-align: end; }
+    
+    /* Schedule specific */
     .schedule-day { margin-bottom: 22px; }
     .day-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
     .day-badge { min-width: 56px; padding: 6px 10px; border-radius: 10px; background: #1d1d1f; color: #fff; text-align: center; font-size: 12px; font-weight: 800; }
     .day-date { font-size: 14px; font-weight: 700; }
     .day-toggle { margin-left: auto; border: 0; background: transparent; color: #86868b; font-size: 13px; }
     .schedule-list { display: flex; flex-direction: column; gap: 9px; }
-    .schedule-card { background: #fff; border-radius: 16px; padding: 14px; display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: 13px; align-items: start; border: 1px solid rgba(0, 0, 0, 0.04); }
+    .schedule-swipe { border-radius: 16px; border: 1px solid rgba(0, 0, 0, 0.04); background: #f2f2f7; }
+    .schedule-card { background: #fff; border-radius: 16px; padding: 14px; display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 13px; align-items: start; }
     .schedule-time { font-size: 12px; color: #007aff; font-weight: 800; line-height: 1.45; }
     .schedule-place { font-size: 15px; font-weight: 800; line-height: 1.4; word-break: break-word; }
     .schedule-meta { margin-top: 4px; font-size: 11px; color: #86868b; }
-    .schedule-actions { display: flex; gap: 5px; }
-    .schedule-action { width: 31px; height: 31px; border: 0; border-radius: 8px; background: #f2f2f7; font-size: 13px; }
-    /* Buy list */
+    .schedule-action { width: 34px; height: 34px; border: 0; border-radius: 10px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 15px; }
+
+    /* Buy specific */
     .buy-owner-section { margin-bottom: 20px; }
     .buy-owner-header { background: #fff; border-radius: 15px 15px 0 0; padding: 13px 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid #f0f0f2; }
     .buy-owner-title { font-size: 14px; font-weight: 800; }
     .buy-owner-summary { color: #86868b; font-size: 11px; }
     .buy-owner-items { background: #fff; border-radius: 0 0 15px 15px; overflow: hidden; }
-    .buy-item-line { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 9px; align-items: center; padding: 11px 13px; border-bottom: 1px solid #f2f2f7; }
-    .buy-item-line:last-child { border-bottom: 0; }
+    .buy-swipe { border-bottom: 1px solid #f2f2f7; background: #f2f2f7; }
+    .buy-swipe:last-child { border-bottom: none; }
+    .buy-item-line { background: #fff; display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 9px; align-items: center; padding: 11px 13px; }
     .buy-item-body { min-width: 0; display: flex; align-items: center; gap: 9px; }
     .buy-item-content { min-width: 0; flex: 1; }
     .buy-item-name { font-size: 13px; font-weight: 700; line-height: 1.35; word-break: break-word; }
     .buy-item-meta { margin-top: 3px; color: #86868b; font-size: 10px; line-height: 1.4; }
     .buy-item-price { margin-top: 3px; font-size: 11px; color: #1d1d1f; font-weight: 700; }
-    .buy-actions { display: flex; gap: 5px; align-items: center; }
-    .buy-action { width: 31px; height: 31px; border: 0; border-radius: 8px; background: #f2f2f7; font-size: 13px; }
+    .buy-action { width: 34px; height: 34px; border: 0; border-radius: 10px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 15px; }
     .checkbox-custom { width: 20px; height: 20px; border-radius: 6px; border: 2px solid #c7c7cc; background: #fff; position: relative; cursor: pointer; }
     .checkbox-custom.checked { background: #34c759; border-color: #34c759; }
     .checkbox-custom.checked::after { content: "✓"; color: #fff; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; }
+    
     /* Photos */
     .photo-thumb { width: 58px; height: 58px; flex: 0 0 58px; border-radius: 10px; object-fit: cover; background: #f2f2f7; display: block; }
     .photo-loading { display: flex; align-items: center; justify-content: center; color: #8e8e93; font-size: 19px; }
@@ -147,8 +152,8 @@
     .loading-dot { width: 7px; height: 7px; border-radius: 50%; background: #007aff; margin-right: 8px; animation: loadingPulse 0.9s infinite alternate; }
     @keyframes loadingPulse { from { opacity: 0.3; } to { opacity: 1; } }
     /* Responsive */
-    @media (max-width: 760px) { .app-main, .header-inner { width: min(100% - 22px, 1100px); } .trip-grid, .filter-grid { grid-template-columns: 1fr; } .schedule-card { grid-template-columns: 62px minmax(0, 1fr) auto; } }
-    @media (max-width: 520px) { .app-main { padding-top: 20px; } .page-title { font-size: 24px; } .brand-subtitle, .user-name { display: none; } .form-grid { grid-template-columns: 1fr; } .form-group.full { grid-column: auto; } .schedule-card { grid-template-columns: 56px minmax(0, 1fr); } .schedule-actions { grid-column: 2; } .buy-item-line { grid-template-columns: 22px minmax(0, 1fr) auto; padding: 10px 9px; } .buy-actions { gap: 3px; } .buy-action { width: 29px; height: 29px; } .photo-thumb { width: 50px; height: 50px; flex-basis: 50px; } .modal-card { padding: 18px 15px; } }
+    @media (max-width: 760px) { .app-main, .header-inner { width: min(100% - 22px, 1100px); } .trip-grid, .filter-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 520px) { .app-main { padding-top: 20px; } .page-title { font-size: 24px; } .brand-subtitle, .user-name { display: none; } .form-grid { grid-template-columns: 1fr; } .form-group.full { grid-column: auto; } .photo-thumb { width: 50px; height: 50px; flex-basis: 50px; } .modal-card { padding: 18px 15px; } }
   </style>
 </head>
 <body>
@@ -208,10 +213,6 @@
             <div id="trip-detail-date" class="trip-detail-date"></div>
           </div>
         </div>
-      </div>
-      <div class="tab-bar">
-        <button id="tab-schedule" class="tab-btn active" onclick="switchTab('schedule')">🗓 行程</button>
-        <button id="tab-buy" class="tab-btn" onclick="switchTab('buy')">🛍 代購</button>
       </div>
 
       <!-- Schedule Tab -->
@@ -323,6 +324,7 @@
       <div class="modal-header"><h2 class="modal-title">編輯行程</h2><button class="modal-close" onclick="closeModal('edit-sch-modal')">×</button></div>
       <form id="edit-schedule-form">
         <input id="edit-sch-id" type="hidden">
+        <input id="edit-sch-photo-remove" type="hidden" value="false"> <!-- 照片移除標記 -->
         <div class="form-grid">
           <div class="form-group"><label class="form-label">日期</label><input id="edit-sch-date" class="form-input" type="date" required></div>
           <div class="form-group"><label class="form-label">Day</label><input id="edit-sch-day" class="form-input" type="text"></div>
@@ -367,6 +369,7 @@
       <div class="modal-header"><h2 class="modal-title">編輯代購</h2><button class="modal-close" onclick="closeModal('edit-buy-modal')">×</button></div>
       <form id="edit-buy-form">
         <input id="edit-buy-id" type="hidden">
+        <input id="edit-buy-photo-remove" type="hidden" value="false"> <!-- 照片移除標記 -->
         <div class="form-grid">
           <div class="form-group full"><label class="form-label">商品名稱</label><input id="edit-buy-name" class="form-input" type="text" required></div>
           <div class="form-group"><label class="form-label">分類</label><input id="edit-buy-category" class="form-input" type="text"></div>
@@ -378,6 +381,11 @@
         <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('edit-buy-modal')">取消</button><button type="submit" class="btn btn-primary">儲存修改</button></div>
       </form>
     </div>
+  </div>
+
+  <!-- Lightbox Modal (Req 3) -->
+  <div id="lightbox-modal" class="modal" style="align-items: center; padding: 20px;" onclick="closeModal('lightbox-modal')">
+    <img id="lightbox-img" src="" style="max-width: 100%; max-height: 100%; border-radius: 12px; object-fit: contain; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
   </div>
 
   <!-- Firebase -->
@@ -540,7 +548,7 @@
       }
       list.innerHTML = `<div class="trip-grid">${trips.map(trip => `
         <div class="trip-card" onclick="openTripDetail('${escapeHtml(trip.id)}')">
-          <div class="trip-card-header"><div style="min-width:0;"><div class="trip-name">${escapeHtml(trip.name || '未命名')}</div><div class="trip-date">${escapeHtml(formatDate(trip.startDate))} ～${escapeHtml(formatDate(trip.endDate))}</div></div><div style="font-size:22px;">🇯🇵</div></div>
+          <div class="trip-card-header"><div style="min-width:0;"><div class="trip-name">${escapeHtml(trip.name || '未命名')}</div><div class="trip-date">${escapeHtml(formatDate(trip.startDate))} ～ ${escapeHtml(formatDate(trip.endDate))}</div></div><div style="font-size:22px;">🇯🇵</div></div>
           <div class="trip-owner">建立者：${escapeHtml(trip.ownerName || '未知')}</div>
           ${(trip.inviteCode || trip.code) ? `<div class="trip-code">邀請碼：${escapeHtml(trip.inviteCode || trip.code)}</div>` : ''}
         </div>`).join('')}</div>`;
@@ -577,7 +585,6 @@
       } catch (err) { alert('建立失敗：\n' + err.message); }
     });
 
-    // =========== 新增的「加入旅程」邏輯 ===========
     function openJoinTrip() {
       document.getElementById('join-trip-form').reset();
       document.getElementById('join-trip-modal').classList.add('show');
@@ -614,20 +621,22 @@
       }
     });
 
+    // =========== 整合底部導航 (Req 4) ===========
     function switchTab(tab) {
       document.getElementById('schedule-tab').style.display = tab === 'schedule' ? 'block' : 'none';
       document.getElementById('buy-tab').style.display = tab === 'buy' ? 'block' : 'none';
-      document.getElementById('tab-schedule').classList.toggle('active', tab === 'schedule');
-      document.getElementById('tab-buy').classList.toggle('active', tab === 'buy');
+      
       document.getElementById('nav-schedule').classList.toggle('active', tab === 'schedule');
       document.getElementById('nav-buy').classList.toggle('active', tab === 'buy');
+      document.getElementById('nav-trips').classList.remove('active'); // 取消行程清單的 active
+
       closeAllQuickPanels();
       if (tab === 'buy') renderBuyList();
     }
 
     function openAddSchedule() {
       closeAllQuickPanels(); document.getElementById('schedule-form').reset();
-      document.getElementById('sch-photo-preview').innerHTML = ''; document.getElementById('sch-photo-status').textContent = '';
+      clearPhotoSelection('sch-photo', 'sch-photo-preview');
       const trip = getCurrentTrip(); if (!trip) return;
       const schedules = Array.isArray(trip.schedules) ? [...trip.schedules] : [];
       if (schedules.length) {
@@ -674,10 +683,11 @@
         const newItem = { id: Date.now(), date: document.getElementById('sch-date').value, day: document.getElementById('sch-day').value.trim(), startTime: document.getElementById('sch-start').value, endTime: document.getElementById('sch-end').value, place: document.getElementById('sch-place').value.trim(), duration: document.getElementById('sch-duration').value.trim(), photoFileId, photoUrl, createdBy: user.uid, createdAt: Date.now() };
         const schedules = Array.isArray(trip.schedules) ? [...trip.schedules] : []; schedules.push(newItem);
         await db.collection('trips').doc(trip.id).update({ schedules });
-        event.target.reset(); document.getElementById('sch-photo-preview').innerHTML = ''; document.getElementById('sch-photo-status').textContent = ''; toggleScheduleForm(false);
+        event.target.reset(); clearPhotoSelection('sch-photo', 'sch-photo-preview'); toggleScheduleForm(false);
       } catch (err) { alert('新增失敗：\n' + err.message); } finally { submitBtn.disabled = false; submitBtn.textContent = '新增行程'; }
     });
 
+    // =========== 左右滑動架構 (Req 1) 與 相機按鈕綁定 (Req 3) ===========
     function renderSchedules() {
       const list = document.getElementById('schedule-list'), trip = getCurrentTrip(); if (!list || !trip) return;
       const schedules = Array.isArray(trip.schedules) ? [...trip.schedules] : [];
@@ -686,9 +696,36 @@
       const groups = schedules.reduce((acc, item) => { const k = item.date || '未指定日期'; acc[k] = acc[k] || []; acc[k].push(item); return acc; }, {});
       list.innerHTML = Object.keys(groups).sort().map(date => {
         const items = groups[date];
-        return `<div class="schedule-day" data-day="${escapeHtml(date)}"><div class="day-header"><div class="day-badge">${escapeHtml(items[0].day || getDayLabel(date))}</div><div class="day-date">${escapeHtml(formatDate(date))}</div><button class="day-toggle" onclick="toggleDayGroup('${escapeHtml(date)}')">收合</button></div><div class="schedule-list" id="day-group-${escapeHtml(date)}">${items.map(item => `<div class="schedule-card"><div class="schedule-time">${escapeHtml(item.endTime ? `${item.startTime||'--:--'} ～ ${item.endTime}` : item.startTime||'--:--')}</div><div style="min-width:0;"><div class="schedule-place">${escapeHtml(item.place\vert{}\vert{}'未命名')}</div><div class="schedule-meta">${item.duration ? `⏱ ${escapeHtml(item.duration)}` : ''} ${(item.photoFileId||item.photoUrl) ? ' 📷' : ''}</div></div><div class="schedule-actions"><button class="schedule-action" onclick="openEditSchedule(${Number(item.id)})">✏️</button><button class="schedule-action" onclick="deleteSchedule(${Number(item.id)})">🗑</button></div></div>`).join('')}</div></div>`;
+        return `<div class="schedule-day" data-day="${escapeHtml(date)}"><div class="day-header"><div class="day-badge">${escapeHtml(items[0].day || getDayLabel(date))}</div><div class="day-date">${escapeHtml(formatDate(date))}</div><button class="day-toggle" onclick="toggleDayGroup('${escapeHtml(date)}')">收合</button></div><div class="schedule-list" id="day-group-${escapeHtml(date)}">${items.map(item => `
+          <div class="swipe-container schedule-swipe">
+            <div class="swipe-content schedule-card">
+              <div class="schedule-time">${escapeHtml(item.endTime ? `${item.startTime||'--:--'} ～ ${item.endTime}` : item.startTime||'--:--')}</div>
+              <div style="min-width:0;">
+                <div class="schedule-place">${escapeHtml(item.place||'未命名')}</div>
+                <div class="schedule-meta">${item.duration ? `⏱ ${escapeHtml(item.duration)}` : ''} ${item.photoFileId ? `<span class="sch-cam-icon" data-file-id="${item.photoFileId}" style="cursor:pointer;" title="點擊放大照片"> 📷</span>` : item.photoUrl ? `<span style="cursor:pointer;" onclick="event.stopPropagation(); openLightbox('${escapeHtml(item.photoUrl)}')"> 📷</span>` : ''}</div>
+              </div>
+            </div>
+            <div class="swipe-actions">
+              <button class="schedule-action" onclick="openEditSchedule(${Number(item.id)})">✏️</button>
+              <button class="schedule-action" onclick="deleteSchedule(${Number(item.id)})">🗑</button>
+            </div>
+          </div>
+        `).join('')}</div></div>`;
       }).join('');
     }
+
+    // 行程區點擊相機圖示開啟放大照片 (Req 3)
+    document.getElementById('schedule-list').addEventListener('click', async (e) => {
+      const icon = e.target.closest('.sch-cam-icon');
+      if (icon) {
+        e.stopPropagation();
+        const fileId = icon.dataset.fileId;
+        icon.textContent = ' ⏳';
+        const url = await getDrivePhotoUrl(fileId);
+        icon.textContent = ' 📷';
+        if (url) openLightbox(url); else alert('無法載入照片');
+      }
+    });
 
     function toggleDayGroup(date) { const g = document.getElementById('day-group-' + date); if (g) g.style.display = g.style.display === 'none' ? 'flex' : 'none'; }
 
@@ -701,20 +738,22 @@
       await showPhotoPreview('edit-sch-photo', 'edit-sch-photo-preview', item.photoUrl || '', item.photoFileId || '');
     }
 
-    document.getElementById('edit-sch-date').addEventListener('change', e => document.getElementById('edit-sch-day').value = getDayLabel(e.target.value));
-
     document.getElementById('edit-schedule-form').addEventListener('submit', async event => {
       event.preventDefault(); const trip = getCurrentTrip(); if (!trip) return;
       const id = Number(document.getElementById('edit-sch-id').value), schedules = Array.isArray(trip.schedules) ? [...trip.schedules] : [];
       const index = schedules.findIndex(s => Number(s.id) === id); if (index < 0) return;
       const submitBtn = event.target.querySelector('button[type="submit"]'); submitBtn.disabled = true; submitBtn.textContent = '儲存中…';
       try {
-        let photoFileId = schedules[index].photoFileId || null, photoUrl = schedules[index].photoUrl || null;
+        const removeFlag = document.getElementById('edit-sch-photo-remove').value === 'true';
+        let photoFileId = removeFlag ? null : (schedules[index].photoFileId || null);
+        let photoUrl = removeFlag ? null : (schedules[index].photoUrl || null);
+        
         const photoFile = document.getElementById('edit-sch-photo').files[0];
         if (photoFile) { setPhotoStatus('edit-sch-photo', '新照片上傳 Google Drive 中…'); const up = await uploadPhoto(photoFile, 'schedule'); photoFileId = up.fileId || null; photoUrl = up.photoUrl || null; }
+        
         schedules[index] = { ...schedules[index], date: document.getElementById('edit-sch-date').value, day: document.getElementById('edit-sch-day').value.trim(), startTime: document.getElementById('edit-sch-start').value, endTime: document.getElementById('edit-sch-end').value, place: document.getElementById('edit-sch-place').value.trim(), duration: document.getElementById('edit-sch-duration').value.trim(), photoFileId, photoUrl, updatedAt: Date.now() };
         await db.collection('trips').doc(trip.id).update({ schedules });
-        event.target.reset(); document.getElementById('edit-sch-photo-preview').innerHTML = ''; closeModal('edit-sch-modal');
+        event.target.reset(); clearPhotoSelection('edit-sch-photo', 'edit-sch-photo-preview'); closeModal('edit-sch-modal');
       } catch (err) { alert('修改失敗：\n' + err.message); } finally { submitBtn.disabled = false; submitBtn.textContent = '儲存修改'; }
     });
 
@@ -725,7 +764,7 @@
     }
 
     function openAddBuy() {
-      closeAllQuickPanels(); document.getElementById('buy-form').reset(); document.getElementById('buy-photo-preview').innerHTML = ''; document.getElementById('buy-photo-status').textContent = ''; document.getElementById('confirm-buy-photo-btn').dataset.confirmed = 'false'; document.getElementById('add-buy-modal').classList.add('show'); setTimeout(() => document.getElementById('buy-name').focus(), 50);
+      closeAllQuickPanels(); document.getElementById('buy-form').reset(); clearPhotoSelection('buy-photo', 'buy-photo-preview'); document.getElementById('confirm-buy-photo-btn').dataset.confirmed = 'false'; document.getElementById('add-buy-modal').classList.add('show'); setTimeout(() => document.getElementById('buy-name').focus(), 50);
     }
 
     document.getElementById('confirm-buy-photo-btn').addEventListener('click', () => {
@@ -745,7 +784,7 @@
         const newItem = { id: Date.now(), name: document.getElementById('buy-name').value.trim(), category: document.getElementById('buy-category').value.trim(), owner: document.getElementById('buy-owner').value.trim() || user.displayName || user.email || '未指定', qty: Math.max(1, Number(document.getElementById('buy-qty').value)||1), price: Math.max(0, Number(document.getElementById('buy-price').value)||0), bought: false, photoFileId, photoUrl, createdBy: user.uid, createdAt: Date.now() };
         const buyItems = Array.isArray(trip.buyItems) ? [...trip.buyItems] : []; buyItems.push(newItem);
         await db.collection('trips').doc(trip.id).update({ buyItems });
-        event.target.reset(); document.getElementById('buy-photo-preview').innerHTML = ''; document.getElementById('buy-photo-status').textContent = ''; closeModal('add-buy-modal');
+        event.target.reset(); clearPhotoSelection('buy-photo', 'buy-photo-preview'); closeModal('add-buy-modal');
       } catch (err) { alert('新增代購失敗：\n' + err.message); } finally { submitBtn.disabled = false; submitBtn.textContent = '新增代購'; }
     });
 
@@ -755,6 +794,7 @@
       if(listData.includes(val)) select.value = val;
     }
 
+    // =========== 代購清單滑動架構 (Req 1) 與 放大的圖片 (Req 3) ===========
     function renderBuyList() {
       const list = document.getElementById('buy-list'), trip = getCurrentTrip(); if (!list || !trip) return;
       const buyItems = Array.isArray(trip.buyItems) ? trip.buyItems : [];
@@ -771,13 +811,37 @@
         const items = groups[owner], boughtCount = items.filter(i => i.bought).length, boughtAmount = items.filter(i => i.bought).reduce((s, i) => s + (Number(i.price)||0)*(Number(i.qty)||0), 0);
         return `<div class="buy-owner-section"><div class="buy-owner-header"><div><div class="buy-owner-title">👤 ${escapeHtml(owner)}</div><div class="buy-owner-summary">${items.length} 項・已購 ${boughtCount} 項</div></div><div style="font-size:12px; font-weight:800;">¥${formatNumber(boughtAmount)}</div></div><div class="buy-owner-items" id="owner-${idx}">${items.map(item => {
           const t = (Number(item.qty)||0) * (Number(item.price)||0);
-          return `<div class="buy-item-line"><div class="checkbox-custom ${item.bought?'checked':''}" onclick="toggleBuyItem(${Number(item.id)})"></div><div class="buy-item-body">${item.photoFileId ? `<span class="photo-thumb photo-loading" data-drive-photo-id="${item.photoFileId}">📷</span>` : item.photoUrl ? `<img class="photo-thumb" src="${escapeHtml(item.photoUrl)}">` : ''}<div class="buy-item-content"><div class="buy-item-name" style="${item.bought?'text-decoration:line-through; color:#8e8e93;':''}">${escapeHtml(item.name||'')}</div><div class="buy-item-meta">${escapeHtml(item.category\vert{}\vert{}'')}・${item.qty} 件</div><div class="buy-item-price">¥${formatNumber(item.price)} ×${item.qty} ＝ ¥${formatNumber(t)} <span style="color:#86868b; font-weight:500;">約 NT$${formatNumber(Math.round(t*exchangeRate))}</span></div></div></div><div class="buy-actions"><button class="buy-action" onclick="openEditBuyItem(${Number(item.id)})">✏️</button><button class="buy-action" onclick="deleteBuyItem(${Number(item.id)})">🗑</button></div></div>`;
+          return `
+          <div class="swipe-container buy-swipe">
+            <div class="swipe-content buy-item-line">
+              <div class="checkbox-custom ${item.bought?'checked':''}" onclick="toggleBuyItem(${Number(item.id)})"></div>
+              <div class="buy-item-body">
+                ${item.photoFileId ? `<span class="photo-thumb photo-loading" data-drive-photo-id="${item.photoFileId}" style="cursor:pointer;" title="點擊放大照片">📷</span>` : item.photoUrl ? `<img class="photo-thumb" style="cursor:pointer;" src="${escapeHtml(item.photoUrl)}" onclick="event.stopPropagation(); openLightbox('${escapeHtml(item.photoUrl)}')">` : ''}
+                <div class="buy-item-content">
+                  <div class="buy-item-name" style="${item.bought?'text-decoration:line-through; color:#8e8e93;':''}">${escapeHtml(item.name||'')}</div>
+                  <div class="buy-item-meta">${escapeHtml(item.category\vert{}\vert{}'')}・${item.qty} 件</div>
+                  <div class="buy-item-price">¥${formatNumber(item.price)} ×${item.qty} ＝ ¥${formatNumber(t)} <span style="color:#86868b; font-weight:500;">約 NT$${formatNumber(Math.round(t*exchangeRate))}</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="swipe-actions">
+              <button class="buy-action" onclick="openEditBuyItem(${Number(item.id)})">✏️</button>
+              <button class="buy-action" onclick="deleteBuyItem(${Number(item.id)})">🗑</button>
+            </div>
+          </div>`;
         }).join('')}</div></div>`;
       }).join('');
-      hydrateBuyDrivePhotos(list);
+      hydrateDrivePhotos(list);
     }
 
-    async function hydrateBuyDrivePhotos(listEl) {
+    // 開啟放大照片燈箱 (Req 3)
+    function openLightbox(url) {
+      if (!url) return;
+      document.getElementById('lightbox-img').src = url;
+      document.getElementById('lightbox-modal').classList.add('show');
+    }
+
+    async function hydrateDrivePhotos(listEl) {
       const nodes = Array.from(listEl.querySelectorAll('[data-drive-photo-id]')); if (!nodes.length) return;
       try {
         await ensureGoogleDriveToken();
@@ -785,7 +849,10 @@
           const fileId = node.dataset.drivePhotoId; if (!fileId) return;
           try {
             const url = await getDrivePhotoUrl(fileId); if (!url || !node.isConnected) return;
-            const img = document.createElement('img'); img.className = 'photo-thumb'; img.src = url; img.onerror = () => { if (img.isConnected) img.remove(); };
+            const img = document.createElement('img'); img.className = 'photo-thumb'; img.src = url; 
+            img.style.cursor = 'pointer';
+            img.onclick = (e) => { e.stopPropagation(); openLightbox(url); }; // 綁定放大
+            img.onerror = () => { if (img.isConnected) img.remove(); };
             node.replaceWith(img);
           } catch (e) { if(node.isConnected) node.remove(); }
         }));
@@ -811,12 +878,16 @@
       const id = Number(document.getElementById('edit-buy-id').value), buyItems = [...trip.buyItems], idx = buyItems.findIndex(i => Number(i.id) === id); if (idx < 0) return;
       const submitBtn = event.target.querySelector('button[type="submit"]'); submitBtn.disabled = true; submitBtn.textContent = '儲存中…';
       try {
-        let photoFileId = buyItems[idx].photoFileId || null, photoUrl = buyItems[idx].photoUrl || null;
+        const removeFlag = document.getElementById('edit-buy-photo-remove').value === 'true';
+        let photoFileId = removeFlag ? null : (buyItems[idx].photoFileId || null);
+        let photoUrl = removeFlag ? null : (buyItems[idx].photoUrl || null);
+        
         const photoFile = document.getElementById('edit-buy-photo').files[0];
         if (photoFile) { setPhotoStatus('edit-buy-photo', '新照片上傳 Google Drive 中…'); const up = await uploadPhoto(photoFile, 'buy'); photoFileId = up.fileId || null; photoUrl = up.photoUrl || null; }
+        
         buyItems[idx] = { ...buyItems[idx], name: document.getElementById('edit-buy-name').value.trim(), category: document.getElementById('edit-buy-category').value.trim(), owner: document.getElementById('edit-buy-owner').value.trim() || '未指定', qty: Math.max(1, Number(document.getElementById('edit-buy-qty').value)||1), price: Math.max(0, Number(document.getElementById('edit-buy-price').value)||0), photoFileId, photoUrl, updatedAt: Date.now() };
         await db.collection('trips').doc(trip.id).update({ buyItems });
-        event.target.reset(); document.getElementById('edit-buy-photo-preview').innerHTML = ''; closeModal('edit-buy-modal');
+        event.target.reset(); clearPhotoSelection('edit-buy-photo', 'edit-buy-photo-preview'); closeModal('edit-buy-modal');
       } catch (err) { alert('修改失敗：\n' + err.message); } finally { submitBtn.disabled = false; submitBtn.textContent = '儲存修改'; }
     });
 
@@ -826,24 +897,57 @@
       try { await db.collection('trips').doc(trip.id).update({ buyItems: trip.buyItems.filter(i => Number(i.id) !== Number(id)) }); } catch(e) { alert('刪除失敗'); }
     }
 
+    // =========== 照片預覽與移除按鈕生成 (Req 2) ===========
+    function clearPhotoSelection(inputId, previewId) {
+      document.getElementById(inputId).value = '';
+      document.getElementById(previewId).innerHTML = '';
+      setPhotoStatus(inputId, '照片已移除');
+      const removeFlag = document.getElementById(inputId + '-remove');
+      if (removeFlag) removeFlag.value = 'true';
+      if (inputId === 'buy-photo') { const btn = document.getElementById('confirm-buy-photo-btn'); if(btn) btn.dataset.confirmed = 'false'; }
+    }
+
+    function buildPreviewWithClear(imgElement, inputId, previewId) {
+      const wrapper = document.createElement('div');
+      wrapper.style.position = 'relative'; wrapper.style.display = 'inline-block'; wrapper.style.marginTop = '10px';
+      
+      const clearBtn = document.createElement('button');
+      clearBtn.innerHTML = '✕'; clearBtn.style.position = 'absolute'; clearBtn.style.top = '-10px'; clearBtn.style.right = '-10px';
+      clearBtn.style.background = '#ff3b30'; clearBtn.style.color = '#fff'; clearBtn.style.border = 'none'; clearBtn.style.borderRadius = '50%';
+      clearBtn.style.width = '24px'; clearBtn.style.height = '24px'; clearBtn.style.fontSize = '12px'; clearBtn.style.fontWeight = 'bold';
+      clearBtn.style.cursor = 'pointer'; clearBtn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
+      clearBtn.style.display = 'flex'; clearBtn.style.alignItems = 'center'; clearBtn.style.justifyContent = 'center';
+      clearBtn.onclick = (e) => { e.preventDefault(); clearPhotoSelection(inputId, previewId); };
+
+      wrapper.appendChild(imgElement); wrapper.appendChild(clearBtn);
+      return wrapper;
+    }
+
     async function showPhotoPreview(inputId, previewId, existingUrl = '', fileId = '') {
       const input = document.getElementById(inputId), preview = document.getElementById(previewId); if (!input || !preview) return;
       preview.innerHTML = '';
+      const removeFlag = document.getElementById(inputId + '-remove'); if (removeFlag) removeFlag.value = 'false';
+
       if (fileId) {
         preview.innerHTML = '<div style="color:#86868b; font-size:11px;">Google Drive 照片載入中…</div>';
         try {
-          const driveUrl = await getDrivePhotoUrl(fileId);
-          preview.innerHTML = driveUrl ? `<img src="${driveUrl}" alt="Drive照片">` : `<div style="color:#ff3b30; font-size:11px;">照片無法讀取</div>`;
+          const driveUrl = await getDrivePhotoUrl(fileId); preview.innerHTML = '';
+          if (driveUrl) { const img = document.createElement('img'); img.src = driveUrl; preview.appendChild(buildPreviewWithClear(img, inputId, previewId)); } 
+          else preview.innerHTML = `<div style="color:#ff3b30; font-size:11px;">照片無法讀取</div>`;
         } catch(e) { preview.innerHTML = `<div style="color:#ff3b30; font-size:11px;">讀取失敗</div>`; }
-      } else if (existingUrl) preview.innerHTML = `<img src="${existingUrl}" alt="照片">`;
+      } else if (existingUrl) {
+         const img = document.createElement('img'); img.src = existingUrl; preview.appendChild(buildPreviewWithClear(img, inputId, previewId));
+      }
 
       input.onchange = () => {
         const file = input.files[0]; if (!file) return;
-        const localUrl = URL.createObjectURL(file);
-        preview.innerHTML = `<img src="${localUrl}" alt="新照片預覽" onload="URL.revokeObjectURL(this.src)">`;
-        setPhotoStatus(inputId, '已選擇照片');
+        const localUrl = URL.createObjectURL(file); const img = document.createElement('img'); img.src = localUrl;
+        img.onload = () => URL.revokeObjectURL(localUrl);
+        preview.innerHTML = ''; preview.appendChild(buildPreviewWithClear(img, inputId, previewId));
+        setPhotoStatus(inputId, '已選擇照片'); if (removeFlag) removeFlag.value = 'false';
       };
     }
+
     function setPhotoStatus(id, text) { const s = document.getElementById(id+'-status'); if (s) s.textContent = text; }
 
     async function ensureGoogleDriveToken() {
