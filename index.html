@@ -118,7 +118,7 @@
     .form-group.full { grid-column: 1 / -1; }
     .form-label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; color: #6e6e73; }
     .form-input, .form-select, .form-textarea { width: 100%; border: 1px solid #d2d2d7; background: #fff; border-radius: 11px; min-height: 42px; padding: 9px 11px; outline: none; font-size: 14px; color: #1d1d1f; }
-    .form-input:focus, .form-select:focus { border-color: #007aff; box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1); }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #007aff; box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1); }
     .form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
     /* Modal */
     .modal { position: fixed; inset: 0; z-index: 2000; background: rgba(0, 0, 0, 0.42); display: none; align-items: flex-end; justify-content: center; padding: 0; }
@@ -332,19 +332,19 @@
     </div>
   </div>
 
-  <!-- Add Buy Modal -->
+  <!-- Add Buy Modal (價格與數量改選填) -->
   <div id="add-buy-modal" class="modal">
     <div class="modal-card">
       <div class="modal-header"><h2 class="modal-title">新增代購</h2><button class="modal-close" onclick="closeModal('add-buy-modal')">×</button></div>
       <form id="buy-form">
         <div class="form-grid">
           <div class="form-group full"><label class="form-label">商品名稱</label><input id="buy-name" class="form-input" type="text" placeholder="例如：Pokemon Center 限定商品" required></div>
-          <div class="form-group"><label class="form-label">分類</label><input id="buy-category" class="form-input" type="text" placeholder="例如：Pokemon"></div>
-          <div class="form-group"><label class="form-label">代購人</label><input id="buy-owner" class="form-input" type="text" placeholder="例如：Vicson"></div>
-          <div class="form-group"><label class="form-label">數量</label><input id="buy-qty" class="form-input" type="number" min="1" value="1" required></div>
-          <div class="form-group"><label class="form-label">單價（日圓）</label><input id="buy-price" class="form-input" type="number" min="0" value="0" required></div>
+          <div class="form-group"><label class="form-label">分類 (選填)</label><input id="buy-category" class="form-input" type="text" placeholder="例如：Pokemon"></div>
+          <div class="form-group"><label class="form-label">代購人 (選填)</label><input id="buy-owner" class="form-input" type="text" placeholder="例如：Vicson"></div>
+          <div class="form-group"><label class="form-label">預期數量 (選填)</label><input id="buy-qty" class="form-input" type="number" min="1" placeholder="數量未定"></div>
+          <div class="form-group"><label class="form-label">預期單價 / 日圓 (選填)</label><input id="buy-price" class="form-input" type="number" min="0" placeholder="價格未定"></div>
           <div class="form-group full">
-            <label class="form-label">照片</label>
+            <label class="form-label">照片 (選填)</label>
             <input id="buy-photo" class="form-input" type="file" accept="image/*">
             <div id="buy-photo-preview" class="photo-preview"></div>
             <div id="buy-photo-status" class="photo-status"></div>
@@ -356,7 +356,7 @@
     </div>
   </div>
 
-  <!-- Edit Buy Modal -->
+  <!-- Edit Buy Modal (價格與數量改選填) -->
   <div id="edit-buy-modal" class="modal">
     <div class="modal-card">
       <div class="modal-header"><h2 class="modal-title">編輯代購</h2><button class="modal-close" onclick="closeModal('edit-buy-modal')">×</button></div>
@@ -365,13 +365,40 @@
         <input id="edit-buy-photo-remove" type="hidden" value="false">
         <div class="form-grid">
           <div class="form-group full"><label class="form-label">商品名稱</label><input id="edit-buy-name" class="form-input" type="text" required></div>
-          <div class="form-group"><label class="form-label">分類</label><input id="edit-buy-category" class="form-input" type="text"></div>
-          <div class="form-group"><label class="form-label">代購人</label><input id="edit-buy-owner" class="form-input" type="text"></div>
-          <div class="form-group"><label class="form-label">數量</label><input id="edit-buy-qty" class="form-input" type="number" min="1" required></div>
-          <div class="form-group"><label class="form-label">單價（日圓）</label><input id="edit-buy-price" class="form-input" type="number" min="0" required></div>
-          <div class="form-group full"><label class="form-label">更換照片</label><input id="edit-buy-photo" class="form-input" type="file" accept="image/*"><div id="edit-buy-photo-preview" class="photo-preview"></div><div id="edit-buy-photo-status" class="photo-status"></div></div>
+          <div class="form-group"><label class="form-label">分類 (選填)</label><input id="edit-buy-category" class="form-input" type="text"></div>
+          <div class="form-group"><label class="form-label">代購人 (選填)</label><input id="edit-buy-owner" class="form-input" type="text"></div>
+          <div class="form-group"><label class="form-label">預期數量 (選填)</label><input id="edit-buy-qty" class="form-input" type="number" min="1" placeholder="數量未定"></div>
+          <div class="form-group"><label class="form-label">預期單價 / 日圓 (選填)</label><input id="edit-buy-price" class="form-input" type="number" min="0" placeholder="價格未定"></div>
+          <div class="form-group full"><label class="form-label">更換照片 (選填)</label><input id="edit-buy-photo" class="form-input" type="file" accept="image/*"><div id="edit-buy-photo-preview" class="photo-preview"></div><div id="edit-buy-photo-status" class="photo-status"></div></div>
         </div>
         <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('edit-buy-modal')">取消</button><button type="submit" class="btn btn-primary">儲存修改</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Actual Buy Modal (打勾時填寫實際金額) -->
+  <div id="actual-buy-modal" class="modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title">輸入實際購買資訊</h2>
+        <button class="modal-close" onclick="closeModal('actual-buy-modal')">×</button>
+      </div>
+      <form id="actual-buy-form">
+        <input id="actual-buy-id" type="hidden">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">實際購買數量</label>
+            <input id="actual-buy-qty" class="form-input" type="number" min="1" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">實際單價（日圓）</label>
+            <input id="actual-buy-price" class="form-input" type="number" min="0" required>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('actual-buy-modal')">取消</button>
+          <button type="submit" class="btn btn-primary">確認已購買</button>
+        </div>
       </form>
     </div>
   </div>
@@ -892,9 +919,10 @@
         try {
           let photoFileId = null, photoUrl = null;
           if (photoFile) { setPhotoStatus('buy-photo', '照片上傳 Google Drive 中…'); const up = await uploadPhoto(photoFile, 'buy'); photoFileId = up.fileId || null; photoUrl = up.photoUrl || null; }
-          let qtyVal = Number(document.getElementById('buy-qty').value); if (isNaN(qtyVal) || qtyVal < 1) qtyVal = 1;
-          let priceVal = Number(document.getElementById('buy-price').value); if (isNaN(priceVal) || priceVal < 0) priceVal = 0;
-          const newItem = { id: Date.now(), name: document.getElementById('buy-name').value.trim(), category: document.getElementById('buy-category').value.trim(), owner: document.getElementById('buy-owner').value.trim() || user.displayName || user.email || '未指定', qty: qtyVal, price: priceVal, bought: false, photoFileId: photoFileId, photoUrl: photoUrl, createdBy: user.uid, createdAt: Date.now() };
+          let qVal = document.getElementById('buy-qty').value; qVal = (qVal === '') ? '' : Number(qVal);
+          let pVal = document.getElementById('buy-price').value; pVal = (pVal === '') ? '' : Number(pVal);
+          
+          const newItem = { id: Date.now(), name: document.getElementById('buy-name').value.trim(), category: document.getElementById('buy-category').value.trim(), owner: document.getElementById('buy-owner').value.trim() || user.displayName || user.email || '未指定', qty: qVal, price: pVal, bought: false, actualQty: null, actualPrice: null, photoFileId: photoFileId, photoUrl: photoUrl, createdBy: user.uid, createdAt: Date.now() };
           const buyItems = Array.isArray(trip.buyItems) ? trip.buyItems.slice() : []; buyItems.push(newItem);
           await db.collection('trips').doc(trip.id).update({ buyItems: buyItems });
           event.target.reset(); clearPhotoSelection('buy-photo', 'buy-photo-preview'); closeModal('add-buy-modal');
@@ -923,7 +951,7 @@
       const ownersSet = {}; const catsSet = {};
       for(let i=0; i<buyItems.length; i++) {
         ownersSet[buyItems[i].owner || '未指定'] = true;
-        catsSet[buyItems[i].category || '未分類'] = true;
+        if(buyItems[i].category) catsSet[buyItems[i].category] = true;
       }
       const ownersArr = Object.keys(ownersSet).sort();
       const catsArr = Object.keys(catsSet).sort();
@@ -962,38 +990,59 @@
         const owner = groupKeys[k];
         const items = groups[owner];
         let boughtCount = 0; let boughtAmount = 0;
+        
+        let itemsHtml = '';
         for(let j=0; j<items.length; j++) {
-          if (items[j].bought) {
+          const item = items[j];
+          let metaText = escapeHtml(item.category || '未分類');
+          let priceHtml = '';
+          let t = 0;
+
+          if (item.bought) {
+            let aQty = (item.actualQty !== undefined && item.actualQty !== null && item.actualQty !== '') ? Number(item.actualQty) : Number(item.qty || 1);
+            let aPrice = (item.actualPrice !== undefined && item.actualPrice !== null && item.actualPrice !== '') ? Number(item.actualPrice) : Number(item.price || 0);
+            t = aQty * aPrice;
+            metaText += '・' + aQty + ' 件 (實際)';
+            priceHtml = '¥' + formatNumber(aPrice) + ' × ' + aQty + ' ＝ ¥' + formatNumber(t) + ' <span style="color:#34c759; font-weight:700;">(實際)</span> <span style="color:#86868b; font-weight:500;">約 NT$' + formatNumber(Math.round(t*exchangeRate)) + '</span>';
             boughtCount++;
-            boughtAmount += (Number(items[j].price)||0) * (Number(items[j].qty)||0);
+            boughtAmount += t;
+          } else {
+            let eQty = (item.qty !== '' && item.qty != null) ? Number(item.qty) : null;
+            let ePrice = (item.price !== '' && item.price != null) ? Number(item.price) : null;
+
+            metaText += '・' + (eQty !== null ? eQty + ' 件 (預期)' : '數量未定');
+            if (ePrice !== null) {
+              let q = eQty !== null ? eQty : 1;
+              t = ePrice * q;
+              priceHtml = '¥' + formatNumber(ePrice) + ' × ' + q + ' ＝ ¥' + formatNumber(t) + ' <span style="color:#86868b; font-weight:500;">(預期) 約 NT$' + formatNumber(Math.round(t*exchangeRate)) + '</span>';
+            } else {
+              priceHtml = '<span style="color:#86868b;">金額未定</span>';
+            }
           }
+
+          itemsHtml += '<div class="swipe-container buy-swipe"><div class="swipe-content buy-item-line">';
+          itemsHtml += '<div class="checkbox-custom ' + (item.bought ? 'checked' : '') + '" onclick="toggleBuyItem(' + Number(item.id) + ')"></div>';
+          itemsHtml += '<div class="buy-item-body">';
+          
+          if (item.photoFileId) {
+            itemsHtml += '<span class="photo-thumb photo-loading" data-drive-photo-id="' + item.photoFileId + '" style="cursor:pointer;" title="點擊放大照片">📷</span>';
+          } else if (item.photoUrl) {
+            itemsHtml += '<img class="photo-thumb" style="cursor:pointer;" src="' + escapeHtml(item.photoUrl) + '" onclick="event.stopPropagation(); openLightbox(\'' + escapeHtml(item.photoUrl) + '\')">';
+          }
+          
+          itemsHtml += '<div class="buy-item-content"><div class="buy-item-name" style="' + (item.bought ? 'text-decoration:line-through; color:#8e8e93;' : '') + '">' + escapeHtml(item.name||'') + '</div>';
+          itemsHtml += '<div class="buy-item-meta">' + metaText + '</div>';
+          itemsHtml += '<div class="buy-item-price">' + priceHtml + '</div>';
+          itemsHtml += '</div></div></div>';
+          
+          itemsHtml += '<div class="swipe-actions">';
+          itemsHtml += '<button class="buy-action" onclick="openEditBuyItem(' + Number(item.id) + ')">✏️</button>';
+          itemsHtml += '<button class="buy-action" onclick="deleteBuyItem(' + Number(item.id) + ')">🗑</button>';
+          itemsHtml += '</div></div>';
         }
         
         html += '<div class="buy-owner-section"><div class="buy-owner-header"><div><div class="buy-owner-title">👤 ' + escapeHtml(owner) + '</div><div class="buy-owner-summary">' + items.length + ' 項・已購 ' + boughtCount + ' 項</div></div><div style="font-size:12px; font-weight:800;">¥' + formatNumber(boughtAmount) + '</div></div><div class="buy-owner-items" id="owner-' + k + '">';
-        
-        for(let j=0; j<items.length; j++) {
-          const item = items[j];
-          const t = (Number(item.qty)||0) * (Number(item.price)||0);
-          html += '<div class="swipe-container buy-swipe"><div class="swipe-content buy-item-line">';
-          html += '<div class="checkbox-custom ' + (item.bought ? 'checked' : '') + '" onclick="toggleBuyItem(' + Number(item.id) + ')"></div>';
-          html += '<div class="buy-item-body">';
-          
-          if (item.photoFileId) {
-            html += '<span class="photo-thumb photo-loading" data-drive-photo-id="' + item.photoFileId + '" style="cursor:pointer;" title="點擊放大照片">📷</span>';
-          } else if (item.photoUrl) {
-            html += '<img class="photo-thumb" style="cursor:pointer;" src="' + escapeHtml(item.photoUrl) + '" onclick="event.stopPropagation(); openLightbox(\'' + escapeHtml(item.photoUrl) + '\')">';
-          }
-          
-          html += '<div class="buy-item-content"><div class="buy-item-name" style="' + (item.bought ? 'text-decoration:line-through; color:#8e8e93;' : '') + '">' + escapeHtml(item.name||'') + '</div>';
-          html += '<div class="buy-item-meta">' + escapeHtml(item.category||'') + '・' + item.qty + ' 件</div>';
-          html += '<div class="buy-item-price">¥' + formatNumber(item.price) + ' × ' + item.qty + ' ＝ ¥' + formatNumber(t) + ' <span style="color:#86868b; font-weight:500;">約 NT$' + formatNumber(Math.round(t*exchangeRate)) + '</span></div>';
-          html += '</div></div></div>';
-          
-          html += '<div class="swipe-actions">';
-          html += '<button class="buy-action" onclick="openEditBuyItem(' + Number(item.id) + ')">✏️</button>';
-          html += '<button class="buy-action" onclick="deleteBuyItem(' + Number(item.id) + ')">🗑</button>';
-          html += '</div></div>';
-        }
+        html += itemsHtml;
         html += '</div></div>';
       }
       list.innerHTML = html;
@@ -1028,14 +1077,52 @@
       } catch (err) { for(let i=0; i<nodes.length; i++) { if(nodes[i].isConnected) nodes[i].parentNode.removeChild(nodes[i]); } }
     }
 
-    async function toggleBuyItem(id) {
+    function toggleBuyItem(id) {
       const trip = getCurrentTrip(); if (!trip) return; 
       const buyItems = trip.buyItems.slice(); 
       let idx = -1;
       for(let i=0; i<buyItems.length; i++) { if (Number(buyItems[i].id) === Number(id)) { idx = i; break; } }
       if (idx < 0) return;
-      buyItems[idx] = Object.assign({}, buyItems[idx], { bought: !buyItems[idx].bought, updatedAt: Date.now() });
-      try { await db.collection('trips').doc(trip.id).update({ buyItems: buyItems }); } catch (err) { alert('更新失敗'); }
+
+      const item = buyItems[idx];
+      if (item.bought) {
+        // 如果已經購買，點擊則取消購買 (把實際金額清空)
+        buyItems[idx] = Object.assign({}, item, { bought: false, actualQty: null, actualPrice: null, updatedAt: Date.now() });
+        db.collection('trips').doc(trip.id).update({ buyItems: buyItems }).catch(function(err) { alert('更新失敗'); });
+      } else {
+        // 如果尚未購買，點擊則跳出輸入實際金額的視窗
+        document.getElementById('actual-buy-id').value = item.id;
+        document.getElementById('actual-buy-qty').value = (item.qty !== '' && item.qty != null) ? item.qty : 1;
+        document.getElementById('actual-buy-price').value = (item.price !== '' && item.price != null) ? item.price : 0;
+        document.getElementById('actual-buy-modal').classList.add('show');
+        setTimeout(function(){ document.getElementById('actual-buy-price').focus(); }, 50);
+      }
+    }
+
+    // 處理實際購買金額送出
+    const actualBuyForm = document.getElementById('actual-buy-form');
+    if (actualBuyForm) {
+      actualBuyForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const trip = getCurrentTrip(); if (!trip) return;
+        const id = Number(document.getElementById('actual-buy-id').value);
+        const actualQty = Number(document.getElementById('actual-buy-qty').value);
+        const actualPrice = Number(document.getElementById('actual-buy-price').value);
+
+        const buyItems = trip.buyItems.slice();
+        let idx = -1;
+        for(let i=0; i<buyItems.length; i++) { if (Number(buyItems[i].id) === id) { idx = i; break; } }
+        if (idx < 0) return;
+
+        buyItems[idx] = Object.assign({}, buyItems[idx], { bought: true, actualQty: actualQty, actualPrice: actualPrice, updatedAt: Date.now() });
+        const submitBtn = event.target.querySelector('button[type="submit"]'); submitBtn.disabled = true; submitBtn.textContent = '儲存中…';
+        try {
+          await db.collection('trips').doc(trip.id).update({ buyItems: buyItems });
+          closeModal('actual-buy-modal');
+        } catch (err) { alert('確認失敗：\n' + err.message); } finally {
+          submitBtn.disabled = false; submitBtn.textContent = '確認已購買';
+        }
+      });
     }
 
     async function openEditBuyItem(id) {
@@ -1047,8 +1134,8 @@
       document.getElementById('edit-buy-name').value = item.name || '';
       document.getElementById('edit-buy-category').value = item.category || '';
       document.getElementById('edit-buy-owner').value = item.owner || '';
-      document.getElementById('edit-buy-qty').value = item.qty || 1;
-      document.getElementById('edit-buy-price').value = item.price || 0;
+      document.getElementById('edit-buy-qty').value = (item.qty !== undefined && item.qty !== null && item.qty !== '') ? item.qty : '';
+      document.getElementById('edit-buy-price').value = (item.price !== undefined && item.price !== null && item.price !== '') ? item.price : '';
       document.getElementById('edit-buy-photo').value = '';
       document.getElementById('edit-buy-modal').classList.add('show');
       await showPhotoPreview('edit-buy-photo', 'edit-buy-photo-preview', item.photoUrl || '', item.photoFileId || '');
@@ -1072,10 +1159,10 @@
           const photoFile = document.getElementById('edit-buy-photo').files[0];
           if (photoFile) { setPhotoStatus('edit-buy-photo', '新照片上傳 Google Drive 中…'); const up = await uploadPhoto(photoFile, 'buy'); photoFileId = up.fileId || null; photoUrl = up.photoUrl || null; }
           
-          let qtyVal = Number(document.getElementById('edit-buy-qty').value); if (isNaN(qtyVal) || qtyVal < 1) qtyVal = 1;
-          let priceVal = Number(document.getElementById('edit-buy-price').value); if (isNaN(priceVal) || priceVal < 0) priceVal = 0;
+          let qVal = document.getElementById('edit-buy-qty').value; qVal = (qVal === '') ? '' : Number(qVal);
+          let pVal = document.getElementById('edit-buy-price').value; pVal = (pVal === '') ? '' : Number(pVal);
           
-          buyItems[idx] = Object.assign({}, buyItems[idx], { name: document.getElementById('edit-buy-name').value.trim(), category: document.getElementById('edit-buy-category').value.trim(), owner: document.getElementById('edit-buy-owner').value.trim() || '未指定', qty: qtyVal, price: priceVal, photoFileId: photoFileId, photoUrl: photoUrl, updatedAt: Date.now() });
+          buyItems[idx] = Object.assign({}, buyItems[idx], { name: document.getElementById('edit-buy-name').value.trim(), category: document.getElementById('edit-buy-category').value.trim(), owner: document.getElementById('edit-buy-owner').value.trim() || '未指定', qty: qVal, price: pVal, photoFileId: photoFileId, photoUrl: photoUrl, updatedAt: Date.now() });
           await db.collection('trips').doc(trip.id).update({ buyItems: buyItems });
           event.target.reset(); clearPhotoSelection('edit-buy-photo', 'edit-buy-photo-preview'); closeModal('edit-buy-modal');
         } catch (err) { alert('修改失敗：\n' + err.message); } finally { submitBtn.disabled = false; submitBtn.textContent = '儲存修改'; }
