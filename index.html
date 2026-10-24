@@ -194,6 +194,21 @@
     .schedule-swipe:before{content:"";position:absolute;left:-16px;top:20px;width:11px;height:11px;border:2px solid var(--ink);background:var(--pink);border-radius:50%;z-index:2}
     .schedule-card{border-radius:14px;background:white;padding:17px;grid-template-columns:76px minmax(0,1fr)}.schedule-time{color:var(--ink);font-size:12px;background:#E8F6FB;padding:5px 6px;border-radius:8px;text-align:center;border:1.5px solid var(--ink)}
     .schedule-place{font-size:16px}.schedule-action,.buy-action{border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink)}
+    .schedule-swipe{--type-bg:#f4f1ec;--type-accent:#77706b}
+    .schedule-swipe.type-transport{--type-bg:#e4f4fb;--type-accent:#3788ad}
+    .schedule-swipe.type-activity{--type-bg:#fde8e4;--type-accent:#cf6d61}
+    .schedule-swipe.type-hotel{--type-bg:#eee8fb;--type-accent:#8067b0}
+    .schedule-swipe.type-food{--type-bg:#fff1c7;--type-accent:#b57a12}
+    .schedule-swipe.type-shopping{--type-bg:#e8f4df;--type-accent:#608e43}
+    .schedule-swipe .schedule-card{background:linear-gradient(90deg,var(--type-bg) 0 8px,#fff 8px);border-left:0}
+    .schedule-swipe .schedule-time{background:var(--type-bg);border-color:var(--type-accent);color:var(--ink)}
+    .schedule-type-pill{display:inline-flex;align-items:center;gap:4px;margin-bottom:6px;padding:3px 8px;border:1.5px solid var(--type-accent);border-radius:999px;background:var(--type-bg);color:var(--ink);font-size:11px;font-weight:800}
+    .schedule-detail-grid{display:grid;gap:5px;margin-top:8px}
+    .schedule-detail{display:grid;grid-template-columns:74px minmax(0,1fr);gap:7px;align-items:start;font-size:12px;line-height:1.5}
+    .schedule-detail-label{color:#696260;font-weight:800}
+    .schedule-detail-value{min-width:0;word-break:break-word}
+    .schedule-note{margin-top:8px;padding:8px 9px;border:1.5px dashed var(--type-accent);border-radius:10px;background:var(--type-bg);font-size:12px;line-height:1.5;word-break:break-word}
+    .schedule-note strong{display:block;margin-bottom:2px;font-size:11px;color:#696260}
     .buy-owner-section{margin-bottom:22px}.buy-owner-header{border-radius:20px 20px 0 0;background:var(--green);box-shadow:none;border-bottom:0}.buy-owner-items{border-radius:0 0 20px 20px;box-shadow:3px 4px 0 var(--ink)}
     .buy-swipe{background:var(--yellow);border-bottom:2px dashed #CCC1B9}.buy-item-line{background:#fff}.checkbox-custom{border-color:var(--ink);border-width:2px}.checkbox-custom.checked{background:var(--green);border-color:var(--ink)}.checkbox-custom.checked:after{color:var(--ink)}
     .bottom-nav{background:var(--paper);border-top:3px solid var(--ink);backdrop-filter:none;-webkit-backdrop-filter:none}.nav-btn{border:2px solid transparent;border-radius:14px;font-size:12px;color:#706862}.nav-btn.active{background:var(--yellow);border-color:var(--ink);color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
@@ -228,6 +243,7 @@
       .schedule-time{font-size:11px}
       .schedule-place{font-size:15px}
       .schedule-meta{font-size:12px;line-height:1.45}
+      .schedule-detail{grid-template-columns:68px minmax(0,1fr);font-size:12px}
       .item-actions{display:flex;flex-direction:column;gap:7px;align-self:center}
       .schedule-action,.buy-action{width:40px;height:40px;font-size:16px;box-shadow:none}
       .buy-item-line{grid-template-columns:24px minmax(0,1fr) 42px;padding:12px 10px;gap:8px}
@@ -965,12 +981,27 @@ Nintendo KYOTO
         for(let j=0; j<items.length; j++) {
           const item = items[j];
           const timeStr = item.endTime ? ((item.startTime||'--:--') + ' ～ ' + item.endTime) : (item.startTime||'--:--');
-          html += '<div class="schedule-swipe"><div class="schedule-card">';
+          const scheduleType = inferScheduleType(item);
+          const hasStructuredDetails = !!(item.transportMode || item.travelTime || item.stayTime || item.route || item.address || item.notes);
+          const shownTravelTime = item.travelTime || (hasStructuredDetails && scheduleType === 'transport' ? item.duration : '');
+          const shownStayTime = item.stayTime || (hasStructuredDetails && scheduleType !== 'transport' ? item.duration : '');
+          html += '<div class="schedule-swipe type-' + scheduleType + '"><div class="schedule-card">';
           html += '<div class="schedule-time">' + escapeHtml(timeStr) + '</div>';
-          html += '<div style="min-width:0;"><div class="schedule-place">' + getScheduleTypeIcon(item.itemType) + (item.itemType ? ' ' : '') + escapeHtml(item.place||'未命名') + '</div>';
+          html += '<div style="min-width:0;"><div class="schedule-type-pill">' + getScheduleTypeIcon(scheduleType) + ' ' + getScheduleTypeLabel(scheduleType) + '</div><div class="schedule-place">' + escapeHtml(item.place||'未命名') + '</div>';
           
           let metaHtml = '';
-          if (item.duration) metaHtml += '⏱ ' + escapeHtml(item.duration) + ' ';
+          if (hasStructuredDetails) {
+            metaHtml += '<div class="schedule-detail-grid">';
+            metaHtml += scheduleDetailRow('交通方式', item.transportMode);
+            metaHtml += scheduleDetailRow('交通時間', shownTravelTime);
+            metaHtml += scheduleDetailRow('停留時間', shownStayTime);
+            metaHtml += scheduleDetailRow('路線／車次', item.route);
+            metaHtml += scheduleDetailRow('地點', item.address);
+            metaHtml += '</div>';
+            if (item.notes) metaHtml += '<div class="schedule-note"><strong>📝 備註</strong>' + escapeHtml(item.notes) + '</div>';
+          } else if (item.duration) {
+            metaHtml += '<div class="schedule-note"><strong>📝 備註／預估時間</strong>' + escapeHtml(item.duration) + '</div>';
+          }
           if (item.photoFileId) {
             metaHtml += '<span class="sch-cam-icon" data-file-id="' + item.photoFileId + '" style="cursor:pointer;" title="點擊放大照片"> 📷</span>';
           } else if (item.photoUrl) {
@@ -1035,6 +1066,25 @@ Nintendo KYOTO
       return ({ transport: '🚆', food: '🍜', hotel: '🏨', shopping: '🛍', activity: '📍' })[value] || '';
     }
 
+    function getScheduleTypeLabel(value) {
+      return ({ transport: '交通', food: '餐廳', hotel: '住宿', shopping: '採買', activity: '景點' })[value] || '其他';
+    }
+
+    function inferScheduleType(item) {
+      if (['transport', 'food', 'hotel', 'shopping', 'activity'].includes(item.itemType)) return item.itemType;
+      const text = [item.place, item.duration, item.notes].filter(Boolean).join(' ');
+      if (/→|-->|機場|車站|JR|地鐵|電車|巴士|交通|前往/.test(text)) return 'transport';
+      if (/飯店|旅館|住宿|Hotel|Inn/.test(text)) return 'hotel';
+      if (/早餐|午餐|晚餐|餐廳|拉麵|燒肉|咖啡|用餐/.test(text)) return 'food';
+      if (/購物|採買|百貨|商店|商城|Pokemon Center|Pokémon Center/.test(text)) return 'shopping';
+      return 'activity';
+    }
+
+    function scheduleDetailRow(label, value) {
+      if (!value) return '';
+      return '<div class="schedule-detail"><div class="schedule-detail-label">' + escapeHtml(label) + '</div><div class="schedule-detail-value">' + escapeHtml(value) + '</div></div>';
+    }
+
     function parseImportedScheduleText(text) {
       const lines = String(text || '').replace(/\r/g, '').split('\n');
       const drafts = [], errors = [];
@@ -1064,8 +1114,12 @@ Nintendo KYOTO
         current.icon = typeInfo.icon;
         current.day = getDayLabel(current.date);
         current.place = current.title;
-        current.duration = detailParts.join('・');
+        current.duration = duration;
         current.transportMode = mode;
+        current.travelTime = typeInfo.value === 'transport' ? duration : '';
+        current.stayTime = typeInfo.value !== 'transport' ? duration : '';
+        current.route = route;
+        current.address = address;
         current.notes = note;
         current.selected = current.warnings.length === 0;
         drafts.push(current);
@@ -1208,7 +1262,7 @@ Nintendo KYOTO
       try {
         const now = Date.now();
         const additions = selected.map(function(item, index) {
-          return { id: now + index, date: item.date, day: item.day, startTime: item.startTime, endTime: item.endTime, place: item.place, duration: item.duration, itemType: item.itemType, transportMode: item.transportMode, notes: item.notes, importedFrom: 'text-v1', createdBy: user.uid, createdAt: now + index };
+          return { id: now + index, date: item.date, day: item.day, startTime: item.startTime, endTime: item.endTime, place: item.place, duration: item.duration, itemType: item.itemType, transportMode: item.transportMode, travelTime: item.travelTime, stayTime: item.stayTime, route: item.route, address: item.address, notes: item.notes, importedFrom: 'text-v1', createdBy: user.uid, createdAt: now + index };
         });
         const schedules = (Array.isArray(trip.schedules) ? trip.schedules.slice() : []).concat(additions);
         await db.collection('trips').doc(trip.id).update({ schedules: schedules });
@@ -1264,7 +1318,10 @@ Nintendo KYOTO
           const photoFile = document.getElementById('edit-sch-photo').files[0];
           if (photoFile) { setPhotoStatus('edit-sch-photo', '新照片上傳 Google Drive 中…'); const up = await uploadPhoto(photoFile, 'schedule'); photoFileId = up.fileId || null; photoUrl = up.photoUrl || null; }
           
-          schedules[index] = Object.assign({}, schedules[index], { date: document.getElementById('edit-sch-date').value, day: document.getElementById('edit-sch-day').value.trim(), startTime: document.getElementById('edit-sch-start').value, endTime: document.getElementById('edit-sch-end').value, place: document.getElementById('edit-sch-place').value.trim(), duration: document.getElementById('edit-sch-duration').value.trim(), photoFileId: photoFileId, photoUrl: photoUrl, updatedAt: Date.now() });
+          const editedDuration = document.getElementById('edit-sch-duration').value.trim();
+          const editedType = inferScheduleType(schedules[index]);
+          const structuredDuration = schedules[index].travelTime || schedules[index].stayTime;
+          schedules[index] = Object.assign({}, schedules[index], { date: document.getElementById('edit-sch-date').value, day: document.getElementById('edit-sch-day').value.trim(), startTime: document.getElementById('edit-sch-start').value, endTime: document.getElementById('edit-sch-end').value, place: document.getElementById('edit-sch-place').value.trim(), duration: editedDuration, travelTime: structuredDuration && editedType === 'transport' ? editedDuration : (schedules[index].travelTime || ''), stayTime: structuredDuration && editedType !== 'transport' ? editedDuration : (schedules[index].stayTime || ''), photoFileId: photoFileId, photoUrl: photoUrl, updatedAt: Date.now() });
           await db.collection('trips').doc(trip.id).update({ schedules: schedules });
           event.target.reset(); clearPhotoSelection('edit-sch-photo', 'edit-sch-photo-preview'); closeModal('edit-sch-modal');
         } catch (err) { alert('修改失敗：\n' + err.message); } finally { submitBtn.disabled = false; submitBtn.textContent = '儲存修改'; }
