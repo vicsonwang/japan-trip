@@ -54,6 +54,11 @@
     .trip-card { background: #fff; border-radius: 20px; padding: 22px; border: 1px solid rgba(0, 0, 0, 0.05); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04); transition: 0.2s; cursor: pointer; }
     .trip-card:hover { transform: translateY(-2px); box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08); }
     .trip-card-header { display: flex; justify-content: space-between; gap: 12px; }
+    .trip-card.past { filter: grayscale(.75); opacity: .62; background: #ece9e5 !important; box-shadow: 2px 3px 0 #8a8580; }
+    .trip-card.past:hover { opacity: .82; }
+    .trip-card-actions { display: flex; align-items: flex-start; gap: 7px; }
+    .trip-ended-badge { display: inline-block; margin-top: 9px; padding: 3px 8px; border: 1.5px solid #77706b; border-radius: 999px; background: #dedbd7; font-size: 11px; font-weight: 800; }
+    .trip-delete-btn { width: 36px; height: 36px; border: 2px solid var(--ink); border-radius: 10px; background: #ffdcd6; font-size: 15px; cursor: pointer; }
     .trip-name { font-size: 19px; font-weight: 800; line-height: 1.35; }
     .trip-date { color: #86868b; font-size: 13px; margin-top: 8px; }
     .trip-owner { margin-top: 18px; font-size: 12px; color: #86868b; }
@@ -763,12 +768,25 @@
       const savedTripId = localStorage.getItem('currentTripId');
       tripsUnsubscribe = db.collection('trips').where('memberUids', 'array-contains', user.uid).onSnapshot(function(snapshot) {
         trips = snapshot.docs.map(function(doc) { return Object.assign({ id: doc.id }, doc.data()); });
+        trips.forEach(function(trip) {
+          ensureTripInviteDocument(trip, user).catch(function(error) { console.warn('Invite migration failed:', error); });
+        });
         renderTripsList();
         if (currentTripId && !trips.some(function(t) { return t.id === currentTripId; })) {
           currentTripId = null; localStorage.removeItem('currentTripId'); showTripsView(); return;
         }
         if (!currentTripId && savedTripId && trips.some(function(t) { return t.id === savedTripId; })) openTripDetail(savedTripId);
       }, function(err) { console.error('Trip Sync Error:', err); });
+    }
+
+    async function ensureTripInviteDocument(trip, user) {
+      const code = String((trip && (trip.inviteCode || trip.code)) || '').trim().toUpperCase();
+      if (!trip || !user || trip.ownerUid !== user.uid || !code) return;
+      const inviteRef = db.collection('tripInvites').doc(code);
+      const inviteDoc = await inviteRef.get();
+      if (!inviteDoc.exists) {
+        await inviteRef.set({ tripId: trip.id, createdBy: user.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      }
     }
 
     function stopRateSync() { if (rateUnsubscribe) rateUnsubscribe(); rateUnsubscribe = null; }
@@ -829,11 +847,22 @@
         list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🗾</div><div style="font-weight:800; color:#1d1d1f; margin-bottom:6px;">還沒有旅程</div><div style="margin-bottom:18px;">建立你的第一個日本旅行吧！</div><button class="btn btn-primary" onclick="openCreateTrip()">＋ 建立旅程</button></div>';
         return;
       }
+      const today = new Date().toISOString().slice(0, 10);
+      const orderedTrips = trips.slice().sort(function(a, b) {
+        const aPast = !!a.endDate && a.endDate < today;
+        const bPast = !!b.endDate && b.endDate < today;
+        if (aPast !== bPast) return aPast ? 1 : -1;
+        if (aPast) return String(b.endDate || '').localeCompare(String(a.endDate || ''));
+        return String(a.startDate || '9999-12-31').localeCompare(String(b.startDate || '9999-12-31'));
+      });
+      const currentUid = auth.currentUser ? auth.currentUser.uid : '';
       let html = '<div class="trip-grid">';
-      for(let i=0; i<trips.length; i++) {
-        const trip = trips[i];
-        html += '<div class="trip-card" onclick="openTripDetail(\'' + escapeHtml(trip.id) + '\')">';
-        html += '<div class="trip-card-header"><div style="min-width:0;"><div class="trip-name">' + escapeHtml(trip.name || '未命名') + '</div><div class="trip-date">' + escapeHtml(formatDate(trip.startDate)) + ' ～ ' + escapeHtml(formatDate(trip.endDate)) + '</div></div><div style="font-size:22px;">🇯🇵</div></div>';
+      for(let i=0; i<orderedTrips.length; i++) {
+        const trip = orderedTrips[i];
+        const isPast = !!trip.endDate && trip.endDate < today;
+        const isOwner = !!currentUid && trip.ownerUid === currentUid;
+        html += '<div class="trip-card' + (isPast ? ' past' : '') + '" onclick="openTripDetail(\'' + escapeHtml(trip.id) + '\')">';
+        html += '<div class="trip-card-header"><div style="min-width:0;"><div class="trip-name">' + escapeHtml(trip.name || '未命名') + '</div><div class="trip-date">' + escapeHtml(formatDate(trip.startDate)) + ' ～ ' + escapeHtml(formatDate(trip.endDate)) + '</div>' + (isPast ? '<span class="trip-ended-badge">已結束・保留紀錄</span>' : '') + '</div><div class="trip-card-actions"><div style="font-size:22px;">🇯🇵</div>' + (isOwner ? '<button type="button" class="trip-delete-btn" aria-label="刪除整趟旅程" title="刪除整趟旅程" onclick="event.stopPropagation(); deleteTrip(\'' + escapeHtml(trip.id) + '\')">🗑</button>' : '') + '</div></div>';
         html += '<div class="trip-owner">建立者：' + escapeHtml(trip.ownerName || '未知') + '</div>';
         if (trip.inviteCode || trip.code) {
           html += '<div class="trip-code">邀請碼：' + escapeHtml(trip.inviteCode || trip.code) + '</div>';
@@ -842,6 +871,31 @@
       }
       html += '</div>';
       list.innerHTML = html;
+    }
+
+    async function deleteTrip(id) {
+      const user = auth.currentUser;
+      const trip = trips.find(function(item) { return item.id === id; });
+      if (!user || !trip) return;
+      if (trip.ownerUid !== user.uid) return alert('只有這趟旅程的建立者可以刪除');
+      if (!confirm('確定要刪除整趟「' + (trip.name || '未命名旅程') + '」嗎？\n\n行程與代購資料都會一起刪除，而且無法復原。')) return;
+      try {
+        const code = String(trip.inviteCode || trip.code || '').trim().toUpperCase();
+        const batch = db.batch();
+        batch.delete(db.collection('trips').doc(id));
+        if (code) {
+          const inviteRef = db.collection('tripInvites').doc(code);
+          const inviteDoc = await inviteRef.get();
+          if (inviteDoc.exists) batch.delete(inviteRef);
+        }
+        await batch.commit();
+        trips = trips.filter(function(item) { return item.id !== id; });
+        if (currentTripId === id) { currentTripId = null; localStorage.removeItem('currentTripId'); }
+        renderTripsList();
+        alert('旅程已刪除');
+      } catch (error) {
+        alert('刪除旅程失敗：\n' + (error.message || error));
+      }
     }
 
     function openCreateTrip() {
@@ -865,11 +919,15 @@
         if (startDate && endDate && startDate > endDate) return alert('結束日期不能早於開始日期');
         const inviteCode = Math.random().toString(36).slice(2, 8).toUpperCase();
         try {
-          const tripRef = await db.collection('trips').add({
+          const tripRef = db.collection('trips').doc();
+          const batch = db.batch();
+          batch.set(tripRef, {
             name: name, startDate: startDate, endDate: endDate, inviteCode: inviteCode, code: inviteCode, schedules: [], buyItems: [],
             ownerUid: user.uid, ownerName: user.displayName || user.email || '', memberUids: [user.uid],
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
+          batch.set(db.collection('tripInvites').doc(inviteCode), { tripId: tripRef.id, createdBy: user.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+          await batch.commit();
           closeModal('create-trip-modal');
           currentTripId = tripRef.id; localStorage.setItem('currentTripId', tripRef.id);
           let found = false;
@@ -898,18 +956,13 @@
         const submitBtn = event.target.querySelector('button[type="submit"]');
         submitBtn.disabled = true; submitBtn.textContent = '尋找並加入中…';
         try {
-          const snapshot = await db.collection('trips').where('inviteCode', '==', code).get();
-          if (snapshot.empty) {
-            alert('找不到此邀請碼對應的旅程！請確認邀請碼是否正確。');
+          const inviteDoc = await db.collection('tripInvites').doc(code).get();
+          if (!inviteDoc.exists || !inviteDoc.data().tripId) {
+            alert('找不到此邀請碼。請確認邀請碼是否正確，或請建立者先開啟一次最新版網頁。');
             submitBtn.disabled = false; submitBtn.textContent = '確認加入'; return;
           }
-          const tripDoc = snapshot.docs[0];
-          const tripData = tripDoc.data();
-          if (tripData.memberUids && tripData.memberUids.includes(user.uid)) {
-            alert('你已經在這個旅程中了！'); closeModal('join-trip-modal'); return;
-          }
-          await db.collection('trips').doc(tripDoc.id).update({ memberUids: firebase.firestore.FieldValue.arrayUnion(user.uid) });
-          alert('成功加入「' + tripData.name + '」！');
+          await db.collection('trips').doc(inviteDoc.data().tripId).update({ memberUids: firebase.firestore.FieldValue.arrayUnion(user.uid) });
+          alert('成功加入旅程！行程資料正在同步。');
           closeModal('join-trip-modal');
         } catch (err) {
           alert('加入旅程失敗：\n' + (err.message || err));
