@@ -190,9 +190,9 @@
     .form-label,.filter-label{color:var(--ink)}.modal{background:rgba(62,58,57,.45)}.modal-card{box-shadow:none;border-bottom:0;max-height:90dvh}.modal-close{background:var(--yellow)}
     .day-badge{background:var(--yellow);color:var(--ink);border:2px solid var(--ink);border-radius:12px;min-width:70px}.day-header{margin-bottom:13px}.day-date{font-size:16px}.day-toggle{color:var(--ink);font-weight:700;text-decoration:underline}
     .schedule-list{position:relative;padding-left:15px;gap:15px}.schedule-list:before{content:"";position:absolute;top:20px;bottom:20px;left:4px;border-left:3px dashed var(--ink)}
-    .schedule-swipe{position:relative;border:2.5px solid var(--ink);border-radius:17px;background:var(--yellow);overflow-x:auto;box-shadow:3px 4px 0 var(--ink)}
+    .schedule-swipe{position:relative;border:2.5px solid var(--ink);border-radius:17px;background:var(--yellow);overflow:hidden;box-shadow:3px 4px 0 var(--ink)}
     .schedule-swipe:before{content:"";position:absolute;left:-16px;top:20px;width:11px;height:11px;border:2px solid var(--ink);background:var(--pink);border-radius:50%;z-index:2}
-    .schedule-card{border-radius:14px;background:white;padding:17px;grid-template-columns:76px minmax(0,1fr)}.schedule-time{color:var(--ink);font-size:12px;background:#E8F6FB;padding:5px 6px;border-radius:8px;text-align:center;border:1.5px solid var(--ink)}
+    .schedule-card{position:relative;z-index:2;border-radius:14px;background:white;padding:17px;grid-template-columns:76px minmax(0,1fr) auto;transition:transform .2s ease}.schedule-time{color:var(--ink);font-size:12px;background:#E8F6FB;padding:5px 6px;border-radius:8px;text-align:center;border:1.5px solid var(--ink)}
     .schedule-place{font-size:16px}.schedule-action,.buy-action{border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink)}
     .schedule-swipe{--type-bg:#f4f1ec;--type-accent:#77706b}
     .schedule-swipe.type-transport{--type-bg:#e4f4fb;--type-accent:#3788ad}
@@ -209,6 +209,11 @@
     .schedule-detail-value{min-width:0;word-break:break-word}
     .schedule-note{margin-top:8px;padding:8px 9px;border:1.5px dashed var(--type-accent);border-radius:10px;background:var(--type-bg);font-size:12px;line-height:1.5;word-break:break-word}
     .schedule-note strong{display:block;margin-bottom:2px;font-size:11px;color:#696260}
+    .schedule-card-tools{display:flex;flex-direction:column;align-items:center;gap:7px;align-self:center}
+    .schedule-nav{min-width:42px;height:36px;padding:0 9px;border:2px solid var(--ink);border-radius:10px;background:#dff2ff;color:var(--ink);font-size:12px;font-weight:800;box-shadow:2px 2px 0 var(--ink);cursor:pointer}
+    .desktop-schedule-actions{display:flex;gap:7px}
+    .mobile-swipe-action{display:none}
+    .swipe-hint{display:none}
     .buy-owner-section{margin-bottom:22px}.buy-owner-header{border-radius:20px 20px 0 0;background:var(--green);box-shadow:none;border-bottom:0}.buy-owner-items{border-radius:0 0 20px 20px;box-shadow:3px 4px 0 var(--ink)}
     .buy-swipe{background:var(--yellow);border-bottom:2px dashed #CCC1B9}.buy-item-line{background:#fff}.checkbox-custom{border-color:var(--ink);border-width:2px}.checkbox-custom.checked{background:var(--green);border-color:var(--ink)}.checkbox-custom.checked:after{color:var(--ink)}
     .bottom-nav{background:var(--paper);border-top:3px solid var(--ink);backdrop-filter:none;-webkit-backdrop-filter:none}.nav-btn{border:2px solid transparent;border-radius:14px;font-size:12px;color:#706862}.nav-btn.active{background:var(--yellow);border-color:var(--ink);color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
@@ -238,13 +243,23 @@
       .toolbar{position:sticky;top:74px;z-index:80;margin:0 -4px 14px;padding:7px 4px;background:rgba(255,252,246,.96)}
       .toolbar .btn{min-height:44px;font-size:13px}
       .schedule-list{padding-left:12px;gap:13px}
-      .schedule-swipe,.buy-swipe{overflow:visible;display:block}
-      .schedule-card{grid-template-columns:67px minmax(0,1fr) 42px;gap:9px;padding:12px}
+      .schedule-swipe{overflow:hidden;display:block;touch-action:pan-y}
+      .buy-swipe{overflow:visible;display:block}
+      .schedule-card{grid-template-columns:67px minmax(0,1fr) auto;gap:9px;padding:12px;touch-action:pan-y;will-change:transform}
       .schedule-time{font-size:11px}
       .schedule-place{font-size:15px}
       .schedule-meta{font-size:12px;line-height:1.45}
       .schedule-detail{grid-template-columns:68px minmax(0,1fr);font-size:12px}
       .item-actions{display:flex;flex-direction:column;gap:7px;align-self:center}
+      .desktop-schedule-actions{display:none}
+      .mobile-swipe-action{position:absolute;top:0;bottom:0;width:82px;display:flex;align-items:center;justify-content:center;z-index:1}
+      .mobile-swipe-action.edit{left:0;background:#dff2ff}
+      .mobile-swipe-action.delete{right:0;background:#ffdcd6}
+      .mobile-swipe-action button{width:100%;height:100%;border:0;background:transparent;color:var(--ink);font-size:12px;font-weight:900}
+      .schedule-swipe.reveal-edit .schedule-card{transform:translateX(82px)}
+      .schedule-swipe.reveal-delete .schedule-card{transform:translateX(-82px)}
+      .schedule-nav{min-width:44px;height:40px;padding:0 7px;box-shadow:none}
+      .swipe-hint{display:block;margin:-3px 0 13px;padding:8px 11px;border:1.5px dashed #8b817a;border-radius:10px;background:#fff8df;font-size:12px;font-weight:700;text-align:center}
       .schedule-action,.buy-action{width:40px;height:40px;font-size:16px;box-shadow:none}
       .buy-item-line{grid-template-columns:24px minmax(0,1fr) 42px;padding:12px 10px;gap:8px}
       .buy-item-body{gap:8px}
@@ -416,17 +431,40 @@
       <p class="import-help">把 ChatGPT 產生的固定格式貼在下方。系統會先產生預覽，確認後才加入旅程，不會覆蓋原有行程。</p>
       <details>
         <summary style="cursor:pointer;font-size:13px;font-weight:800;margin-bottom:8px;">查看格式範例</summary>
-        <pre class="import-format">DAY 1｜2026-09-25
+        <pre class="import-format">DAY 1｜2026-12-17
 
-07:00-08:50｜交通
-關西機場 → 京都站
-方式：HARUKA
-交通時間：1小時50分
+05:30-07:10｜交通
+成田機場 → 池袋第一賓館
+方式：電車
+交通時間：1小時40分
+路線／車次：Skyliner → JR 山手線
+地址：池袋第一賓館
+備註：抵達後先寄放行李
 
-10:00-11:30｜景點
-Nintendo KYOTO
-停留時間：1小時30分
-備註：京都高島屋 S.C. T8 7樓</pre>
+10:00-12:00｜景點
+晴空塔
+停留時間：2小時
+地址：東京晴空塔
+備註：預留拍照與排隊時間
+
+12:15-13:15｜餐廳
+敘敘苑 東京晴空塔店
+停留時間：1小時
+地址：東京晴空塔城 Solamachi 30F
+備註：建議事先訂位
+
+14:30-17:30｜採買
+秋葉原電器街
+停留時間：3小時
+地址：秋葉原站
+備註：模型、電玩與代購品項
+
+20:00-23:00｜住宿
+池袋第一賓館
+停留時間：過夜
+地址：池袋第一賓館
+備註：入住後整理當日戰利品</pre>
+        <p class="import-help">規則：每天以 DAY N｜YYYY-MM-DD 開頭；每個項目之間空一行。地址會優先作為導航目的地。</p>
       </details>
       <label class="form-label" for="import-schedule-text">貼上行程內容</label>
       <textarea id="import-schedule-text" class="form-textarea import-textarea" placeholder="從 DAY 1｜YYYY-MM-DD 開始貼上…"></textarea>
@@ -950,6 +988,73 @@ Nintendo KYOTO
       });
     }
 
+    function getScheduleDestination(item) {
+      if (!item) return '';
+      if (item.address) return String(item.address).trim();
+      const place = String(item.place || '').trim();
+      const parts = place.split(/\s*(?:→|-->|->)\s*/);
+      return (parts[parts.length - 1] || place).trim();
+    }
+
+    function getScheduleTravelMode(item) {
+      const text = ((item && item.transportMode) || '') + ' ' + ((item && item.place) || '');
+      if (/步行|走路|徒步/.test(text)) return 'walking';
+      if (/開車|自駕|計程車|出租車|taxi/i.test(text)) return 'driving';
+      if (/單車|自行車|腳踏車/.test(text)) return 'bicycling';
+      return 'transit';
+    }
+
+    function openScheduleNavigation(id) {
+      const trip = getCurrentTrip();
+      const item = trip && (trip.schedules || []).find(function(entry) { return Number(entry.id) === Number(id); });
+      const destination = getScheduleDestination(item);
+      if (!destination) return alert('這個行程還沒有可導航的地點');
+      const url = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(destination) + '&travelmode=' + getScheduleTravelMode(item);
+      window.open(url, '_blank', 'noopener');
+    }
+
+    function setupScheduleSwipeActions(list) {
+      if (!list || !window.matchMedia('(max-width: 520px)').matches) return;
+      const closeAll = function(except) {
+        list.querySelectorAll('.schedule-swipe.reveal-edit,.schedule-swipe.reveal-delete').forEach(function(row) {
+          if (row !== except) row.classList.remove('reveal-edit', 'reveal-delete');
+        });
+      };
+      list.querySelectorAll('.schedule-swipe').forEach(function(row) {
+        const card = row.querySelector('.schedule-card');
+        let startX = 0, startY = 0, dragging = false;
+        card.addEventListener('pointerdown', function(event) {
+          if (event.target.closest('button')) return;
+          startX = event.clientX; startY = event.clientY; dragging = true; closeAll(row);
+          card.setPointerCapture(event.pointerId);
+        });
+        card.addEventListener('pointermove', function(event) {
+          if (!dragging) return;
+          const dx = event.clientX - startX, dy = event.clientY - startY;
+          if (Math.abs(dy) > Math.abs(dx)) return;
+          event.preventDefault();
+          card.style.transform = 'translateX(' + Math.max(-82, Math.min(82, dx)) + 'px)';
+        });
+        const finish = function(event) {
+          if (!dragging) return;
+          dragging = false;
+          const dx = event.clientX - startX, dy = event.clientY - startY;
+          card.style.transform = '';
+          row.classList.remove('reveal-edit', 'reveal-delete');
+          if (Math.abs(dx) > Math.abs(dy) && dx > 38) row.classList.add('reveal-edit');
+          if (Math.abs(dx) > Math.abs(dy) && dx < -38) row.classList.add('reveal-delete');
+        };
+        card.addEventListener('pointerup', finish);
+        card.addEventListener('pointercancel', function() { dragging = false; card.style.transform = ''; });
+      });
+      if (!list.dataset.swipeCloseBound) {
+        list.dataset.swipeCloseBound = 'true';
+        document.addEventListener('pointerdown', function(event) {
+          if (!event.target.closest('.schedule-swipe')) closeAll();
+        });
+      }
+    }
+
     function renderSchedules() {
       const list = document.getElementById('schedule-list'), trip = getCurrentTrip(); if (!list || !trip) return;
       const schedules = Array.isArray(trip.schedules) ? trip.schedules.slice() : [];
@@ -971,7 +1076,7 @@ Nintendo KYOTO
       }
       
       const dates = Object.keys(groups).sort();
-      let html = '';
+      let html = '<div class="swipe-hint">↔ 手機操作：右滑編輯・左滑刪除</div>';
       for(let i=0; i<dates.length; i++) {
         const date = dates[i];
         const items = groups[date];
@@ -985,7 +1090,10 @@ Nintendo KYOTO
           const hasStructuredDetails = !!(item.transportMode || item.travelTime || item.stayTime || item.route || item.address || item.notes);
           const shownTravelTime = item.travelTime || (hasStructuredDetails && scheduleType === 'transport' ? item.duration : '');
           const shownStayTime = item.stayTime || (hasStructuredDetails && scheduleType !== 'transport' ? item.duration : '');
-          html += '<div class="schedule-swipe type-' + scheduleType + '"><div class="schedule-card">';
+          html += '<div class="schedule-swipe type-' + scheduleType + '">';
+          html += '<div class="mobile-swipe-action edit"><button type="button" onclick="openEditSchedule(' + Number(item.id) + ')">✏️<br>編輯</button></div>';
+          html += '<div class="mobile-swipe-action delete"><button type="button" onclick="deleteSchedule(' + Number(item.id) + ')">🗑<br>刪除</button></div>';
+          html += '<div class="schedule-card">';
           html += '<div class="schedule-time">' + escapeHtml(timeStr) + '</div>';
           html += '<div style="min-width:0;"><div class="schedule-type-pill">' + getScheduleTypeIcon(scheduleType) + ' ' + getScheduleTypeLabel(scheduleType) + '</div><div class="schedule-place">' + escapeHtml(item.place||'未命名') + '</div>';
           
@@ -1008,14 +1116,16 @@ Nintendo KYOTO
             metaHtml += '<span style="cursor:pointer;" onclick="event.stopPropagation(); openLightbox(\'' + escapeHtml(item.photoUrl) + '\')"> 📷</span>';
           }
           html += '<div class="schedule-meta">' + metaHtml + '</div></div>';
-          html += '<div class="item-actions">';
-          html += '<button class="schedule-action" aria-label="編輯行程" title="編輯行程" onclick="openEditSchedule(' + Number(item.id) + ')">✏️</button>';
-          html += '<button class="schedule-action" aria-label="刪除行程" title="刪除行程" onclick="deleteSchedule(' + Number(item.id) + ')">🗑</button>';
+          html += '<div class="schedule-card-tools">';
+          html += '<button class="schedule-nav" aria-label="使用 Google 地圖導航" title="使用 Google 地圖導航" onclick="openScheduleNavigation(' + Number(item.id) + ')">導航</button>';
+          html += '<div class="desktop-schedule-actions"><button class="schedule-action" aria-label="編輯行程" title="編輯行程" onclick="openEditSchedule(' + Number(item.id) + ')">✏️</button>';
+          html += '<button class="schedule-action" aria-label="刪除行程" title="刪除行程" onclick="deleteSchedule(' + Number(item.id) + ')">🗑</button></div>';
           html += '</div></div></div>';
         }
         html += '</div></div>';
       }
       list.innerHTML = html;
+      setupScheduleSwipeActions(list);
     }
 
     const schList = document.getElementById('schedule-list');
