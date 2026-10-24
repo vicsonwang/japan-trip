@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>日本自由行規劃</title>
+  <title>日本旅行手帖｜旅遊行程規劃</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { margin: 0; padding: 0; width: 100%; min-height: 100%; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Noto Sans TC", "Microsoft JhengHei", sans-serif; background: #f5f5f7; color: #1d1d1f; }
@@ -147,6 +150,46 @@
     /* Responsive */
     @media (max-width: 760px) { .app-main, .header-inner { width: min(100% - 22px, 1100px); } .trip-grid, .filter-grid { grid-template-columns: 1fr; } }
     @media (max-width: 520px) { .app-main { padding-top: 20px; } .page-title { font-size: 24px; } .brand-subtitle, .user-name { display: none; } .form-grid { grid-template-columns: 1fr; } .form-group.full { grid-column: auto; } .photo-thumb { width: 50px; height: 50px; flex-basis: 50px; } .modal-card { padding: 18px 15px; } }
+
+    /* Japan travel storybook theme – original Firebase and forms remain intact */
+    :root {--paper:#FFFCF6;--ink:#3E3A39;--pink:#F2A497;--yellow:#F6D27A;--blue:#A8D3E6;--green:#B9DAA5;--shadow:4px 5px 0 var(--ink)}
+    html,body{background:var(--paper);color:var(--ink);font-family:'Huninn','Noto Sans TC',sans-serif}
+    button,input,select,textarea{font-family:inherit} button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #4B8AA7;outline-offset:3px}
+    .app-header{background:var(--paper);border-bottom:3px solid var(--ink);backdrop-filter:none;-webkit-backdrop-filter:none}
+    .header-inner{min-height:72px}.brand-icon,.login-logo{background:var(--pink);border:3px solid var(--ink);border-radius:17px;color:var(--ink);box-shadow:2px 3px 0 var(--ink)}
+    .brand-title{font-size:19px}.brand-subtitle,.page-subtitle,.trip-date,.trip-owner,.trip-detail-date,.schedule-meta,.buy-item-meta,.buy-owner-summary,.rate-note{color:#696260}
+    .page-title,.trip-detail-title{letter-spacing:0;font-size:30px}
+    .login-card,.trip-card,.empty-state,.form-card,.filter-panel,.quick-panel,.buy-owner-header,.buy-owner-items,.modal-card{background:white;border:3px solid var(--ink);border-radius:23px;box-shadow:var(--shadow)}
+    #login-overlay{background:var(--paper)}.login-card{max-width:420px}.login-logo{width:84px;height:84px;border-radius:23px}
+    .btn,.icon-btn,.logout-btn,#google-login-btn,.modal-close,.toolbar-item{border:2.5px solid var(--ink);border-radius:13px;background:white;color:var(--ink);box-shadow:2px 3px 0 var(--ink);transition:transform .15s,box-shadow .15s}
+    .btn:active,.icon-btn:active,.nav-btn:active{transform:translate(2px,3px);box-shadow:none}
+    .btn-primary,.btn-primary:hover{background:var(--pink);color:var(--ink)}.btn-secondary{background:var(--yellow)}
+    .logout-btn{background:var(--paper);color:var(--ink)}.trip-card{padding:22px;position:relative;overflow:hidden}.trip-card:nth-child(4n+2){background:#EFF8FC}.trip-card:nth-child(4n+3){background:#F8FBEF}.trip-card:hover{box-shadow:6px 7px 0 var(--ink);transform:translateY(-2px)}
+    .trip-code{background:var(--yellow);border:2px solid var(--ink);border-radius:10px;color:var(--ink);font-weight:700}
+    .toolbar{gap:10px}.toolbar .btn{min-height:40px}.form-input,.form-select,.form-textarea{border:2px solid var(--ink);border-radius:12px;color:var(--ink);background:var(--paper)}
+    .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:#4D8BA4;box-shadow:0 0 0 3px rgba(168,211,230,.35)}
+    .form-label,.filter-label{color:var(--ink)}.modal{background:rgba(62,58,57,.45)}.modal-card{box-shadow:none;border-bottom:0;max-height:90dvh}.modal-close{background:var(--yellow)}
+    .day-badge{background:var(--yellow);color:var(--ink);border:2px solid var(--ink);border-radius:12px;min-width:70px}.day-header{margin-bottom:13px}.day-date{font-size:16px}.day-toggle{color:var(--ink);font-weight:700;text-decoration:underline}
+    .schedule-list{position:relative;padding-left:15px;gap:15px}.schedule-list:before{content:"";position:absolute;top:20px;bottom:20px;left:4px;border-left:3px dashed var(--ink)}
+    .schedule-swipe{position:relative;border:2.5px solid var(--ink);border-radius:17px;background:var(--yellow);overflow-x:auto;box-shadow:3px 4px 0 var(--ink)}
+    .schedule-swipe:before{content:"";position:absolute;left:-16px;top:20px;width:11px;height:11px;border:2px solid var(--ink);background:var(--pink);border-radius:50%;z-index:2}
+    .schedule-card{border-radius:14px;background:white;padding:17px;grid-template-columns:76px minmax(0,1fr)}.schedule-time{color:var(--ink);font-size:12px;background:#E8F6FB;padding:5px 6px;border-radius:8px;text-align:center;border:1.5px solid var(--ink)}
+    .schedule-place{font-size:16px}.schedule-action,.buy-action{border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink)}
+    .buy-owner-section{margin-bottom:22px}.buy-owner-header{border-radius:20px 20px 0 0;background:var(--green);box-shadow:none;border-bottom:0}.buy-owner-items{border-radius:0 0 20px 20px;box-shadow:3px 4px 0 var(--ink)}
+    .buy-swipe{background:var(--yellow);border-bottom:2px dashed #CCC1B9}.buy-item-line{background:#fff}.checkbox-custom{border-color:var(--ink);border-width:2px}.checkbox-custom.checked{background:var(--green);border-color:var(--ink)}.checkbox-custom.checked:after{color:var(--ink)}
+    .bottom-nav{background:var(--paper);border-top:3px solid var(--ink);backdrop-filter:none;-webkit-backdrop-filter:none}.nav-btn{border:2px solid transparent;border-radius:14px;font-size:12px;color:#706862}.nav-btn.active{background:var(--yellow);border-color:var(--ink);color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
+    .loading-dot{background:var(--pink)}
+    .storybook-hero{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center;padding:18px 23px;margin:0 0 24px;background:#EAF5FA;border:3px solid var(--ink);border-radius:25px;box-shadow:var(--shadow);overflow:hidden}
+    .storybook-hero h2{font-size:24px;line-height:1.4;margin:6px 0 9px}.storybook-hero p{font-size:13px;margin:0}.hero-kicker{font-size:12px;letter-spacing:2px;font-weight:800}.hero-count{display:inline-flex;gap:7px;align-items:baseline;margin-top:12px;padding:7px 12px;border:2px solid var(--ink);border-radius:13px;background:var(--yellow);font-size:15px;font-weight:700}.hero-count strong{font-size:25px}.hero-svg{width:100%;max-height:195px;overflow:visible}.hero-train{animation:floatTrain 3s ease-in-out infinite alternate}.hero-cloud{animation:floatTrain 4s ease-in-out infinite alternate-reverse}
+    @keyframes floatTrain{from{transform:translateY(0)}to{transform:translateY(-5px)}}
+    .day-picker{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:3px 3px 11px;margin-bottom:14px;scroll-snap-type:x mandatory}.day-picker::-webkit-scrollbar{display:none}
+    .day-pill{flex:0 0 auto;min-width:80px;padding:9px 12px;border:2.5px solid var(--ink);border-radius:14px;background:white;color:var(--ink);font-size:12px;font-weight:800;box-shadow:2px 3px 0 var(--ink);scroll-snap-align:start}
+    .day-pill.active{background:var(--pink);animation:pillPop .28s ease-out}.day-pill .pill-small{display:block;margin-top:3px;font-size:11px;opacity:.85}
+    @keyframes pillPop{0%{transform:scale(.88)}70%{transform:scale(1.04)}100%{transform:scale(1)}}
+    .trip-detail-header{margin-bottom:15px}.page-title-row{flex-wrap:wrap}
+    @media(max-width:760px){.storybook-hero{grid-template-columns:1fr 1fr}.trip-card{padding:19px}}
+    @media(max-width:520px){.storybook-hero{padding:14px;grid-template-columns:1fr 1fr}.storybook-hero h2{font-size:20px}.hero-svg{max-height:160px}.page-title{font-size:24px}.page-title-row>div:last-child{width:100%;justify-content:flex-start}.page-title-row .btn{padding:0 10px;font-size:12px}.schedule-card{grid-template-columns:70px minmax(0,1fr);gap:10px;padding:12px}.schedule-time{font-size:11px}.app-main{padding-top:20px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
   </style>
 </head>
 <body>
@@ -208,6 +251,18 @@
         </div>
       </div>
 
+
+      <section class="storybook-hero" aria-label="旅程倒數">
+        <div><div class="hero-kicker">✿ JAPAN TRAVEL DIARY</div><h2>一起去日本<br>收藏好日子！</h2><p id="hero-trip-date">把每一天都變成小小的故事 ♡</p><div class="hero-count" id="trip-countdown" aria-live="off">✈️ 旅程準備中</div></div>
+        <svg class="hero-svg" viewBox="0 0 300 230" role="img" aria-label="富士山與行駛中的小火車插畫">
+          <g class="hero-cloud" fill="white" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"><path d="M18 75q-12-19 13-24 8-23 29-13 10-16 26-7 19 5 15 26 18 14-2 23Z"/><path d="M206 43q1-18 20-16 8-21 27-7 20-6 26 15 17 8 7 22h-73Z"/></g>
+          <path d="M28 176 134 40 248 176Z" fill="#A8D3E6" stroke="#3E3A39" stroke-width="4" stroke-linejoin="round"/><path d="m97 87 37-47 41 51-23-7-12 13-16-14-14 8Z" fill="#FFFCF6" stroke="#3E3A39" stroke-width="3"/>
+          <path d="M9 178q54-37 99 0 56-44 107 0 45-34 82 0v31H9Z" fill="#B9DAA5" stroke="#3E3A39" stroke-width="4"/><path d="M0 208H300" stroke="#3E3A39" stroke-width="5" stroke-linecap="round"/>
+          <g class="hero-train"><rect x="74" y="145" width="160" height="46" rx="13" fill="#F2A497" stroke="#3E3A39" stroke-width="4"/><rect x="88" y="154" width="30" height="20" rx="5" fill="#FFFCF6" stroke="#3E3A39" stroke-width="3"/><rect x="129" y="154" width="30" height="20" rx="5" fill="#FFFCF6" stroke="#3E3A39" stroke-width="3"/><rect x="171" y="154" width="28" height="20" rx="5" fill="#FFFCF6" stroke="#3E3A39" stroke-width="3"/><circle cx="109" cy="194" r="9" fill="#3E3A39"/><circle cx="201" cy="194" r="9" fill="#3E3A39"/></g>
+          <g fill="#F6D27A" stroke="#3E3A39" stroke-width="2"><circle cx="266" cy="87" r="17"/><path d="m266 61v-9m0 70v-9m26-26h-8m-37 0h-8" stroke-linecap="round"/></g>
+        </svg>
+      </section>
+
       <!-- Schedule Tab -->
       <div id="schedule-tab">
         <div class="toolbar">
@@ -236,6 +291,7 @@
             </div>
           </form>
         </div>
+        <div id="day-picker" class="day-picker" aria-label="依日期切換行程"></div>
         <div id="schedule-list"></div>
       </div>
 
@@ -1339,6 +1395,68 @@
         }
       }
     }, 800);
+
+
+    // Storybook extensions: the original CRUD, Google OAuth and Firestore routines remain unchanged.
+    let storybookSelectedDate = '';
+    let storybookTripId = '';
+    function storybookCountdown() {
+      const trip = getCurrentTrip();
+      const text = document.getElementById('trip-countdown');
+      const subtitle = document.getElementById('hero-trip-date');
+      if (!trip || !text) return;
+      subtitle.textContent = (trip.startDate && trip.endDate) ? formatDate(trip.startDate) + ' ～ ' + formatDate(trip.endDate) : '快樂的日本旅程';
+      const start = trip.startDate ? new Date(trip.startDate + 'T00:00:00') : null;
+      const today = new Date(); today.setHours(0,0,0,0);
+      if (!start || isNaN(start.getTime())) { text.textContent='✈️ 出發日尚未設定'; return; }
+      const days = Math.round((start - today) / 86400000);
+      const end = trip.endDate ? new Date(trip.endDate + 'T23:59:59') : start;
+      if (days > 0) text.innerHTML='✈️ 距離出發還有 <strong>'+days+'</strong> 天';
+      else if (today.getTime() <= end.getTime()) text.textContent='🌸 日本旅行進行中！';
+      else text.textContent='♡ 旅程結束，回憶永存';
+    }
+    function storybookDays(trip) {
+      const result = [];
+      if (trip.startDate && trip.endDate && trip.endDate >= trip.startDate) {
+        let date = new Date(trip.startDate+'T00:00:00');
+        const end = new Date(trip.endDate+'T00:00:00');
+        while(date <= end && result.length < 40) {result.push(date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0'));date.setDate(date.getDate()+1);}
+      }
+      const schedules = Array.isArray(trip.schedules) ? trip.schedules : [];
+      schedules.forEach(function(item){if(item.date && !result.includes(item.date))result.push(item.date);});
+      return result.sort();
+    }
+    function selectStorybookDay(date) {
+      storybookSelectedDate = date;
+      document.querySelectorAll('#day-picker .day-pill').forEach(function(b){b.classList.toggle('active',b.dataset.date===date);b.setAttribute('aria-pressed',String(b.dataset.date===date));});
+      document.querySelectorAll('#schedule-list .schedule-day').forEach(function(el){el.style.display = (!date || el.dataset.day === date)?'':'none';});
+      const trip = getCurrentTrip();
+      if(trip && date && !(trip.schedules||[]).some(function(item){return item.date === date;})) {
+        const el = document.getElementById('schedule-list');
+        if(el && !document.getElementById('storybook-empty-day')) el.insertAdjacentHTML('beforeend','<div id="storybook-empty-day" class="empty-state">🌸 這一天還沒有安排景點，點選「新增行程」開始規劃吧！</div>');
+      }
+      const empty = document.getElementById('storybook-empty-day');
+      if(empty)empty.style.display = date && trip && !(trip.schedules||[]).some(function(item){return item.date === date;})?'':'none';
+    }
+    function storybookRenderDayPicker(){
+      const trip = getCurrentTrip(), holder = document.getElementById('day-picker');
+      if(!holder || !trip)return;
+      if(storybookTripId!==trip.id){storybookTripId=trip.id;storybookSelectedDate='';}
+      storybookCountdown();
+      const dates=storybookDays(trip);
+      holder.innerHTML = '<button type="button" class="day-pill" data-date="" onclick="selectStorybookDay(\'\')">全部<span class="pill-small">行程總覽</span></button>'+
+        dates.map(function(date,i){return '<button type="button" class="day-pill" data-date="'+escapeHtml(date)+'" onclick="selectStorybookDay(\''+escapeHtml(date)+'\')">DAY '+(i+1)+'<span class="pill-small">'+escapeHtml(date.slice(5).replace('-','/'))+' '+escapeHtml(getDayLabel(date))+'</span></button>';}).join('');
+      if(storybookSelectedDate && !dates.includes(storybookSelectedDate))storybookSelectedDate='';
+      if(!storybookSelectedDate && dates.length)storybookSelectedDate=dates[0];
+      selectStorybookDay(storybookSelectedDate);
+    }
+    const storybookOriginalRenderSchedules=renderSchedules;
+    renderSchedules=function(){storybookOriginalRenderSchedules();storybookRenderDayPicker();};
+    const storybookOriginalOpenTripDetail=openTripDetail;
+    openTripDetail=function(id){storybookOriginalOpenTripDetail(id);storybookRenderDayPicker();};
+    const storybookOriginalOpenAddSchedule=openAddSchedule;
+    openAddSchedule=function(){storybookOriginalOpenAddSchedule();if(storybookSelectedDate){document.getElementById('sch-date').value=storybookSelectedDate;document.getElementById('sch-day').value=getDayLabel(storybookSelectedDate);}};
+    setInterval(storybookCountdown,60000);
 
     renderTripsList();
   </script>
