@@ -59,6 +59,12 @@
     .trip-card-actions { display: flex; align-items: flex-start; gap: 7px; }
     .trip-ended-badge { display: inline-block; margin-top: 9px; padding: 3px 8px; border: 1.5px solid #77706b; border-radius: 999px; background: #dedbd7; font-size: 11px; font-weight: 800; }
     .trip-delete-btn { width: 36px; height: 36px; border: 2px solid var(--ink); border-radius: 10px; background: #ffdcd6; font-size: 15px; cursor: pointer; }
+    .trip-members { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
+    .trip-members-label { font-size: 11px; font-weight: 800; color: #696260; }
+    .member-chip { display: inline-flex; align-items: center; gap: 5px; max-width: 150px; padding: 3px 8px 3px 4px; border: 1.5px solid var(--ink); border-radius: 999px; background: #fff; font-size: 11px; font-weight: 800; }
+    .member-avatar { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--ink); background: var(--yellow); object-fit: cover; display: grid; place-items: center; flex: 0 0 22px; font-size: 10px; }
+    .member-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .trip-detail-members { margin-top: 9px; }
     .trip-name { font-size: 19px; font-weight: 800; line-height: 1.35; }
     .trip-date { color: #86868b; font-size: 13px; margin-top: 8px; }
     .trip-owner { margin-top: 18px; font-size: 12px; color: #86868b; }
@@ -365,6 +371,7 @@
           <div style="min-width:0;">
             <h1 id="trip-detail-title" class="trip-detail-title">旅程</h1>
             <div id="trip-detail-date" class="trip-detail-date"></div>
+            <div id="trip-detail-members" class="trip-members trip-detail-members"></div>
           </div>
         </div>
       </div>
@@ -770,6 +777,7 @@
         trips = snapshot.docs.map(function(doc) { return Object.assign({ id: doc.id }, doc.data()); });
         trips.forEach(function(trip) {
           ensureTripInviteDocument(trip, user).catch(function(error) { console.warn('Invite migration failed:', error); });
+          ensureTripMemberProfile(trip, user).catch(function(error) { console.warn('Member profile migration failed:', error); });
         });
         renderTripsList();
         if (currentTripId && !trips.some(function(t) { return t.id === currentTripId; })) {
@@ -787,6 +795,33 @@
       if (!inviteDoc.exists) {
         await inviteRef.set({ tripId: trip.id, createdBy: user.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
       }
+    }
+
+    function getMemberProfile(user) {
+      return { name: (user && user.displayName) || '旅伴', photoURL: (user && user.photoURL) || '' };
+    }
+
+    async function ensureTripMemberProfile(trip, user) {
+      if (!trip || !user || !(trip.memberUids || []).includes(user.uid)) return;
+      if (trip.memberProfiles && trip.memberProfiles[user.uid]) return;
+      const update = {};
+      update['memberProfiles.' + user.uid] = getMemberProfile(user);
+      await db.collection('trips').doc(trip.id).update(update);
+    }
+
+    function renderTripMembers(trip, compact) {
+      const uids = Array.isArray(trip.memberUids) ? trip.memberUids : [];
+      const profiles = trip.memberProfiles || {};
+      let html = '<span class="trip-members-label">👥 ' + uids.length + ' 位旅伴</span>';
+      if (compact) return html;
+      uids.forEach(function(uid, index) {
+        const profile = profiles[uid] || {};
+        const fallbackName = uid === trip.ownerUid ? (trip.ownerName || '建立者') : ('旅伴 ' + (index + 1));
+        const name = profile.name || fallbackName;
+        const avatar = profile.photoURL ? '<img class="member-avatar" src="' + escapeHtml(profile.photoURL) + '" alt="">' : '<span class="member-avatar">' + escapeHtml(name.slice(0, 1)) + '</span>';
+        html += '<span class="member-chip">' + avatar + '<span class="member-name">' + escapeHtml(name) + '</span></span>';
+      });
+      return html;
     }
 
     function stopRateSync() { if (rateUnsubscribe) rateUnsubscribe(); rateUnsubscribe = null; }
@@ -834,6 +869,7 @@
       document.getElementById('trip-view').classList.add('active');
       document.getElementById('trip-detail-title').textContent = trip.name || '未命名旅程';
       document.getElementById('trip-detail-date').textContent = formatDate(trip.startDate) + ' ～ ' + formatDate(trip.endDate);
+      document.getElementById('trip-detail-members').innerHTML = renderTripMembers(trip, false);
       const targetTab = pendingTripTab || 'schedule';
       pendingTripTab = '';
       switchTab(targetTab);
@@ -864,6 +900,7 @@
         html += '<div class="trip-card' + (isPast ? ' past' : '') + '" onclick="openTripDetail(\'' + escapeHtml(trip.id) + '\')">';
         html += '<div class="trip-card-header"><div style="min-width:0;"><div class="trip-name">' + escapeHtml(trip.name || '未命名') + '</div><div class="trip-date">' + escapeHtml(formatDate(trip.startDate)) + ' ～ ' + escapeHtml(formatDate(trip.endDate)) + '</div>' + (isPast ? '<span class="trip-ended-badge">已結束・保留紀錄</span>' : '') + '</div><div class="trip-card-actions"><div style="font-size:22px;">🇯🇵</div>' + (isOwner ? '<button type="button" class="trip-delete-btn" aria-label="刪除整趟旅程" title="刪除整趟旅程" onclick="event.stopPropagation(); deleteTrip(\'' + escapeHtml(trip.id) + '\')">🗑</button>' : '') + '</div></div>';
         html += '<div class="trip-owner">建立者：' + escapeHtml(trip.ownerName || '未知') + '</div>';
+        html += '<div class="trip-members">' + renderTripMembers(trip, true) + '</div>';
         if (trip.inviteCode || trip.code) {
           html += '<div class="trip-code">邀請碼：' + escapeHtml(trip.inviteCode || trip.code) + '</div>';
         }
@@ -921,9 +958,10 @@
         try {
           const tripRef = db.collection('trips').doc();
           const batch = db.batch();
+          const memberProfiles = {}; memberProfiles[user.uid] = getMemberProfile(user);
           batch.set(tripRef, {
             name: name, startDate: startDate, endDate: endDate, inviteCode: inviteCode, code: inviteCode, schedules: [], buyItems: [],
-            ownerUid: user.uid, ownerName: user.displayName || user.email || '', memberUids: [user.uid],
+            ownerUid: user.uid, ownerName: user.displayName || user.email || '', memberUids: [user.uid], memberProfiles: memberProfiles,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
           batch.set(db.collection('tripInvites').doc(inviteCode), { tripId: tripRef.id, createdBy: user.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
@@ -932,7 +970,7 @@
           currentTripId = tripRef.id; localStorage.setItem('currentTripId', tripRef.id);
           let found = false;
           for(let i=0; i<trips.length; i++) { if (trips[i].id === tripRef.id) found = true; }
-          if (!found) trips.push({ id: tripRef.id, name: name, startDate: startDate, endDate: endDate, inviteCode: inviteCode, code: inviteCode, schedules: [], buyItems: [], ownerUid: user.uid, ownerName: user.displayName || user.email || '', memberUids: [user.uid] });
+          if (!found) trips.push({ id: tripRef.id, name: name, startDate: startDate, endDate: endDate, inviteCode: inviteCode, code: inviteCode, schedules: [], buyItems: [], ownerUid: user.uid, ownerName: user.displayName || user.email || '', memberUids: [user.uid], memberProfiles: memberProfiles });
           openTripDetail(tripRef.id);
         } catch (err) { alert('建立失敗：\n' + err.message); }
       });
@@ -961,7 +999,9 @@
             alert('找不到此邀請碼。請確認邀請碼是否正確，或請建立者先開啟一次最新版網頁。');
             submitBtn.disabled = false; submitBtn.textContent = '確認加入'; return;
           }
-          await db.collection('trips').doc(inviteDoc.data().tripId).update({ memberUids: firebase.firestore.FieldValue.arrayUnion(user.uid) });
+          const joinUpdate = { memberUids: firebase.firestore.FieldValue.arrayUnion(user.uid) };
+          joinUpdate['memberProfiles.' + user.uid] = getMemberProfile(user);
+          await db.collection('trips').doc(inviteDoc.data().tripId).update(joinUpdate);
           alert('成功加入旅程！行程資料正在同步。');
           closeModal('join-trip-modal');
         } catch (err) {
