@@ -85,11 +85,12 @@
     .day-toggle { margin-left: auto; border: 0; background: transparent; color: #86868b; font-size: 13px; }
     .schedule-list { display: flex; flex-direction: column; gap: 9px; }
     .schedule-swipe { border-radius: 16px; border: 1px solid rgba(0, 0, 0, 0.04); background: #f2f2f7; }
-    .schedule-card { background: #fff; border-radius: 16px; padding: 14px; display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 13px; align-items: start; }
+    .schedule-card { background: #fff; border-radius: 16px; padding: 14px; display: grid; grid-template-columns: 72px minmax(0, 1fr) 42px; gap: 13px; align-items: start; }
     .schedule-time { font-size: 12px; color: #007aff; font-weight: 800; line-height: 1.45; }
     .schedule-place { font-size: 15px; font-weight: 800; line-height: 1.4; word-break: break-word; }
     .schedule-meta { margin-top: 4px; font-size: 11px; color: #86868b; }
     .schedule-action { width: 34px; height: 34px; border: 0; border-radius: 10px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 15px; }
+    .item-actions { display: flex; flex-direction: column; gap: 7px; align-self: center; }
     /* Buy specific */
     .buy-owner-section { margin-bottom: 20px; }
     .buy-owner-header { background: #fff; border-radius: 15px 15px 0 0; padding: 13px 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid #f0f0f2; }
@@ -98,7 +99,7 @@
     .buy-owner-items { background: #fff; border-radius: 0 0 15px 15px; overflow: hidden; }
     .buy-swipe { border-bottom: 1px solid #f2f2f7; background: #f2f2f7; }
     .buy-swipe:last-child { border-bottom: none; }
-    .buy-item-line { background: #fff; display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 9px; align-items: center; padding: 11px 13px; }
+    .buy-item-line { background: #fff; display: grid; grid-template-columns: 24px minmax(0, 1fr) 42px; gap: 9px; align-items: center; padding: 11px 13px; }
     .buy-item-body { min-width: 0; display: flex; align-items: center; gap: 9px; }
     .buy-item-content { min-width: 0; flex: 1; }
     .buy-item-name { font-size: 13px; font-weight: 700; line-height: 1.35; word-break: break-word; }
@@ -188,7 +189,49 @@
     @keyframes pillPop{0%{transform:scale(.88)}70%{transform:scale(1.04)}100%{transform:scale(1)}}
     .trip-detail-header{margin-bottom:15px}.page-title-row{flex-wrap:wrap}
     @media(max-width:760px){.storybook-hero{grid-template-columns:1fr 1fr}.trip-card{padding:19px}}
-    @media(max-width:520px){.storybook-hero{padding:14px;grid-template-columns:1fr 1fr}.storybook-hero h2{font-size:20px}.hero-svg{max-height:160px}.page-title{font-size:24px}.page-title-row>div:last-child{width:100%;justify-content:flex-start}.page-title-row .btn{padding:0 10px;font-size:12px}.schedule-card{grid-template-columns:70px minmax(0,1fr);gap:10px;padding:12px}.schedule-time{font-size:11px}.app-main{padding-top:20px}}
+    @media(max-width:520px){
+      .app-main{padding-top:14px;padding-bottom:96px}
+      .page-title{font-size:24px}
+      .page-title-row>div:last-child{width:100%;justify-content:flex-start}
+      .page-title-row .btn{padding:0 10px;font-size:12px}
+      .trip-detail-header{margin-bottom:10px}
+      .back-row{margin-bottom:8px;align-items:center}
+      .trip-detail-title{font-size:21px;line-height:1.25}
+      .storybook-hero{display:block;padding:10px 13px;margin-bottom:14px;border-radius:17px;box-shadow:2px 3px 0 var(--ink)}
+      .storybook-hero .hero-kicker,.storybook-hero h2,.storybook-hero .hero-svg{display:none}
+      .storybook-hero p{font-size:12px;font-weight:700}
+      .hero-count{margin-top:6px;padding:5px 9px;font-size:13px;border-radius:10px}
+      .hero-count strong{font-size:18px}
+      .toolbar{position:sticky;top:74px;z-index:80;margin:0 -4px 14px;padding:7px 4px;background:rgba(255,252,246,.96)}
+      .toolbar .btn{min-height:44px;font-size:13px}
+      .schedule-list{padding-left:12px;gap:13px}
+      .schedule-swipe,.buy-swipe{overflow:visible;display:block}
+      .schedule-card{grid-template-columns:67px minmax(0,1fr) 42px;gap:9px;padding:12px}
+      .schedule-time{font-size:11px}
+      .schedule-place{font-size:15px}
+      .schedule-meta{font-size:12px;line-height:1.45}
+      .item-actions{display:flex;flex-direction:column;gap:7px;align-self:center}
+      .schedule-action,.buy-action{width:40px;height:40px;font-size:16px;box-shadow:none}
+      .buy-item-line{grid-template-columns:24px minmax(0,1fr) 42px;padding:12px 10px;gap:8px}
+      .buy-item-body{gap:8px}
+      .buy-item-name{font-size:15px}
+      .buy-item-meta,.buy-item-price{font-size:12px;line-height:1.45}
+      .buy-owner-title{font-size:15px}
+      .buy-owner-summary{font-size:12px}
+      .photo-thumb{width:48px;height:48px;flex-basis:48px}
+      .checkbox-custom{width:22px;height:22px}
+      .nav-btn{min-height:48px}
+      .icon-btn,.modal-close{min-width:44px;min-height:44px}
+      .form-input,.form-select,.form-textarea{min-height:46px;font-size:16px}
+      .modal{align-items:stretch}
+      .modal-card{width:100%;height:100dvh;max-height:100dvh;border:0;border-radius:0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));overflow-y:auto}
+      .modal-header{position:sticky;top:-18px;z-index:3;background:#fff;padding:18px 0 10px;margin-bottom:8px}
+      .modal-card .form-actions,#sch-form-body .form-actions{position:sticky;bottom:-18px;z-index:3;margin:18px -16px -18px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:#fff;border-top:2px solid var(--ink)}
+      body:has(.modal.show){overflow:hidden}
+      body:has(.modal.show) .bottom-nav,body.schedule-form-open .bottom-nav{display:none}
+      #sch-form-body{position:fixed;inset:0;z-index:2000;margin:0;border:0;border-radius:0;box-shadow:none;padding:18px 16px calc(18px + env(safe-area-inset-bottom));overflow-y:auto}
+      #sch-form-body .modal-header{position:sticky;top:-18px;z-index:3;background:#fff;padding:18px 0 10px;margin-bottom:8px}
+    }
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
   </style>
 </head>
@@ -267,7 +310,6 @@
       <div id="schedule-tab">
         <div class="toolbar">
           <button class="btn btn-primary btn-small" onclick="openAddSchedule()">＋ 新增行程</button>
-          <button class="btn btn-secondary btn-small" onclick="toggleScheduleForm()">展開表單</button>
           <button class="btn btn-secondary btn-small" onclick="showSyncStatus()">☁ 同步中</button>
         </div>
         <div id="sch-form-body" class="form-card" style="display:none;">
@@ -322,8 +364,8 @@
   <nav class="bottom-nav">
     <div class="bottom-nav-inner">
       <button id="nav-trips" class="nav-btn active" onclick="showTripsView()">🧳<br>我的旅程</button>
-      <button id="nav-schedule" class="nav-btn" onclick="currentTripId ? switchTab('schedule') : showTripsView()">🗓<br>行程</button>
-      <button id="nav-buy" class="nav-btn" onclick="currentTripId ? switchTab('buy') : showTripsView()">🛍<br>代購</button>
+      <button id="nav-schedule" class="nav-btn" onclick="navigateToTripTab('schedule')">🗓<br>行程</button>
+      <button id="nav-buy" class="nav-btn" onclick="navigateToTripTab('buy')">🛍<br>代購</button>
     </div>
   </nav>
 
@@ -598,7 +640,19 @@
       }, function(err) { console.warn('Rate sync error:', err); });
     }
 
-    function showTripsView() {
+    let pendingTripTab = '';
+
+    function navigateToTripTab(tab) {
+      if (currentTripId) { switchTab(tab); return; }
+      pendingTripTab = tab;
+      if (trips.length === 1) { openTripDetail(trips[0].id); return; }
+      showTripsView(true);
+      const subtitle = document.querySelector('#trips-view .page-subtitle');
+      if (subtitle) subtitle.textContent = trips.length ? '請先選擇要查看的旅程' : '先建立旅程，就能開始安排內容';
+    }
+
+    function showTripsView(keepPendingTab) {
+      if (!keepPendingTab) pendingTripTab = '';
       currentTripId = null; localStorage.removeItem('currentTripId');
       document.getElementById('trips-view').classList.add('active');
       document.getElementById('trip-view').classList.remove('active');
@@ -606,6 +660,8 @@
       document.getElementById('nav-schedule').classList.remove('active');
       document.getElementById('nav-buy').classList.remove('active');
       closeAllQuickPanels();
+      const subtitle = document.querySelector('#trips-view .page-subtitle');
+      if (subtitle && !keepPendingTab) subtitle.textContent = '建立、管理你的日本旅行計畫';
     }
 
     function openTripDetail(id) {
@@ -616,7 +672,9 @@
       document.getElementById('trip-view').classList.add('active');
       document.getElementById('trip-detail-title').textContent = trip.name || '未命名旅程';
       document.getElementById('trip-detail-date').textContent = formatDate(trip.startDate) + ' ～ ' + formatDate(trip.endDate);
-      switchTab('schedule');
+      const targetTab = pendingTripTab || 'schedule';
+      pendingTripTab = '';
+      switchTab(targetTab);
       setTimeout(function() { setScheduleDefaults(); }, 0);
     }
 
@@ -768,6 +826,7 @@
       } else {
         body.style.display = (displayNow === 'none') ? 'block' : 'none';
       }
+      document.body.classList.toggle('schedule-form-open', body.style.display !== 'none');
     }
 
     function setScheduleDefaults() {
@@ -848,7 +907,7 @@
         for(let j=0; j<items.length; j++) {
           const item = items[j];
           const timeStr = item.endTime ? ((item.startTime||'--:--') + ' ～ ' + item.endTime) : (item.startTime||'--:--');
-          html += '<div class="swipe-container schedule-swipe"><div class="swipe-content schedule-card">';
+          html += '<div class="schedule-swipe"><div class="schedule-card">';
           html += '<div class="schedule-time">' + escapeHtml(timeStr) + '</div>';
           html += '<div style="min-width:0;"><div class="schedule-place">' + escapeHtml(item.place||'未命名') + '</div>';
           
@@ -859,12 +918,11 @@
           } else if (item.photoUrl) {
             metaHtml += '<span style="cursor:pointer;" onclick="event.stopPropagation(); openLightbox(\'' + escapeHtml(item.photoUrl) + '\')"> 📷</span>';
           }
-          html += '<div class="schedule-meta">' + metaHtml + '</div></div></div>';
-          
-          html += '<div class="swipe-actions">';
-          html += '<button class="schedule-action" onclick="openEditSchedule(' + Number(item.id) + ')">✏️</button>';
-          html += '<button class="schedule-action" onclick="deleteSchedule(' + Number(item.id) + ')">🗑</button>';
-          html += '</div></div>';
+          html += '<div class="schedule-meta">' + metaHtml + '</div></div>';
+          html += '<div class="item-actions">';
+          html += '<button class="schedule-action" aria-label="編輯行程" title="編輯行程" onclick="openEditSchedule(' + Number(item.id) + ')">✏️</button>';
+          html += '<button class="schedule-action" aria-label="刪除行程" title="刪除行程" onclick="deleteSchedule(' + Number(item.id) + ')">🗑</button>';
+          html += '</div></div></div>';
         }
         html += '</div></div>';
       }
@@ -1076,8 +1134,8 @@
             }
           }
 
-          itemsHtml += '<div class="swipe-container buy-swipe"><div class="swipe-content buy-item-line">';
-          itemsHtml += '<div class="checkbox-custom ' + (item.bought ? 'checked' : '') + '" onclick="toggleBuyItem(' + Number(item.id) + ')"></div>';
+          itemsHtml += '<div class="buy-swipe"><div class="buy-item-line">';
+          itemsHtml += '<button type="button" class="checkbox-custom ' + (item.bought ? 'checked' : '') + '" role="checkbox" aria-label="' + (item.bought ? '標記為未購買' : '標記為已購買') + '" aria-checked="' + String(!!item.bought) + '" onclick="toggleBuyItem(' + Number(item.id) + ')"></button>';
           itemsHtml += '<div class="buy-item-body">';
           
           if (item.photoFileId) {
@@ -1089,12 +1147,11 @@
           itemsHtml += '<div class="buy-item-content"><div class="buy-item-name" style="' + (item.bought ? 'text-decoration:line-through; color:#8e8e93;' : '') + '">' + escapeHtml(item.name||'') + '</div>';
           itemsHtml += '<div class="buy-item-meta">' + metaText + '</div>';
           itemsHtml += '<div class="buy-item-price">' + priceHtml + '</div>';
-          itemsHtml += '</div></div></div>';
-          
-          itemsHtml += '<div class="swipe-actions">';
-          itemsHtml += '<button class="buy-action" onclick="openEditBuyItem(' + Number(item.id) + ')">✏️</button>';
-          itemsHtml += '<button class="buy-action" onclick="deleteBuyItem(' + Number(item.id) + ')">🗑</button>';
           itemsHtml += '</div></div>';
+          itemsHtml += '<div class="item-actions">';
+          itemsHtml += '<button class="buy-action" aria-label="編輯代購" title="編輯代購" onclick="openEditBuyItem(' + Number(item.id) + ')">✏️</button>';
+          itemsHtml += '<button class="buy-action" aria-label="刪除代購" title="刪除代購" onclick="deleteBuyItem(' + Number(item.id) + ')">🗑</button>';
+          itemsHtml += '</div></div></div>';
         }
         
         html += '<div class="buy-owner-section"><div class="buy-owner-header"><div><div class="buy-owner-title">👤 ' + escapeHtml(owner) + '</div><div class="buy-owner-summary">' + items.length + ' 項・已購 ' + boughtCount + ' 項</div></div><div style="font-size:12px; font-weight:800;">¥' + formatNumber(boughtAmount) + '</div></div><div class="buy-owner-items" id="owner-' + k + '">';
