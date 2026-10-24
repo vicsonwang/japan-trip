@@ -416,6 +416,7 @@
               <div class="form-group full"><label class="form-label">地點 / 行程</label><input id="sch-place" class="form-input" type="text" placeholder="例如：大阪城、USJ、心齋橋" required></div>
               <div class="form-group"><label class="form-label">預估時間</label><input id="sch-duration" class="form-input" type="text" placeholder="例如：2 小時"></div>
               <div class="form-group"><label class="form-label">照片</label><input id="sch-photo" class="form-input" type="file" accept="image/*"><div id="sch-photo-preview" class="photo-preview"></div><div id="sch-photo-status" class="photo-status"></div></div>
+              <div class="form-group full"><label class="form-label" for="sch-notes">備註</label><textarea id="sch-notes" class="form-textarea" rows="3" placeholder="例如：預約資訊、集合地點、要買的東西…"></textarea></div>
             </div>
             <div class="form-actions">
               <button type="button" class="btn btn-secondary" onclick="toggleScheduleForm(false)">取消</button>
@@ -580,6 +581,7 @@
           <div class="form-group full"><label class="form-label">地點 / 行程</label><input id="edit-sch-place" class="form-input" type="text" required></div>
           <div class="form-group"><label class="form-label">預估時間</label><input id="edit-sch-duration" class="form-input" type="text"></div>
           <div class="form-group"><label class="form-label">更換照片</label><input id="edit-sch-photo" class="form-input" type="file" accept="image/*"><div id="edit-sch-photo-preview" class="photo-preview"></div><div id="edit-sch-photo-status" class="photo-status"></div></div>
+          <div class="form-group full"><label class="form-label" for="edit-sch-notes">備註</label><textarea id="edit-sch-notes" class="form-textarea" rows="3" placeholder="新增或修改這筆行程的備註…"></textarea></div>
         </div>
         <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('edit-sch-modal')">取消</button><button type="submit" class="btn btn-primary">儲存修改</button></div>
       </form>
@@ -1105,7 +1107,7 @@
             const uploaded = await uploadPhoto(photoFile, 'schedule');
             photoFileId = uploaded.fileId || null; photoUrl = uploaded.photoUrl || null;
           }
-          const newItem = { id: Date.now(), date: document.getElementById('sch-date').value, day: document.getElementById('sch-day').value.trim(), startTime: document.getElementById('sch-start').value, endTime: document.getElementById('sch-end').value, place: document.getElementById('sch-place').value.trim(), duration: document.getElementById('sch-duration').value.trim(), photoFileId: photoFileId, photoUrl: photoUrl, createdBy: user.uid, createdAt: Date.now() };
+          const newItem = { id: Date.now(), date: document.getElementById('sch-date').value, day: document.getElementById('sch-day').value.trim(), startTime: document.getElementById('sch-start').value, endTime: document.getElementById('sch-end').value, place: document.getElementById('sch-place').value.trim(), duration: document.getElementById('sch-duration').value.trim(), notes: document.getElementById('sch-notes').value.trim(), photoFileId: photoFileId, photoUrl: photoUrl, createdBy: user.uid, createdAt: Date.now() };
           const schedules = Array.isArray(trip.schedules) ? trip.schedules.slice() : []; schedules.push(newItem);
           await db.collection('trips').doc(trip.id).update({ schedules: schedules });
           event.target.reset(); clearPhotoSelection('sch-photo', 'sch-photo-preview'); toggleScheduleForm(false);
@@ -1615,6 +1617,7 @@
       document.getElementById('edit-sch-end').value = item.endTime || '';
       document.getElementById('edit-sch-place').value = item.place || '';
       document.getElementById('edit-sch-duration').value = item.duration || '';
+      document.getElementById('edit-sch-notes').value = item.notes || '';
       document.getElementById('edit-sch-photo').value = '';
       document.getElementById('edit-sch-modal').classList.add('show');
       await showPhotoPreview('edit-sch-photo', 'edit-sch-photo-preview', item.photoUrl || '', item.photoFileId || '');
@@ -1646,7 +1649,7 @@
           const editedDuration = document.getElementById('edit-sch-duration').value.trim();
           const editedType = inferScheduleType(schedules[index]);
           const structuredDuration = schedules[index].travelTime || schedules[index].stayTime;
-          schedules[index] = Object.assign({}, schedules[index], { date: document.getElementById('edit-sch-date').value, day: document.getElementById('edit-sch-day').value.trim(), startTime: document.getElementById('edit-sch-start').value, endTime: document.getElementById('edit-sch-end').value, place: document.getElementById('edit-sch-place').value.trim(), duration: editedDuration, travelTime: structuredDuration && editedType === 'transport' ? editedDuration : (schedules[index].travelTime || ''), stayTime: structuredDuration && editedType !== 'transport' ? editedDuration : (schedules[index].stayTime || ''), photoFileId: photoFileId, photoUrl: photoUrl, updatedAt: Date.now() });
+          schedules[index] = Object.assign({}, schedules[index], { date: document.getElementById('edit-sch-date').value, day: document.getElementById('edit-sch-day').value.trim(), startTime: document.getElementById('edit-sch-start').value, endTime: document.getElementById('edit-sch-end').value, place: document.getElementById('edit-sch-place').value.trim(), duration: editedDuration, notes: document.getElementById('edit-sch-notes').value.trim(), travelTime: structuredDuration && editedType === 'transport' ? editedDuration : (schedules[index].travelTime || ''), stayTime: structuredDuration && editedType !== 'transport' ? editedDuration : (schedules[index].stayTime || ''), photoFileId: photoFileId, photoUrl: photoUrl, updatedAt: Date.now() });
           await db.collection('trips').doc(trip.id).update({ schedules: schedules });
           event.target.reset(); clearPhotoSelection('edit-sch-photo', 'edit-sch-photo-preview'); closeModal('edit-sch-modal');
         } catch (err) { alert('修改失敗：\n' + err.message); } finally { submitBtn.disabled = false; submitBtn.textContent = '儲存修改'; }
