@@ -124,6 +124,24 @@
     .form-input, .form-select, .form-textarea { width: 100%; border: 1px solid #d2d2d7; background: #fff; border-radius: 11px; min-height: 42px; padding: 9px 11px; outline: none; font-size: 14px; color: #1d1d1f; }
     .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #007aff; box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1); }
     .form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+    /* Schedule import */
+    .import-help { margin: 0 0 12px; color: #696260; font-size: 13px; line-height: 1.6; }
+    .import-format { margin: 0 0 14px; padding: 12px; border: 2px dashed var(--ink); border-radius: 13px; background: #fff8df; font-size: 12px; line-height: 1.55; white-space: pre-wrap; }
+    .import-textarea { min-height: 220px; resize: vertical; line-height: 1.55; }
+    .import-preview { display: none; margin-top: 16px; }
+    .import-preview.show { display: block; }
+    .import-summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; font-size: 13px; font-weight: 800; }
+    .import-day { margin-bottom: 14px; }
+    .import-day-title { margin-bottom: 7px; font-size: 13px; font-weight: 800; }
+    .import-row { display: grid; grid-template-columns: 26px 62px minmax(0,1fr); gap: 9px; align-items: start; padding: 10px; border: 2px solid var(--ink); border-radius: 13px; background: #fff; margin-bottom: 8px; }
+    .import-row.has-warning { background: #fff4e5; }
+    .import-check { width: 22px; height: 22px; margin: 1px 0 0; accent-color: #4d8ba4; }
+    .import-row-time { font-size: 12px; font-weight: 800; line-height: 1.45; }
+    .import-row-title { font-size: 14px; font-weight: 800; line-height: 1.4; }
+    .import-row-meta { margin-top: 3px; color: #696260; font-size: 12px; line-height: 1.45; }
+    .import-warning { margin-top: 5px; color: #a04126; font-size: 11px; font-weight: 700; }
+    .import-errors { display: none; margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: #fff0ed; color: #923f2c; font-size: 12px; line-height: 1.5; }
+    .import-errors.show { display: block; }
     /* Modal */
     .modal { position: fixed; inset: 0; z-index: 2000; background: rgba(0, 0, 0, 0.42); display: none; align-items: flex-end; justify-content: center; padding: 0; }
     .modal.show { display: flex; }
@@ -223,6 +241,8 @@
       .nav-btn{min-height:48px}
       .icon-btn,.modal-close{min-width:44px;min-height:44px}
       .form-input,.form-select,.form-textarea{min-height:46px;font-size:16px}
+      .import-textarea{min-height:240px}
+      .import-row{grid-template-columns:26px 58px minmax(0,1fr);padding:9px 8px;gap:7px}
       .modal{align-items:stretch}
       .modal-card{width:100%;height:100dvh;max-height:100dvh;border:0;border-radius:0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));overflow-y:auto}
       .modal-header{position:sticky;top:-18px;z-index:3;background:#fff;padding:18px 0 10px;margin-bottom:8px}
@@ -310,6 +330,7 @@
       <div id="schedule-tab">
         <div class="toolbar">
           <button class="btn btn-primary btn-small" onclick="openAddSchedule()">＋ 新增行程</button>
+          <button class="btn btn-secondary btn-small" onclick="openImportSchedule()">📋 匯入行程</button>
           <button class="btn btn-secondary btn-small" onclick="showSyncStatus()">☁ 同步中</button>
         </div>
         <div id="sch-form-body" class="form-card" style="display:none;">
@@ -368,6 +389,43 @@
       <button id="nav-buy" class="nav-btn" onclick="navigateToTripTab('buy')">🛍<br>代購</button>
     </div>
   </nav>
+
+  <!-- Import Schedule Modal -->
+  <div id="import-schedule-modal" class="modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title">📋 匯入行程草稿</h2>
+        <button class="modal-close" aria-label="關閉匯入行程" onclick="closeImportSchedule()">×</button>
+      </div>
+      <p class="import-help">把 ChatGPT 產生的固定格式貼在下方。系統會先產生預覽，確認後才加入旅程，不會覆蓋原有行程。</p>
+      <details>
+        <summary style="cursor:pointer;font-size:13px;font-weight:800;margin-bottom:8px;">查看格式範例</summary>
+        <pre class="import-format">DAY 1｜2026-09-25
+
+07:00-08:50｜交通
+關西機場 → 京都站
+方式：HARUKA
+交通時間：1小時50分
+
+10:00-11:30｜景點
+Nintendo KYOTO
+停留時間：1小時30分
+備註：京都高島屋 S.C. T8 7樓</pre>
+      </details>
+      <label class="form-label" for="import-schedule-text">貼上行程內容</label>
+      <textarea id="import-schedule-text" class="form-textarea import-textarea" placeholder="從 DAY 1｜YYYY-MM-DD 開始貼上…"></textarea>
+      <div id="import-schedule-errors" class="import-errors" role="alert"></div>
+      <div id="import-schedule-preview" class="import-preview">
+        <div class="import-summary"><span id="import-schedule-summary"></span><button type="button" class="btn btn-secondary btn-small" onclick="toggleAllImportedSchedules()">全選／取消</button></div>
+        <div id="import-schedule-list"></div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeImportSchedule()">取消</button>
+        <button id="parse-import-btn" type="button" class="btn btn-secondary" onclick="previewImportedSchedules()">產生預覽</button>
+        <button id="save-import-btn" type="button" class="btn btn-primary" onclick="saveImportedSchedules()" style="display:none;">加入選取行程</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Create Trip Modal -->
   <div id="create-trip-modal" class="modal">
@@ -909,7 +967,7 @@
           const timeStr = item.endTime ? ((item.startTime||'--:--') + ' ～ ' + item.endTime) : (item.startTime||'--:--');
           html += '<div class="schedule-swipe"><div class="schedule-card">';
           html += '<div class="schedule-time">' + escapeHtml(timeStr) + '</div>';
-          html += '<div style="min-width:0;"><div class="schedule-place">' + escapeHtml(item.place||'未命名') + '</div>';
+          html += '<div style="min-width:0;"><div class="schedule-place">' + getScheduleTypeIcon(item.itemType) + (item.itemType ? ' ' : '') + escapeHtml(item.place||'未命名') + '</div>';
           
           let metaHtml = '';
           if (item.duration) metaHtml += '⏱ ' + escapeHtml(item.duration) + ' ';
@@ -945,6 +1003,225 @@
     }
 
     function toggleDayGroup(date) { const g = document.getElementById('day-group-' + date); if (g) g.style.display = g.style.display === 'none' ? 'flex' : 'none'; }
+
+    let importedScheduleDrafts = [];
+
+    function normalizeImportDate(value) {
+      const match = String(value || '').trim().match(/^(\d{4})[\/.\-](\d{1,2})[\/.\-](\d{1,2})$/);
+      if (!match) return '';
+      const date = match[1] + '-' + String(match[2]).padStart(2, '0') + '-' + String(match[3]).padStart(2, '0');
+      const parsed = new Date(date + 'T00:00:00');
+      const valid = !isNaN(parsed.getTime()) && parsed.getFullYear() === Number(match[1]) && parsed.getMonth() + 1 === Number(match[2]) && parsed.getDate() === Number(match[3]);
+      return valid ? date : '';
+    }
+
+    function minutesFromTime(value) {
+      const match = String(value || '').match(/^(\d{1,2}):(\d{2})$/);
+      if (!match) return null;
+      const hours = Number(match[1]), minutes = Number(match[2]);
+      return hours < 24 && minutes < 60 ? hours * 60 + minutes : null;
+    }
+
+    function importTypeInfo(label) {
+      const value = String(label || '').trim();
+      if (/交通|移動/.test(value)) return { value: 'transport', label: '交通', icon: '🚆' };
+      if (/餐廳|美食|用餐/.test(value)) return { value: 'food', label: '餐廳', icon: '🍜' };
+      if (/住宿|飯店|旅館/.test(value)) return { value: 'hotel', label: '住宿', icon: '🏨' };
+      if (/購物|逛街/.test(value)) return { value: 'shopping', label: '購物', icon: '🛍' };
+      return { value: 'activity', label: value || '景點', icon: '📍' };
+    }
+
+    function getScheduleTypeIcon(value) {
+      return ({ transport: '🚆', food: '🍜', hotel: '🏨', shopping: '🛍', activity: '📍' })[value] || '';
+    }
+
+    function parseImportedScheduleText(text) {
+      const lines = String(text || '').replace(/\r/g, '').split('\n');
+      const drafts = [], errors = [];
+      let activeDate = '', activeDay = '', current = null;
+
+      function finishCurrent() {
+        if (!current) return;
+        current.title = current.title.trim();
+        if (!current.title) current.warnings.push('缺少行程名稱');
+        if (!current.date) current.warnings.push('缺少或無法辨識日期');
+        if (minutesFromTime(current.startTime) === null || minutesFromTime(current.endTime) === null) current.warnings.push('時間格式不正確');
+        if (minutesFromTime(current.startTime) !== null && minutesFromTime(current.endTime) !== null && minutesFromTime(current.endTime) <= minutesFromTime(current.startTime)) current.warnings.push('結束時間必須晚於開始時間');
+        const typeInfo = importTypeInfo(current.typeLabel);
+        const detailParts = [];
+        const mode = current.details['方式'] || current.details['交通方式'] || '';
+        const duration = current.details['交通時間'] || current.details['停留時間'] || current.details['預計時間'] || '';
+        const route = current.details['路線／車次'] || current.details['路線/車次'] || current.details['路線'] || current.details['車次'] || '';
+        const address = current.details['地址'] || '';
+        const note = current.details['備註'] || '';
+        if (mode) detailParts.push(mode);
+        if (duration) detailParts.push((typeInfo.value === 'transport' ? '交通 ' : '停留 ') + duration);
+        if (route) detailParts.push(route);
+        if (address) detailParts.push(address);
+        if (note) detailParts.push(note);
+        current.itemType = typeInfo.value;
+        current.typeName = typeInfo.label;
+        current.icon = typeInfo.icon;
+        current.day = getDayLabel(current.date);
+        current.place = current.title;
+        current.duration = detailParts.join('・');
+        current.transportMode = mode;
+        current.notes = note;
+        current.selected = current.warnings.length === 0;
+        drafts.push(current);
+        current = null;
+      }
+
+      for (let index = 0; index < lines.length; index++) {
+        const line = lines[index].trim();
+        if (!line) continue;
+        const dayMatch = line.match(/^DAY\s*(\d+)\s*[｜|]\s*(\S+)/i);
+        if (dayMatch) {
+          finishCurrent();
+          activeDay = 'DAY ' + dayMatch[1];
+          activeDate = normalizeImportDate(dayMatch[2]);
+          if (!activeDate) errors.push('第 ' + (index + 1) + ' 行的日期無法辨識：' + line);
+          continue;
+        }
+        const itemMatch = line.match(/^(\d{1,2}:\d{2})\s*[-–—~～至]\s*(\d{1,2}:\d{2})\s*[｜|]\s*(.+)$/);
+        if (itemMatch) {
+          finishCurrent();
+          current = { date: activeDate, dayLabel: activeDay, startTime: itemMatch[1].padStart(5, '0'), endTime: itemMatch[2].padStart(5, '0'), typeLabel: itemMatch[3].trim(), title: '', details: {}, extra: [], warnings: [], sourceLine: index + 1 };
+          continue;
+        }
+        if (!current) {
+          errors.push('第 ' + (index + 1) + ' 行沒有對應的日期或時間：' + line);
+          continue;
+        }
+        const detailMatch = line.match(/^([^：:]{1,14})[：:]\s*(.+)$/);
+        if (detailMatch) current.details[detailMatch[1].trim()] = detailMatch[2].trim();
+        else if (!current.title) current.title = line;
+        else current.extra.push(line);
+      }
+      finishCurrent();
+
+      const byDate = {};
+      drafts.forEach(function(item) {
+        if (!byDate[item.date]) byDate[item.date] = [];
+        byDate[item.date].push(item);
+        if (item.extra.length) item.duration += (item.duration ? '・' : '') + item.extra.join('・');
+      });
+      Object.keys(byDate).forEach(function(date) {
+        const sorted = byDate[date].slice().sort(function(a, b) { return (a.startTime || '').localeCompare(b.startTime || ''); });
+        for (let i = 1; i < sorted.length; i++) {
+          if (minutesFromTime(sorted[i].startTime) < minutesFromTime(sorted[i - 1].endTime)) {
+            sorted[i].warnings.push('與上一筆行程時間重疊');
+          }
+        }
+      });
+
+      const trip = getCurrentTrip();
+      const existing = trip && Array.isArray(trip.schedules) ? trip.schedules : [];
+      drafts.forEach(function(item) {
+        if (existing.some(function(saved) { return saved.date === item.date && saved.startTime === item.startTime && String(saved.place || '').trim() === item.place; })) {
+          item.warnings.push('旅程中已有相同時間與名稱的行程');
+          item.selected = false;
+        }
+      });
+      return { drafts: drafts, errors: errors };
+    }
+
+    function openImportSchedule() {
+      closeAllQuickPanels();
+      importedScheduleDrafts = [];
+      document.getElementById('import-schedule-text').value = '';
+      document.getElementById('import-schedule-errors').classList.remove('show');
+      document.getElementById('import-schedule-preview').classList.remove('show');
+      document.getElementById('save-import-btn').style.display = 'none';
+      document.getElementById('parse-import-btn').style.display = '';
+      document.getElementById('import-schedule-modal').classList.add('show');
+      setTimeout(function() { document.getElementById('import-schedule-text').focus(); }, 50);
+    }
+
+    function closeImportSchedule() {
+      importedScheduleDrafts = [];
+      closeModal('import-schedule-modal');
+    }
+
+    function previewImportedSchedules() {
+      const text = document.getElementById('import-schedule-text').value;
+      const result = parseImportedScheduleText(text);
+      importedScheduleDrafts = result.drafts;
+      const errorBox = document.getElementById('import-schedule-errors');
+      if (!importedScheduleDrafts.length) result.errors.unshift('沒有找到可匯入的行程，請確認格式是否包含 DAY、日期與時間。');
+      errorBox.textContent = result.errors.join('\n');
+      errorBox.classList.toggle('show', result.errors.length > 0);
+      renderImportedSchedulePreview();
+    }
+
+    function renderImportedSchedulePreview() {
+      const preview = document.getElementById('import-schedule-preview');
+      const saveBtn = document.getElementById('save-import-btn');
+      if (!importedScheduleDrafts.length) {
+        preview.classList.remove('show');
+        saveBtn.style.display = 'none';
+        return;
+      }
+      const groups = {};
+      importedScheduleDrafts.forEach(function(item, index) {
+        if (!groups[item.date || '未指定日期']) groups[item.date || '未指定日期'] = [];
+        groups[item.date || '未指定日期'].push({ item: item, index: index });
+      });
+      let html = '';
+      Object.keys(groups).sort().forEach(function(date) {
+        html += '<div class="import-day"><div class="import-day-title">' + escapeHtml(formatDate(date)) + '・' + escapeHtml(getDayLabel(date)) + '</div>';
+        groups[date].forEach(function(entry) {
+          const item = entry.item;
+          html += '<div class="import-row ' + (item.warnings.length ? 'has-warning' : '') + '">';
+          html += '<input class="import-check" type="checkbox" data-import-index="' + entry.index + '" ' + (item.selected ? 'checked' : '') + ' aria-label="選取 ' + escapeHtml(item.place || '未命名行程') + '">';
+          html += '<div class="import-row-time">' + escapeHtml(item.startTime) + '<br>↓<br>' + escapeHtml(item.endTime) + '</div>';
+          html += '<div><div class="import-row-title">' + item.icon + ' ' + escapeHtml(item.place || '未命名行程') + '</div><div class="import-row-meta">' + escapeHtml(item.typeName + (item.duration ? '・' + item.duration : '')) + '</div>';
+          if (item.warnings.length) html += '<div class="import-warning">⚠ ' + escapeHtml(item.warnings.join('；')) + '</div>';
+          html += '</div></div>';
+        });
+        html += '</div>';
+      });
+      document.getElementById('import-schedule-list').innerHTML = html;
+      document.getElementById('import-schedule-summary').textContent = '解析到 ' + importedScheduleDrafts.length + ' 筆行程';
+      preview.classList.add('show');
+      saveBtn.style.display = '';
+      document.getElementById('parse-import-btn').textContent = '重新解析';
+      document.querySelectorAll('[data-import-index]').forEach(function(input) {
+        input.addEventListener('change', function() { importedScheduleDrafts[Number(input.dataset.importIndex)].selected = input.checked; });
+      });
+    }
+
+    function toggleAllImportedSchedules() {
+      if (!importedScheduleDrafts.length) return;
+      const shouldSelect = importedScheduleDrafts.some(function(item) { return !item.selected && !item.warnings.length; });
+      importedScheduleDrafts.forEach(function(item) { item.selected = shouldSelect && !item.warnings.length; });
+      renderImportedSchedulePreview();
+    }
+
+    async function saveImportedSchedules() {
+      const user = auth.currentUser, trip = getCurrentTrip();
+      if (!user || !trip) return alert('請先登入並選擇旅程');
+      const selected = importedScheduleDrafts.filter(function(item) { return item.selected && !item.warnings.length; });
+      if (!selected.length) return alert('請至少選取一筆沒有警告的行程');
+      const button = document.getElementById('save-import-btn');
+      button.disabled = true; button.textContent = '匯入中…';
+      try {
+        const now = Date.now();
+        const additions = selected.map(function(item, index) {
+          return { id: now + index, date: item.date, day: item.day, startTime: item.startTime, endTime: item.endTime, place: item.place, duration: item.duration, itemType: item.itemType, transportMode: item.transportMode, notes: item.notes, importedFrom: 'text-v1', createdBy: user.uid, createdAt: now + index };
+        });
+        const schedules = (Array.isArray(trip.schedules) ? trip.schedules.slice() : []).concat(additions);
+        await db.collection('trips').doc(trip.id).update({ schedules: schedules });
+        trip.schedules = schedules;
+        closeImportSchedule();
+        renderSchedules();
+        alert('已匯入 ' + additions.length + ' 筆行程，你可以使用每筆右側的編輯按鈕繼續調整。');
+      } catch (error) {
+        alert('匯入失敗：\n' + (error.message || error));
+      } finally {
+        button.disabled = false; button.textContent = '加入選取行程';
+      }
+    }
 
     async function openEditSchedule(id) {
       const trip = getCurrentTrip(); if (!trip) return;
