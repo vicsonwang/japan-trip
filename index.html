@@ -213,7 +213,8 @@
     .schedule-swipe.type-shopping{--type-bg:#e8f4df;--type-accent:#608e43}
     .schedule-swipe .schedule-card{background:linear-gradient(90deg,var(--type-bg) 0 8px,#fff 8px);border-left:0}
     .schedule-swipe .schedule-time{background:var(--type-bg);border-color:var(--type-accent);color:var(--ink)}
-    .schedule-type-pill{display:inline-flex;align-items:center;gap:4px;margin-bottom:6px;padding:3px 8px;border:1.5px solid var(--type-accent);border-radius:999px;background:var(--type-bg);color:var(--ink);font-size:11px;font-weight:800}
+    .schedule-heading-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:6px}
+    .schedule-type-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border:1.5px solid var(--type-accent);border-radius:999px;background:var(--type-bg);color:var(--ink);font-size:11px;font-weight:800}
     .schedule-detail-grid{display:grid;gap:5px;margin-top:8px}
     .schedule-detail{display:grid;grid-template-columns:74px minmax(0,1fr);gap:7px;align-items:start;font-size:12px;line-height:1.5}
     .schedule-detail-label{color:#696260;font-weight:800}
@@ -221,7 +222,7 @@
     .schedule-note{margin-top:8px;padding:8px 9px;border:1.5px dashed var(--type-accent);border-radius:10px;background:var(--type-bg);font-size:12px;line-height:1.5;word-break:break-word}
     .schedule-note strong{display:block;margin-bottom:2px;font-size:11px;color:#696260}
     .schedule-card-tools{display:flex;flex-direction:column;align-items:center;gap:7px;align-self:center}
-    .schedule-nav{min-width:42px;height:36px;padding:0 9px;border:2px solid var(--ink);border-radius:10px;background:#dff2ff;color:var(--ink);font-size:12px;font-weight:800;box-shadow:2px 2px 0 var(--ink);cursor:pointer}
+    .schedule-nav{height:28px;padding:0 9px;border:1.5px solid var(--ink);border-radius:999px;background:#dff2ff;color:var(--ink);font-size:11px;font-weight:800;cursor:pointer}
     .desktop-schedule-actions{display:flex;gap:7px}
     .mobile-swipe-action{display:none}
     .swipe-hint{display:none}
@@ -253,26 +254,30 @@
       .hero-count strong{font-size:18px}
       .toolbar{position:sticky;top:74px;z-index:80;margin:0 -4px 14px;padding:7px 4px;background:rgba(255,252,246,.96)}
       .toolbar .btn{min-height:44px;font-size:13px}
-      .schedule-manage-wrap{margin-left:auto}
+      .schedule-toolbar{display:flex;flex-wrap:nowrap;gap:5px;overflow:visible}
+      .schedule-toolbar>.btn,.schedule-toolbar>.schedule-manage-wrap{flex:1 1 0;min-width:0}
+      .schedule-toolbar>.btn,.schedule-toolbar>.schedule-manage-wrap>.btn{width:100%;min-height:40px;padding:0 4px;font-size:11px;white-space:nowrap}
+      .schedule-manage-wrap{margin-left:0}
       .schedule-manage-panel{position:fixed;top:132px;right:14px;width:210px}
       .import-mode-grid{grid-template-columns:1fr}
       .schedule-list{padding-left:12px;gap:13px}
       .schedule-swipe{overflow:hidden;display:block;touch-action:pan-y}
       .buy-swipe{overflow:visible;display:block}
-      .schedule-card{grid-template-columns:67px minmax(0,1fr) auto;gap:9px;padding:12px;touch-action:pan-y;will-change:transform}
+      .schedule-card{grid-template-columns:67px minmax(0,1fr);gap:9px;padding:12px;touch-action:pan-y;will-change:transform}
       .schedule-time{font-size:11px}
       .schedule-place{font-size:15px}
       .schedule-meta{font-size:12px;line-height:1.45}
       .schedule-detail{grid-template-columns:68px minmax(0,1fr);font-size:12px}
       .item-actions{display:flex;flex-direction:column;gap:7px;align-self:center}
       .desktop-schedule-actions{display:none}
+      .schedule-card-tools{display:none}
       .mobile-swipe-action{position:absolute;top:0;bottom:0;width:82px;display:flex;align-items:center;justify-content:center;z-index:1}
       .mobile-swipe-action.edit{left:0;background:#dff2ff}
       .mobile-swipe-action.delete{right:0;background:#ffdcd6}
       .mobile-swipe-action button{width:100%;height:100%;border:0;background:transparent;color:var(--ink);font-size:12px;font-weight:900}
       .schedule-swipe.reveal-edit .schedule-card{transform:translateX(82px)}
       .schedule-swipe.reveal-delete .schedule-card{transform:translateX(-82px)}
-      .schedule-nav{min-width:44px;height:40px;padding:0 7px;box-shadow:none}
+      .schedule-nav{height:28px;padding:0 8px}
       .swipe-hint{display:block;margin:-3px 0 13px;padding:8px 11px;border:1.5px dashed #8b817a;border-radius:10px;background:#fff8df;font-size:12px;font-weight:700;text-align:center}
       .schedule-action,.buy-action{width:40px;height:40px;font-size:16px;box-shadow:none}
       .buy-item-line{grid-template-columns:24px minmax(0,1fr) 42px;padding:12px 10px;gap:8px}
@@ -373,7 +378,7 @@
 
       <!-- Schedule Tab -->
       <div id="schedule-tab">
-        <div class="toolbar">
+        <div class="toolbar schedule-toolbar">
           <button class="btn btn-primary btn-small" onclick="openAddSchedule()">＋ 新增行程</button>
           <button class="btn btn-secondary btn-small" onclick="openImportSchedule()">📋 匯入行程</button>
           <button class="btn btn-secondary btn-small" onclick="showSyncStatus()">☁ 同步中</button>
@@ -1031,13 +1036,42 @@
       return 'transit';
     }
 
+    function getPreviousScheduleDestination(trip, id) {
+      const schedules = (trip && Array.isArray(trip.schedules) ? trip.schedules.slice() : []).sort(function(a, b) {
+        return ((a.date || '') + ' ' + (a.startTime || '')).localeCompare((b.date || '') + ' ' + (b.startTime || ''));
+      });
+      const index = schedules.findIndex(function(entry) { return Number(entry.id) === Number(id); });
+      return index > 0 ? getScheduleDestination(schedules[index - 1]) : '';
+    }
+
     function openScheduleNavigation(id) {
       const trip = getCurrentTrip();
       const item = trip && (trip.schedules || []).find(function(entry) { return Number(entry.id) === Number(id); });
       const destination = getScheduleDestination(item);
       if (!destination) return alert('這個行程還沒有可導航的地點');
-      const url = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(destination) + '&travelmode=' + getScheduleTravelMode(item);
-      window.open(url, '_blank', 'noopener');
+      const previous = getPreviousScheduleDestination(trip, id);
+      const mapWindow = window.open('about:blank', '_blank');
+      if (mapWindow) mapWindow.opener = null;
+      const openMap = function(useCurrentLocation) {
+        let url;
+        if (useCurrentLocation) {
+          url = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(destination) + '&travelmode=' + getScheduleTravelMode(item);
+        } else if (previous) {
+          url = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(previous) + '&destination=' + encodeURIComponent(destination) + '&travelmode=' + getScheduleTravelMode(item);
+        } else {
+          url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(destination);
+        }
+        if (mapWindow) mapWindow.location.href = url;
+        else window.location.href = url;
+      };
+      if (!navigator.geolocation) return openMap(false);
+      navigator.geolocation.getCurrentPosition(function(position) {
+        const lat = position.coords.latitude, lng = position.coords.longitude;
+        const inJapan = lat >= 24 && lat <= 46 && lng >= 123 && lng <= 146;
+        openMap(inJapan);
+      }, function() {
+        openMap(false);
+      }, { enableHighAccuracy: false, timeout: 5000, maximumAge: 300000 });
     }
 
     function setupScheduleSwipeActions(list) {
@@ -1122,7 +1156,7 @@
           html += '<div class="mobile-swipe-action delete"><button type="button" onclick="deleteSchedule(' + Number(item.id) + ')">🗑<br>刪除</button></div>';
           html += '<div class="schedule-card">';
           html += '<div class="schedule-time">' + escapeHtml(timeStr) + '</div>';
-          html += '<div style="min-width:0;"><div class="schedule-type-pill">' + getScheduleTypeIcon(scheduleType) + ' ' + getScheduleTypeLabel(scheduleType) + '</div><div class="schedule-place">' + escapeHtml(item.place||'未命名') + '</div>';
+          html += '<div style="min-width:0;"><div class="schedule-heading-row"><div class="schedule-type-pill">' + getScheduleTypeIcon(scheduleType) + ' ' + getScheduleTypeLabel(scheduleType) + '</div><button class="schedule-nav" aria-label="使用 Google 地圖導航" title="使用 Google 地圖導航" onclick="openScheduleNavigation(' + Number(item.id) + ')">🧭 導航</button></div><div class="schedule-place">' + escapeHtml(item.place||'未命名') + '</div>';
           
           let metaHtml = '';
           if (hasStructuredDetails) {
@@ -1144,7 +1178,6 @@
           }
           html += '<div class="schedule-meta">' + metaHtml + '</div></div>';
           html += '<div class="schedule-card-tools">';
-          html += '<button class="schedule-nav" aria-label="使用 Google 地圖導航" title="使用 Google 地圖導航" onclick="openScheduleNavigation(' + Number(item.id) + ')">導航</button>';
           html += '<div class="desktop-schedule-actions"><button class="schedule-action" aria-label="編輯行程" title="編輯行程" onclick="openEditSchedule(' + Number(item.id) + ')">✏️</button>';
           html += '<button class="schedule-action" aria-label="刪除行程" title="刪除行程" onclick="deleteSchedule(' + Number(item.id) + ')">🗑</button></div>';
           html += '</div></div></div>';
