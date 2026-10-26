@@ -223,8 +223,9 @@
     .schedule-swipe.type-food{--type-bg:#fff1c7;--type-accent:#b57a12}
     .schedule-swipe.type-shopping{--type-bg:#e8f4df;--type-accent:#608e43}
     .schedule-swipe .schedule-card{background:linear-gradient(90deg,var(--type-bg) 0 8px,#fff 8px);border-left:0}
-    .schedule-swipe.has-auto-photo .schedule-card{background-image:linear-gradient(90deg,var(--type-bg) 0 8px,rgba(255,255,255,.78) 8px),linear-gradient(90deg,rgba(255,255,255,.88) 0%,rgba(255,255,255,.68) 55%,rgba(255,255,255,.35) 100%),var(--schedule-photo);background-size:auto,auto,cover;background-position:center}
-    .schedule-swipe.has-auto-photo .schedule-main{padding:9px 10px;border:1px solid rgba(62,58,57,.16);border-radius:12px;background:rgba(255,252,246,.68);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+    .schedule-swipe.has-auto-photo .schedule-card{background-image:linear-gradient(90deg,var(--type-bg) 0 8px,rgba(255,255,255,.18) 8px),linear-gradient(90deg,rgba(255,255,255,.58) 0%,rgba(255,255,255,.22) 60%,rgba(255,255,255,.08) 100%),var(--schedule-photo);background-size:auto,auto,cover;background-position:center}
+    .schedule-swipe.has-auto-photo .schedule-main{position:relative;padding:9px 10px;border:0;border-radius:12px;background:rgba(255,252,246,.30);box-shadow:0 1px 8px rgba(255,255,255,.32);backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px)}
+    .schedule-swipe.has-auto-photo .schedule-place,.schedule-swipe.has-auto-photo .schedule-detail,.schedule-swipe.has-auto-photo .schedule-note{text-shadow:0 1px 2px rgba(255,255,255,.9)}
     .schedule-swipe .schedule-time{background:var(--type-bg);border-color:var(--type-accent);color:var(--ink)}
     .schedule-heading-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:6px}
     .schedule-type-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border:1.5px solid var(--type-accent);border-radius:999px;background:var(--type-bg);color:var(--ink);font-size:11px;font-weight:800}
@@ -234,8 +235,12 @@
     .schedule-detail-value{min-width:0;word-break:break-word}
     .schedule-note{margin-top:8px;padding:8px 9px;border:1.5px dashed var(--type-accent);border-radius:10px;background:var(--type-bg);font-size:12px;line-height:1.5;word-break:break-word}
     .schedule-note strong{display:block;margin-bottom:2px;font-size:11px;color:#696260}
-    .schedule-photo-credit{display:none;align-items:center;gap:5px;flex-wrap:wrap;margin-top:8px;padding-top:6px;border-top:1px dashed rgba(62,58,57,.35);font-size:10px;line-height:1.4;color:#514b48}
-    .schedule-photo-credit.show{display:flex}
+    .schedule-photo-credit{display:none;margin-top:5px;font-size:10px;line-height:1.4;color:#514b48}
+    .schedule-photo-credit.show{display:block}
+    .schedule-photo-credit details{position:relative;display:flex;justify-content:flex-end}
+    .schedule-photo-credit summary{display:flex;align-items:center;justify-content:center;width:24px;height:24px;margin-left:auto;border:1px solid rgba(62,58,57,.5);border-radius:50%;background:rgba(255,255,255,.78);font-size:14px;font-weight:900;cursor:pointer;list-style:none;box-shadow:1px 1px 0 rgba(62,58,57,.45)}
+    .schedule-photo-credit summary::-webkit-details-marker{display:none}
+    .schedule-photo-credit-panel{position:absolute;right:0;bottom:30px;z-index:5;width:min(265px,75vw);padding:8px;border:1.5px solid var(--ink);border-radius:10px;background:rgba(255,252,246,.96);box-shadow:2px 3px 0 var(--ink)}
     .schedule-photo-credit a{color:#315e77;font-weight:800;text-decoration:underline}
     .schedule-photo-credit button{padding:1px 5px;border:1px solid #77706b;border-radius:999px;background:rgba(255,255,255,.84);color:var(--ink);font-size:10px;font-weight:800}
     .schedule-card-tools{display:flex;flex-direction:column;align-items:center;gap:7px;align-self:center}
@@ -1167,7 +1172,7 @@
       const author = photo.author ? '・' + escapeHtml(photo.author) : '';
       const license = photo.license ? '・' + escapeHtml(photo.license) : '';
       const source = photo.sourceLabel === '我的照片' ? '<span>圖片：我的照片</span>' : '<a href="' + escapeHtml(photo.pageUrl) + '" target="_blank" rel="noopener">圖片：Wikimedia Commons</a>';
-      credit.innerHTML = source + author + license + (total > 1 ? '<button type="button" onclick="changeScheduleAutoPhoto(' + Number(row.dataset.scheduleId) + ',1);event.stopPropagation()">更換 ' + (index + 1) + '/' + total + '</button>' : '') + '<button type="button" onclick="hideScheduleAutoPhoto(' + Number(row.dataset.scheduleId) + ');event.stopPropagation()">隱藏</button>';
+      credit.innerHTML = '<details onclick="event.stopPropagation()"><summary aria-label="圖片資訊與設定" title="圖片資訊與設定">ⓘ</summary><div class="schedule-photo-credit-panel">' + source + author + license + '<div style="margin-top:6px">' + (total > 1 ? '<button type="button" onclick="changeScheduleAutoPhoto(' + Number(row.dataset.scheduleId) + ',1);event.stopPropagation()">更換 ' + (index + 1) + '/' + total + '</button>' : '') + '<button type="button" onclick="hideScheduleAutoPhoto(' + Number(row.dataset.scheduleId) + ');event.stopPropagation()">隱藏圖片</button></div></div></details>';
       credit.classList.add('show');
     }
 
