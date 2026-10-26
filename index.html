@@ -1130,7 +1130,7 @@
       return (parts[parts.length - 1] || place).trim();
     }
 
-    const schedulePhotoCacheKey = 'japanTripWikimediaPhotoCacheV1';
+    const schedulePhotoCacheKey = 'japanTripWikimediaPhotoCacheV2';
     const schedulePhotoPrefKey = 'japanTripWikimediaPhotoPrefsV1';
 
     function readLocalJson(key) {
@@ -1182,20 +1182,30 @@
     }
 
     async function searchWikimediaPhotos(item) {
-      const query = [item.place, item.address, 'Japan'].filter(Boolean).join(' ');
-      const url = 'https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=' + encodeURIComponent(query + ' filetype:bitmap') + '&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url%7Cmime%7Csize%7Cextmetadata&iiurlwidth=1000&format=json&origin=*';
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Wikimedia search failed');
-      const data = await response.json();
-      const pages = data && data.query && data.query.pages ? Object.values(data.query.pages) : [];
-      return pages.map(function(page) {
+      const place = String(item.place || '').trim();
+      const address = String(item.address || '').trim();
+      const queries = [
+        [place, address, 'Japan'].filter(Boolean).join(' '),
+        [place, 'Japan'].filter(Boolean).join(' '),
+        place
+      ].filter(function(query, index, all) { return query && all.indexOf(query) === index; });
+      for (let q = 0; q < queries.length; q++) {
+        const url = 'https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=' + encodeURIComponent(queries[q] + ' filetype:bitmap') + '&gsrnamespace=6&gsrlimit=12&prop=imageinfo&iiprop=url%7Cmime%7Csize%7Cextmetadata&iiurlwidth=1000&format=json&origin=*';
+        const response = await fetch(url);
+        if (!response.ok) continue;
+        const data = await response.json();
+        const pages = data && data.query && data.query.pages ? Object.values(data.query.pages) : [];
+        const photos = pages.map(function(page) {
         const info = page.imageinfo && page.imageinfo[0];
         const meta = info && info.extmetadata ? info.extmetadata : {};
         const license = plainMetadata(meta.LicenseShortName && meta.LicenseShortName.value);
         const reusable = /^(CC0|Public domain|PD|CC BY|CC BY-SA)/i.test(license);
         if (!info || !reusable || !/^image\/(jpeg|png|webp)$/i.test(info.mime || '') || Number(info.width || 0) < 640) return null;
         return { url: info.thumburl || info.url, pageUrl: info.descriptionurl || ('https://commons.wikimedia.org/wiki/' + encodeURIComponent(page.title)), author: plainMetadata((meta.Artist && meta.Artist.value) || (meta.Credit && meta.Credit.value)).slice(0, 80), license: license };
-      }).filter(Boolean).slice(0, 5);
+        }).filter(Boolean).slice(0, 5);
+        if (photos.length) return photos;
+      }
+      return [];
     }
 
     async function loadScheduleAutoPhoto(row) {
@@ -1206,19 +1216,23 @@
       if (pref.hidden) return showHiddenSchedulePhotoState(row);
       if (item.photoUrl) return applySchedulePhoto(row, { url: item.photoUrl, pageUrl: '', author: '', license: '', sourceLabel: '我的照片' }, 0, 1);
       row.dataset.photoLoading = 'true';
+      const credit = row.querySelector('.schedule-photo-credit');
+      if (credit) { credit.textContent = '圖片搜尋中…'; credit.classList.add('show'); }
       try {
         const cache = readLocalJson(schedulePhotoCacheKey);
+        const queryKey = [item.place || '', item.address || ''].join('|');
         let entry = cache[id];
-        if (!entry || !entry.savedAt || Date.now() - entry.savedAt > 604800000) {
-          entry = { savedAt: Date.now(), photos: await searchWikimediaPhotos(item) };
+        if (!entry || entry.queryKey !== queryKey || !entry.savedAt || Date.now() - entry.savedAt > (entry.photos && entry.photos.length ? 604800000 : 300000)) {
+          entry = { savedAt: Date.now(), queryKey: queryKey, photos: await searchWikimediaPhotos(item) };
           cache[id] = entry; writeLocalJson(schedulePhotoCacheKey, cache);
         }
         const photos = entry.photos || [];
-        if (!photos.length) return;
+        if (!photos.length) { if (credit) credit.textContent = '目前找不到可自由使用的地點圖片'; return; }
         const index = Math.min(Number(pref.index || 0), photos.length - 1);
         applySchedulePhoto(row, photos[index], index, photos.length);
       } catch (error) {
         console.warn('Auto photo unavailable:', error);
+        if (credit) credit.textContent = '圖片暫時無法載入，稍後會自動重試';
       } finally {
         row.dataset.photoLoading = 'false';
       }
